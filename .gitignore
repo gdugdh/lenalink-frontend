@@ -39,3 +39,4 @@ coverage/
 .npm/
 .eslintcache
 .prettierignore
+.next
