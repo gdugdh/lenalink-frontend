@@ -25,13 +25,7 @@ export default function Page() {
         <header className="relative z-10 px-6 py-6">
           <div className="flex items-center gap-2 text-white">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#022444]">
-              <svg
-                className="h-5 w-5 text-white"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M12 2L4 7v10c0 5.5 3.8 9.3 8 10 4.2-.7 8-4.5 8-10V7l-8-5zm0 2.2L18 8v9c0 4.4-3 7.6-6 8.2-3-.6-6-3.8-6-8.2V8l6-3.8z" />
-              </svg>
+              <img src={"/logo.png"} />
             </div>
             <span className="text-2xl font-semibold">LenaLink</span>
           </div>
@@ -57,7 +51,7 @@ export default function Page() {
                   {/* From Field */}
                   <div className="space-y-2">
                     <Label className="text-xs font-normal text-gray-500 uppercase">
-                      Еду из
+                      Откуда
                     </Label>
                     <Input
                       defaultValue="Москва, Россия"
@@ -75,7 +69,7 @@ export default function Page() {
                   {/* To Field */}
                   <div className="space-y-2">
                     <Label className="text-xs font-normal text-gray-500 uppercase">
-                      В
+                      Куда
                     </Label>
                     <Input
                       defaultValue="Олекминск, Якутия"
@@ -102,16 +96,16 @@ export default function Page() {
           <div className="flex items-center justify-center gap-8 flex-wrap">
             <span className="text-sm text-gray-500">Наши партнеры:</span>
             <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
-              <span className="text-lg font-bold text-gray-700">Tutu.ru</span>
-            </div>
-            <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
-              <span className="text-lg font-bold text-gray-700">Aviasales</span>
+              <span className="text-lg font-bold text-gray-700">ГАРС</span>
             </div>
             <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
               <span className="text-lg font-bold text-gray-700">АвиБус</span>
             </div>
             <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
-              <span className="text-lg font-bold text-gray-700">ГАРС</span>
+              <span className="text-lg font-bold text-gray-700">Aviasales</span>
+            </div>
+            <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
+              <span className="text-lg font-bold text-gray-700">Tutu.ru</span>
             </div>
           </div>
         </div>

@@ -252,7 +252,7 @@ export default function SeatSelectionPage() {
                 <div className="flex justify-between">
                   <span className="font-bold text-[#022444]">Итого</span>
                   <span className="text-2xl font-bold text-[#7B91FF]">
-                    51 400₽
+                    43 500₽
                   </span>
                 </div>
               </div>

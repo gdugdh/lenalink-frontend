@@ -28,6 +28,8 @@ export default function BookingPage() {
   }, []);
 
   useEffect(() => {
+    if (!isMounted) return;
+
     // Check if script already exists
     if (document.querySelector('script[src*="api-maps.yandex.ru"]')) {
       // Script already loaded, just initialize map
@@ -147,7 +149,7 @@ export default function BookingPage() {
       }
     };
     document.head.appendChild(script);
-  }, []);
+  }, [isMounted]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,9 +179,9 @@ export default function BookingPage() {
             </h1>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
             {/* Left Side - Form */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
               {/* Route Overview */}
               <div className="rounded-lg border bg-white p-6">
                 <h2 className="mb-4 text-xl font-bold text-[#022444]">
@@ -424,7 +426,7 @@ export default function BookingPage() {
             </div>
 
             {/* Right Side - Map and Price Summary */}
-            <div className="space-y-6">
+            <div className="lg:col-span-2 space-y-6">
               {/* Yandex Map */}
               <div className="rounded-lg border bg-white p-4">
                 <h3 className="mb-3 text-lg font-bold text-[#022444]">КАРТА</h3>
