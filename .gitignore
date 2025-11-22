@@ -1,0 +1,41 @@
+# Dependency directories
+node_modules/
+jspm_packages/ # Jspm dependencies
+
+# Build output
+dist/
+build/
+.next/ # Next.js build output
+out/ # Nuxt.js build / generate output
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor/IDE specific files
+.vscode/ # VS Code settings
+.idea/ # IntelliJ IDEA settings
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Misc
+.nyc_output/
+.npm/
+.eslintcache
+.prettierignore
