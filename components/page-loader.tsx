@@ -10,7 +10,7 @@ export function PageLoader() {
     // Simulate loading for 1-2 seconds
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 500);
+    }, 130);
 
     return () => clearTimeout(timer);
   }, []);

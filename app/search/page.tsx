@@ -279,11 +279,11 @@ export default function SearchPage() {
           <main className="flex-1">
             <div className="space-y-4">
               {/* Result 1 - Optimal */}
-              <button
+              <div
                 onClick={() => setIsModalOpen(true)}
-                className="w-full text-left"
+                className="w-full text-left cursor-pointer"
               >
-                <div className="cursor-pointer rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                <div className="rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-[#00C48C] px-3 py-1 text-xs font-medium text-white">
@@ -352,14 +352,14 @@ export default function SearchPage() {
                     </div>
                   </div>
                 </div>
-              </button>
+              </div>
 
               {/* Result 2 - Cheapest */}
-              <button
+              <div
                 onClick={() => setIsModalOpen(true)}
-                className="w-full text-left"
+                className="w-full text-left cursor-pointer"
               >
-                <div className="cursor-pointer rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                <div className="rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-[#00C48C] px-3 py-1 text-xs font-medium text-white">
@@ -437,14 +437,14 @@ export default function SearchPage() {
                     </div>
                   </div>
                 </div>
-              </button>
+              </div>
 
               {/* Result 3 - Fastest */}
-              <button
+              <div
                 onClick={() => setIsModalOpen(true)}
-                className="w-full text-left"
+                className="w-full text-left cursor-pointer"
               >
-                <div className="cursor-pointer rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                <div className="rounded-lg border bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-[#00C48C] px-3 py-1 text-xs font-medium text-white">
@@ -513,7 +513,7 @@ export default function SearchPage() {
                     </div>
                   </div>
                 </div>
-              </button>
+              </div>
             </div>
           </main>
         </div>

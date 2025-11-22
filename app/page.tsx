@@ -91,18 +91,6 @@ export default function Page() {
                   </Link>
                 </div>
               </div>
-
-              {/* Booking.com Checkbox */}
-              <div className="mt-4 flex items-center gap-2 text-white text-sm">
-                <Checkbox
-                  id="booking"
-                  defaultChecked
-                  className="border-white data-[state=checked]:bg-white data-[state=checked]:text-black"
-                />
-                <label htmlFor="booking" className="cursor-pointer">
-                  Search accommodation with Booking.com
-                </label>
-              </div>
             </div>
           </div>
         </div>
