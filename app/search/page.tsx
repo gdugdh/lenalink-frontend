@@ -532,7 +532,7 @@ export default function SearchPage() {
 
         <InsuranceModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onCloseAction={() => setIsModalOpen(false)}
         />
       </div>
     </>

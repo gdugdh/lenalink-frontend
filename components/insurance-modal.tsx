@@ -5,24 +5,24 @@ import { useRouter } from "next/navigation";
 
 interface InsuranceModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onCloseAction: () => void;
 }
 
-export function InsuranceModal({ isOpen, onClose }: InsuranceModalProps) {
+export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
   const router = useRouter();
 
   if (!isOpen) return null;
 
   const handleSelectInsurance = () => {
     router.push("/booking");
-    onClose();
+    onCloseAction();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="relative flex h-[90vh] w-full max-w-6xl overflow-hidden rounded-lg bg-white shadow-xl">
         <button
-          onClick={onClose}
+          onClick={onCloseAction}
           className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-gray-300 bg-white hover:bg-gray-100"
         >
           <X className="h-6 w-6 text-[#022444]" />
