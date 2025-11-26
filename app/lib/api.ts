@@ -101,7 +101,7 @@ export const paymentApi = {
   createPayment: (bookingId: string, paymentMethod: string) =>
     apiClient.post('/payment/create', { bookingId, paymentMethod }),
   confirmPayment: (paymentId: string) =>
-    apiClient.post(`/payment/${paymentId}/confirm`),
+    apiClient.post(`/payment/${paymentId}/confirm`, {}),
 };
 
 // API методы для подтверждения
