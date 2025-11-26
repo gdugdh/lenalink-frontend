@@ -4,6 +4,7 @@ import { Check, Plane, Download, Share2, Calendar } from "lucide-react";
 import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
+import { routes } from "@/app/lib/routes";
 
 export function ConfirmationPageClient() {
   const router = useRouter();
@@ -14,23 +15,23 @@ export function ConfirmationPageClient() {
       <div className="min-h-screen bg-[#FFFFFF]">
         <UnifiedHeader />
 
-      {/* Success message */}
-      <div className="bg-gradient-to-r from-[#7B91FF] to-[#7B91FF] py-12 text-center text-white">
-        <div className="mx-auto max-w-3xl px-4">
-          <div className="mb-4 flex justify-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white">
-              <Check className="h-12 w-12 text-[#7B91FF]" />
+        {/* Success message */}
+        <div className="bg-gradient-to-r from-[#7B91FF] to-[#7B91FF] py-12 text-center text-white">
+          <div className="mx-auto max-w-3xl px-4">
+            <div className="mb-4 flex justify-center">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white">
+                <Check className="h-12 w-12 text-[#7B91FF]" />
+              </div>
             </div>
+            <h1 className="mb-2 text-3xl font-bold">
+              Бронирование подтверждено!
+            </h1>
+            <p className="text-lg">Ваш билет был успешно забронирован</p>
           </div>
-          <h1 className="mb-2 text-3xl font-bold">
-            Бронирование подтверждено!
-          </h1>
-          <p className="text-lg">Ваш билет был успешно забронирован</p>
         </div>
-      </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="mx-auto max-w-7xl px-4 py-8">
+          <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
             <div className="rounded-lg border bg-white p-6">
               <h2 className="mb-4 text-xl font-bold text-[#022444]">
@@ -324,7 +325,7 @@ export function ConfirmationPageClient() {
             </div>
 
             <button
-              onClick={() => router.push("/")}
+              onClick={() => router.push(routes.home)}
               className="w-full rounded-lg bg-[#7B91FF] py-3 text-center font-semibold text-white hover:bg-[#E16D32]"
             >
               Вернуться на главную
@@ -332,7 +333,6 @@ export function ConfirmationPageClient() {
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

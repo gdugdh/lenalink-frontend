@@ -6,13 +6,14 @@ import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { routes } from "@/app/lib/routes";
 
 export function PaymentPageClient() {
   const router = useRouter();
   const [selectedPayment, setSelectedPayment] = useState<string>("card");
 
   const handlePayment = () => {
-    router.push("/confirmation");
+    router.push(routes.confirmation);
   };
 
   return (
