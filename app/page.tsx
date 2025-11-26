@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative h-[800px] overflow-hidden">
+      <div className="relative h-[500px] sm:h-[600px] md:h-[800px] overflow-hidden">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -22,64 +22,64 @@ export default function Page() {
         </div>
 
         {/* Header */}
-        <header className="relative z-10 px-6 py-6">
+        <header className="relative z-10 px-3 sm:px-6 py-3 sm:py-6">
           <div className="flex items-center gap-2 text-white">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#022444]">
-              <img src={"/logo.png"} />
+            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-[#022444]">
+              <img src={"/logo.png"} className="w-full h-full object-contain" />
             </div>
-            <span className="text-2xl font-semibold">LenaLink</span>
+            <span className="text-lg sm:text-2xl font-semibold">LenaLink</span>
           </div>
         </header>
 
         {/* Hero Content */}
-        <div className="relative z-10 flex h-full items-center justify-center px-6">
-          <div className="flex w-full max-w-6xl items-center justify-between gap-12">
+        <div className="relative z-10 flex h-full items-center justify-center px-3 sm:px-6 pb-6">
+          <div className="flex flex-col md:flex-row w-full max-w-6xl items-center justify-between gap-6 md:gap-12">
             {/* Left side - Text */}
-            <div className="flex-1 text-white">
-              <h1 className="mb-4 text-5xl font-bold leading-tight text-balance">
+            <div className="flex-1 text-white text-center md:text-left">
+              <h1 className="mb-3 sm:mb-4 text-2xl sm:text-3xl md:text-5xl font-bold leading-tight text-balance">
                 Узнайте, как добраться куда угодно
               </h1>
-              <p className="text-sm font-light tracking-[0.2em] uppercase">
+              <p className="text-xs sm:text-sm font-light tracking-[0.1em] sm:tracking-[0.2em] uppercase">
                 На самолете, поезде, автобусе, пароме или машине
               </p>
             </div>
 
             {/* Right side - Search Form */}
             <div className="w-full max-w-md">
-              <div className="rounded-2xl bg-white p-6 shadow-xl">
-                <div className="space-y-4">
+              <div className="rounded-xl sm:rounded-2xl bg-white p-3 sm:p-4 md:p-6 shadow-xl">
+                <div className="space-y-3 sm:space-y-4">
                   {/* From Field */}
-                  <div className="space-y-2">
-                    <Label className="text-xs font-normal text-gray-500 uppercase">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label className="text-[10px] sm:text-xs font-normal text-gray-500 uppercase">
                       Откуда
                     </Label>
                     <Input
                       defaultValue="Москва, Россия"
-                      className="border-gray-200 text-base"
+                      className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
                     />
                   </div>
 
                   {/* Swap Button */}
-                  <div className="flex justify-center -my-2">
-                    <button className="rounded-full bg-white border border-gray-200 p-2 hover:bg-gray-50 transition-colors shadow-sm">
-                      <ArrowUpDown className="h-4 w-4 text-gray-600" />
+                  <div className="flex justify-center -my-1 sm:-my-2">
+                    <button className="rounded-full bg-white border border-gray-200 p-1.5 sm:p-2 hover:bg-gray-50 transition-colors shadow-sm">
+                      <ArrowUpDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
                     </button>
                   </div>
 
                   {/* To Field */}
-                  <div className="space-y-2">
-                    <Label className="text-xs font-normal text-gray-500 uppercase">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    <Label className="text-[10px] sm:text-xs font-normal text-gray-500 uppercase">
                       Куда
                     </Label>
                     <Input
                       defaultValue="Олекминск, Якутия"
-                      className="border-gray-200 text-base"
+                      className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
                     />
                   </div>
 
                   <Link href="/search">
-                    <Button className="w-full bg-[#7B91FF] hover:bg-[#E06D32] text-white text-base font-medium py-6">
-                      <Search className="mr-2 h-5 w-5" />
+                    <Button className="w-full bg-[#7B91FF] hover:bg-[#E06D32] text-white text-sm sm:text-base font-medium py-3 sm:py-4 md:py-6 h-auto">
+                      <Search className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                       Найти варианты
                     </Button>
                   </Link>
@@ -91,33 +91,33 @@ export default function Page() {
       </div>
 
       {/* Partners Section */}
-      <div className="border-b bg-white py-8">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-center gap-8 flex-wrap">
-            <span className="text-sm text-gray-500">Наши партнеры:</span>
-            <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
-              <span className="text-lg font-bold text-gray-700">ГАРС</span>
+      <div className="border-b bg-white py-4 sm:py-6 md:py-8">
+        <div className="container mx-auto px-3 sm:px-6">
+          <div className="flex items-center justify-center gap-3 sm:gap-6 md:gap-8 flex-wrap">
+            <span className="text-xs sm:text-sm text-gray-500">Наши партнеры:</span>
+            <div className="h-7 sm:h-8 flex items-center px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-100 rounded opacity-60">
+              <span className="text-sm sm:text-lg font-bold text-gray-700">ГАРС</span>
             </div>
-            <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
-              <span className="text-lg font-bold text-gray-700">АвиБус</span>
+            <div className="h-7 sm:h-8 flex items-center px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-100 rounded opacity-60">
+              <span className="text-sm sm:text-lg font-bold text-gray-700">АвиБус</span>
             </div>
-            <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
-              <span className="text-lg font-bold text-gray-700">Aviasales</span>
+            <div className="h-7 sm:h-8 flex items-center px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-100 rounded opacity-60">
+              <span className="text-sm sm:text-lg font-bold text-gray-700">Aviasales</span>
             </div>
-            <div className="h-8 flex items-center px-4 py-2 bg-gray-100 rounded opacity-60">
-              <span className="text-lg font-bold text-gray-700">Tutu.ru</span>
+            <div className="h-7 sm:h-8 flex items-center px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-100 rounded opacity-60">
+              <span className="text-sm sm:text-lg font-bold text-gray-700">Tutu.ru</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Info Section */}
-      <div className="bg-white py-16">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="mb-6 text-3xl font-bold text-balance">
+      <div className="bg-white py-8 sm:py-12 md:py-16">
+        <div className="container mx-auto px-3 sm:px-6 text-center">
+          <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl md:text-3xl font-bold text-balance">
             Что умеет LenaLink
           </h2>
-          <p className="mx-auto max-w-3xl text-lg text-gray-600 leading-relaxed text-balance">
+          <p className="mx-auto max-w-3xl text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed text-balance">
             LenaLink найдет любое место, город или достопримечательность по
             всему миру и знает тысячи маршрутов для того, чтобы вы легко нашли
             путь из пункта А в пункт Б.

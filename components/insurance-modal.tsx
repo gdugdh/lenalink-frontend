@@ -19,78 +19,78 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="relative flex h-[90vh] w-full max-w-6xl overflow-hidden rounded-lg bg-white shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
+      <div className="relative flex h-[95vh] sm:h-[90vh] w-full max-w-6xl overflow-hidden rounded-lg bg-white shadow-xl flex-col md:flex-row">
         <button
           onClick={onCloseAction}
-          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-gray-300 bg-white hover:bg-gray-100"
+          className="absolute right-2 top-2 sm:right-4 sm:top-4 z-10 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border-2 border-gray-300 bg-white hover:bg-gray-100"
         >
-          <X className="h-6 w-6 text-[#022444]" />
+          <X className="h-5 w-5 sm:h-6 sm:w-6 text-[#022444]" />
         </button>
 
-        <div className="flex w-full overflow-y-auto">
-          <div className="flex-1 p-8">
-            <div className="mb-6">
-              <h2 className="mb-2 text-2xl font-bold text-[#022444]">
+        <div className="flex w-full overflow-y-auto flex-col md:flex-row">
+          <div className="flex-1 p-4 sm:p-6 md:p-8">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="mb-2 text-xl sm:text-2xl font-bold text-[#022444]">
                 Детали поездки
               </h2>
             </div>
 
-            <div className="mb-8">
-              <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-[#022444]">
+            <div className="mb-6 sm:mb-8">
+              <h3 className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2 text-base sm:text-lg font-semibold text-[#022444]">
                 Москва → Олекминск
-                <span className="text-sm font-normal text-[#022444]">
+                <span className="text-xs sm:text-sm font-normal text-[#022444]">
                   🕐 21 ч. в пути
                 </span>
               </h3>
 
               {/* Flight Segment */}
-              <div className="mb-4 space-y-4 rounded-lg border border-gray-200 p-4">
-                <div className="flex items-start gap-4">
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-[#022444]">
+              <div className="mb-4 space-y-3 sm:space-y-4 rounded-lg border border-gray-200 p-3 sm:p-4">
+                <div className="flex items-start gap-2 sm:gap-4">
+                  <div className="text-right min-w-[60px] sm:min-w-[80px]">
+                    <div className="text-base sm:text-lg font-bold text-[#022444]">
                       09:00
                     </div>
                     <div className="text-xs text-[#022444]">пн, 25 нояб.</div>
                   </div>
-                  <Plane className="mt-1 h-5 w-5 rotate-90 text-[#558DCA]" />
-                  <div className="flex-1">
-                    <div className="font-medium text-[#022444]">
+                  <Plane className="mt-1 h-4 w-4 sm:h-5 sm:w-5 rotate-90 text-[#558DCA] shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm sm:text-base text-[#022444]">
                       Москва • DME
                     </div>
-                    <div className="text-sm text-[#022444]">
+                    <div className="text-xs sm:text-sm text-[#022444]">
                       Аэропорт Домодедово
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 pl-20">
-                  <div className="flex items-center gap-2 text-sm text-[#022444]">
+                <div className="flex items-center gap-2 sm:gap-4 pl-12 sm:pl-20">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-[#022444]">
                     <span>10 ч. 30 мин.</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-green-100">
                       <span className="text-xs font-bold text-green-700">
                         S7
                       </span>
                     </div>
-                    <span className="text-sm font-medium text-[#022444]">
+                    <span className="text-xs sm:text-sm font-medium text-[#022444]">
                       S7 Airlines
                     </span>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-[#022444]">
+                <div className="flex items-start gap-2 sm:gap-4">
+                  <div className="text-right min-w-[60px] sm:min-w-[80px]">
+                    <div className="text-base sm:text-lg font-bold text-[#022444]">
                       19:30
                     </div>
                     <div className="text-xs text-[#022444]">пн, 25 нояб.</div>
                   </div>
-                  <Plane className="mt-1 h-5 w-5 -rotate-90 text-[#558DCA]" />
-                  <div className="flex-1">
-                    <div className="font-medium text-[#022444]">
+                  <Plane className="mt-1 h-4 w-4 sm:h-5 sm:w-5 -rotate-90 text-[#558DCA] shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm sm:text-base text-[#022444]">
                       Якутск • YKS
                     </div>
-                    <div className="text-sm text-[#022444]">
+                    <div className="text-xs sm:text-sm text-[#022444]">
                       Аэропорт Якутск
                     </div>
                   </div>
@@ -98,46 +98,46 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
               </div>
 
               {/* Bus Segment */}
-              <div className="mb-4 space-y-4 rounded-lg border border-gray-200 p-4">
-                <div className="flex items-start gap-4">
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-[#022444]">
+              <div className="mb-4 space-y-3 sm:space-y-4 rounded-lg border border-gray-200 p-3 sm:p-4">
+                <div className="flex items-start gap-2 sm:gap-4">
+                  <div className="text-right min-w-[60px] sm:min-w-[80px]">
+                    <div className="text-base sm:text-lg font-bold text-[#022444]">
                       20:00
                     </div>
                     <div className="text-xs text-[#022444]">пн, 25 нояб.</div>
                   </div>
-                  <Bus className="mt-1 h-5 w-5 text-[#558DCA]" />
-                  <div className="flex-1">
-                    <div className="font-medium text-[#022444]">
+                  <Bus className="mt-1 h-4 w-4 sm:h-5 sm:w-5 text-[#558DCA] shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm sm:text-base text-[#022444]">
                       Аэропорт Якутск
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 pl-20">
-                  <div className="flex items-center gap-2 text-sm text-[#022444]">
+                <div className="flex items-center gap-2 sm:gap-4 pl-12 sm:pl-20">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-[#022444]">
                     <span>30 мин.</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-blue-100">
                       <span className="text-xs font-bold text-blue-700">
                         АБ
                       </span>
                     </div>
-                    <span className="text-sm font-medium text-[#022444]">
+                    <span className="text-xs sm:text-sm font-medium text-[#022444]">
                       АвиБус
                     </span>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-[#022444]">
+                <div className="flex items-start gap-2 sm:gap-4">
+                  <div className="text-right min-w-[60px] sm:min-w-[80px]">
+                    <div className="text-base sm:text-lg font-bold text-[#022444]">
                       20:30
                     </div>
                     <div className="text-xs text-[#022444]">пн, 25 нояб.</div>
                   </div>
-                  <Bus className="mt-1 h-5 w-5 text-[#558DCA]" />
-                  <div className="flex-1">
-                    <div className="font-medium text-[#022444]">
+                  <Bus className="mt-1 h-4 w-4 sm:h-5 sm:w-5 text-[#558DCA] shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm sm:text-base text-[#022444]">
                       Речной порт Якутск
                     </div>
                   </div>
@@ -145,58 +145,58 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
               </div>
 
               {/* River Segment */}
-              <div className="space-y-4 rounded-lg border border-gray-200 p-4">
-                <div className="flex items-start gap-4">
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-[#022444]">
+              <div className="space-y-3 sm:space-y-4 rounded-lg border border-gray-200 p-3 sm:p-4">
+                <div className="flex items-start gap-2 sm:gap-4">
+                  <div className="text-right min-w-[60px] sm:min-w-[80px]">
+                    <div className="text-base sm:text-lg font-bold text-[#022444]">
                       21:00
                     </div>
                     <div className="text-xs text-[#022444]">пн, 25 нояб.</div>
                   </div>
                   <svg
-                    className="mt-1 h-5 w-5 text-[#558DCA]"
+                    className="mt-1 h-4 w-4 sm:h-5 sm:w-5 text-[#558DCA] shrink-0"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
                     <path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.34-.42-.6-.5L20 10.62V6c0-1.1-.9-2-2-2h-3V1H9v3H6c-1.1 0-2 .9-2 2v4.62l-1.29.42c-.26.08-.48.26-.6.5s-.15.52-.06.78L3.95 19zM6 6h12v3.97L12 8 6 9.97V6z" />
                   </svg>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#022444]">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm sm:text-base text-[#022444]">
                       Якутск • Речной порт
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 pl-20">
-                  <div className="flex items-center gap-2 text-sm text-[#022444]">
+                <div className="flex items-center gap-2 sm:gap-4 pl-12 sm:pl-20">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-[#022444]">
                     <span>9 ч.</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-100">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-cyan-100">
                       <span className="text-xs font-bold text-cyan-700">
                         ЛЗ
                       </span>
                     </div>
-                    <span className="text-sm font-medium text-[#022444]">
+                    <span className="text-xs sm:text-sm font-medium text-[#022444]">
                       Ленские Зори
                     </span>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-[#022444]">
+                <div className="flex items-start gap-2 sm:gap-4">
+                  <div className="text-right min-w-[60px] sm:min-w-[80px]">
+                    <div className="text-base sm:text-lg font-bold text-[#022444]">
                       06:00
                     </div>
                     <div className="text-xs text-[#022444]">вт, 26 нояб.</div>
                   </div>
                   <svg
-                    className="mt-1 h-5 w-5 text-[#558DCA]"
+                    className="mt-1 h-4 w-4 sm:h-5 sm:w-5 text-[#558DCA] shrink-0"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
                     <path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.34-.42-.6-.5L20 10.62V6c0-1.1-.9-2-2-2h-3V1H9v3H6c-1.1 0-2 .9-2 2v4.62l-1.29.42c-.26.08-.48.26-.6.5s-.15.52-.06.78L3.95 19zM6 6h12v3.97L12 8 6 9.97V6z" />
                   </svg>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#022444]">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm sm:text-base text-[#022444]">
                       Олекминск • Речной порт
                     </div>
                   </div>
@@ -204,11 +204,11 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
               </div>
             </div>
 
-            <div className="rounded-lg border border-gray-200 p-4">
-              <div className="mb-2 font-medium text-[#022444]">
+            <div className="rounded-lg border border-gray-200 p-3 sm:p-4">
+              <div className="mb-2 text-sm sm:text-base font-medium text-[#022444]">
                 Путешествуете с кем-то еще?
               </div>
-              <button className="flex items-center gap-2 text-sm text-[#7B91FF]">
+              <button className="flex items-center gap-2 text-xs sm:text-sm text-[#7B91FF]">
                 <span>📤</span>
                 <span className="underline">Поделиться</span>
               </button>
@@ -218,8 +218,8 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
             </div>
           </div>
 
-          <div className="flex-1 bg-gradient-to-b from-[#7B91FF] to-[#7B91FF] p-6">
-            <div className="mb-6 text-right mr-10">
+          <div className="flex-1 bg-gradient-to-b from-[#7B91FF] to-[#7B91FF] p-4 sm:p-6 overflow-y-auto">
+            <div className="mb-4 sm:mb-6 text-center sm:text-right sm:mr-10">
               <div className="text-sm text-white">
                 Цены на билеты от 41 256₽
               </div>
@@ -228,15 +228,15 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
               </div>
             </div>
 
-            <div className="mb-4 rounded-lg bg-white p-5 shadow-lg">
+            <div className="mb-4 rounded-lg bg-white p-4 sm:p-5 shadow-lg">
               <div className="mb-3 flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7B91FF]/10">
-                  <span className="text-sm font-bold text-[#7B91FF]">K</span>
+                <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-[#7B91FF]/10">
+                  <span className="text-xs sm:text-sm font-bold text-[#7B91FF]">K</span>
                 </div>
-                <h3 className="text-lg font-bold text-[#022444]">Benefits</h3>
+                <h3 className="text-base sm:text-lg font-bold text-[#022444]">Benefits</h3>
               </div>
 
-              <div className="mb-3 text-sm text-[#022444]">
+              <div className="mb-3 text-xs sm:text-sm text-[#022444]">
                 Получите мгновенный возврат баллами на вашу учетную запись
                 lena.linkpc.net в случае отмены рейса или задержек.
               </div>
@@ -297,15 +297,15 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
               </button>
             </div>
 
-            <div className="rounded-lg bg-white p-5 shadow-lg">
+            <div className="rounded-lg bg-white p-4 sm:p-5 shadow-lg">
               <div className="mb-3 flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#558DCA]/10">
-                  <span className="text-sm font-bold text-[#558DCA]">K</span>
+                <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-[#558DCA]/10">
+                  <span className="text-xs sm:text-sm font-bold text-[#558DCA]">K</span>
                 </div>
-                <h3 className="text-lg font-bold text-[#022444]">Basic</h3>
+                <h3 className="text-base sm:text-lg font-bold text-[#022444]">Basic</h3>
               </div>
 
-              <div className="mb-3 text-sm text-[#022444]">
+              <div className="mb-3 text-xs sm:text-sm text-[#022444]">
                 Только билет на рейс, ничего больше. Вы можете добавить
                 дополнительные услуги позже.
               </div>
