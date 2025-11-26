@@ -1,8 +1,8 @@
 "use client";
 
 import { Check, Plane, Download, Share2, Calendar } from "lucide-react";
-import { UnifiedHeader } from "@/components/unified-header";
-import { PageLoader } from "@/components/page-loader";
+import { UnifiedHeader } from "@/app/components/shared/unified-header";
+import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 
 export default function ConfirmationPage() {

@@ -1,9 +1,9 @@
 "use client";
 
 import { ArrowLeft, CreditCard, Smartphone, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { UnifiedHeader } from "@/components/unified-header";
-import { PageLoader } from "@/components/page-loader";
+import { Button } from "@/app/components/ui/button";
+import { UnifiedHeader } from "@/app/components/shared/unified-header";
+import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
