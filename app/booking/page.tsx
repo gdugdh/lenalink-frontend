@@ -204,7 +204,7 @@ export default function BookingPage() {
                             Москва (DME)
                           </div>
                         </div>
-                        <div className="text-center w-full sm:w-auto order-3 sm:order-2">
+                        <div className="text-center w-full sm:w-auto order-2 sm:order-2">
                           <div className="text-[10px] sm:text-xs text-[#022444]">
                             10 ч 30 мин
                           </div>
@@ -213,7 +213,7 @@ export default function BookingPage() {
                             Самолет • S7 Airlines
                           </div>
                         </div>
-                        <div className="min-w-0 text-left sm:text-right order-2 sm:order-3">
+                        <div className="min-w-0 text-left sm:text-right order-3 sm:order-3">
                           <div className="text-base sm:text-lg font-bold text-[#022444]">
                             19:30
                           </div>
@@ -240,14 +240,14 @@ export default function BookingPage() {
                             Аэропорт Якутск
                           </div>
                         </div>
-                        <div className="text-center w-full sm:w-auto order-3 sm:order-2">
+                        <div className="text-center w-full sm:w-auto order-2 sm:order-2">
                           <div className="text-[10px] sm:text-xs text-[#022444]">30 мин</div>
                           <div className="my-1 sm:my-2 h-px w-16 sm:w-20 md:w-24 bg-[#7B91FF] mx-auto"></div>
                           <div className="text-[10px] sm:text-xs font-medium text-[#022444]">
                             Автобус • АвиБус
                           </div>
                         </div>
-                        <div className="min-w-0 text-left sm:text-right order-2 sm:order-3">
+                        <div className="min-w-0 text-left sm:text-right order-3 sm:order-3">
                           <div className="text-base sm:text-lg font-bold text-[#022444]">
                             20:30
                           </div>
@@ -280,7 +280,7 @@ export default function BookingPage() {
                             Якутск, речной порт
                           </div>
                         </div>
-                        <div className="text-center w-full sm:w-auto order-3 sm:order-2">
+                        <div className="text-center w-full sm:w-auto order-2 sm:order-2">
                           <div className="text-[10px] sm:text-xs text-[#022444]">9 ч</div>
                           <div className="flex justify-center">
                             <div className="my-auto h-px w-16 sm:w-20 md:w-24 bg-[#96FFFF] text-center"></div>
@@ -289,7 +289,7 @@ export default function BookingPage() {
                             Речной транспорт • Ленские Зори
                           </div>
                         </div>
-                        <div className="min-w-0 text-left sm:text-right order-2 sm:order-3">
+                        <div className="min-w-0 text-left sm:text-right order-3 sm:order-3">
                           <div className="text-base sm:text-lg font-bold text-[#022444]">
                             06:00
                           </div>
