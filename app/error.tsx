@@ -21,7 +21,7 @@ export default function Error({
         Произошла ошибка при загрузке страницы. Пожалуйста, попробуйте обновить страницу.
       </p>
       <div className="flex gap-4">
-        <Button onClick={reset} className="bg-[#7B91FF] hover:bg-[#E06D32] text-white">
+        <Button onClick={reset} className="bg-[#7B91FF] hover:bg-[#E16D32] text-white">
           Попробовать снова
         </Button>
         <Button 

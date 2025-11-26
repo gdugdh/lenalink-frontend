@@ -10,7 +10,7 @@ export default function NotFound() {
         К сожалению, запрашиваемая страница не существует или была перемещена.
       </p>
       <Link href="/">
-        <Button className="bg-[#7B91FF] hover:bg-[#E06D32] text-white">
+        <Button className="bg-[#7B91FF] hover:bg-[#E16D32] text-white">
           Вернуться на главную
         </Button>
       </Link>

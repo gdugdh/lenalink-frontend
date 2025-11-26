@@ -97,7 +97,7 @@ export default function Page() {
                   </div>
 
                   <Link href="/search">
-                    <Button className="w-full bg-[#7B91FF] hover:bg-[#E06D32] text-white text-sm sm:text-base font-medium py-3 sm:py-4 md:py-6 h-auto">
+                    <Button className="w-full bg-[#7B91FF] hover:bg-[#E16D32] text-white text-sm sm:text-base font-medium py-3 sm:py-4 md:py-6 h-auto">
                       <Search className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                       Найти варианты
                     </Button>
