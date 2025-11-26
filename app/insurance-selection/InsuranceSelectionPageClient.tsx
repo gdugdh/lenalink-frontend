@@ -6,13 +6,24 @@ import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { routes } from "@/app/lib/routes";
 
 export function InsuranceSelectionPageClient() {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<string>("tariff2");
 
   const handleContinue = () => {
-    router.push("/seat-selection");
+    router.push(routes.seatSelection);
+  };
+
+  const getTariffName = (plan: string): string => {
+    const tariffMap: Record<string, string> = {
+      tariff1: "Тариф 1",
+      tariff2: "Тариф 2",
+      tariff3: "Тариф 3",
+      tariff4: "Тариф 4",
+    };
+    return tariffMap[plan] || "Тариф";
   };
 
   return (
@@ -270,7 +281,7 @@ export function InsuranceSelectionPageClient() {
                   onClick={handleContinue}
                   className="bg-[#7B91FF] hover:bg-[#E16D32]"
                 >
-                  Выбрать «Тариф 2»
+                  Выбрать «{getTariffName(selectedPlan)}»
                 </Button>
               </div>
             </div>

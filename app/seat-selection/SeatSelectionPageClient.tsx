@@ -7,13 +7,14 @@ import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { routes } from "@/app/lib/routes";
 
 export function SeatSelectionPageClient() {
   const router = useRouter();
   const [selectedOutbound, setSelectedOutbound] = useState<string>("random");
 
   const handleContinue = () => {
-    router.push("/payment");
+    router.push(routes.payment);
   };
 
   return (
