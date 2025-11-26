@@ -1,19 +1,13 @@
-import type { Metadata } from "next";
-import { InsuranceSelectionPageClient } from "./InsuranceSelectionPageClient";
+"use client";
 
-export const metadata: Metadata = {
-  title: 'Выбор тарифа | LenaLink',
-  description: 'Выберите тариф для вашего бронирования с различными условиями изменения и возврата',
-  openGraph: {
-    title: 'Выбор тарифа | LenaLink',
-    description: 'Выберите подходящий тариф для вашего маршрута',
-  },
-};
+import { Check, Info, ArrowLeft } from "lucide-react";
+import { Button } from "@/app/components/ui/button";
+import { UnifiedHeader } from "@/app/components/shared/unified-header";
+import { PageLoader } from "@/app/components/shared/page-loader";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function InsuranceSelectionPage() {
-  return <InsuranceSelectionPageClient />;
-}
-
+export function InsuranceSelectionPageClient() {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<string>("tariff2");
 
@@ -318,3 +312,4 @@ export default function InsuranceSelectionPage() {
     </>
   );
 }
+

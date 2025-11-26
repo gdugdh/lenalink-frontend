@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import {
   Sheet,
@@ -19,8 +20,15 @@ export function UnifiedHeader() {
         <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 max-w-full">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2">
-              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-white shrink-0">
-                <img src={"/logo.png"} className="w-full h-full object-contain p-1" />
+              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-white shrink-0 relative">
+                <Image 
+                  src="/logo.png" 
+                  alt="LenaLink Logo" 
+                  width={40} 
+                  height={40} 
+                  className="w-full h-full object-contain p-1"
+                  priority
+                />
               </div>
               <span className="text-lg sm:text-xl font-semibold text-white">LenaLink</span>
             </Link>

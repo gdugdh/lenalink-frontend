@@ -1,24 +1,16 @@
-import type { Metadata } from "next";
-import { Suspense } from 'react';
-import { BookingPageClient } from './BookingPageClient';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Бронирование | LenaLink',
-  description: 'Заполните данные пассажира для завершения бронирования маршрута',
-  openGraph: {
-    title: 'Бронирование | LenaLink',
-    description: 'Завершите бронирование вашего маршрута',
-  },
-};
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/app/components/ui/button';
+import { PageLoader } from '@/app/components/shared/page-loader';
+import { UnifiedHeader } from '@/app/components/shared/unified-header';
+import { RouteOverview } from '@/app/components/features/booking/RouteOverview';
+import { BookingForm } from '@/app/components/features/booking/BookingForm';
+import { MapView } from '@/app/components/features/booking/MapView';
+import { PriceSummary } from '@/app/components/features/booking/PriceSummary';
+import { useRouter } from 'next/navigation';
 
-export default function BookingPage() {
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="h-12 w-12 border-4 border-[#7B91FF] border-t-transparent rounded-full animate-spin" /></div>}>
-      <BookingPageClient />
-    </Suspense>
-  );
-}
-
+export function BookingPageClient() {
   const router = useRouter();
 
   return (
@@ -60,3 +52,4 @@ export default function BookingPage() {
     </>
   );
 }
+

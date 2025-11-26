@@ -1,9 +1,21 @@
+import type { Metadata } from "next";
 import { Search, ArrowUpDown } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import { Checkbox } from "@/app/components/ui/checkbox";
 import Link from "next/link";
+import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: 'Главная | LenaLink',
+  description: 'Найдите лучшие маршруты для вашей поездки на самолете, поезде, автобусе, пароме или машине',
+  openGraph: {
+    title: 'LenaLink - Найдите маршрут куда угодно',
+    description: 'Найдите лучшие маршруты для вашей поездки',
+    type: 'website',
+  },
+};
 
 export default function Page() {
   return (
@@ -24,8 +36,15 @@ export default function Page() {
         {/* Header */}
         <header className="relative z-10 px-3 sm:px-6 py-3 sm:py-6">
           <div className="flex items-center gap-2 text-white">
-            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-[#022444]">
-              <img src={"/logo.png"} className="w-full h-full object-contain" />
+            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-[#022444] relative">
+              <Image 
+                src="/logo.png" 
+                alt="LenaLink Logo" 
+                width={32} 
+                height={32} 
+                className="w-full h-full object-contain"
+                priority
+              />
             </div>
             <span className="text-lg sm:text-2xl font-semibold">LenaLink</span>
           </div>

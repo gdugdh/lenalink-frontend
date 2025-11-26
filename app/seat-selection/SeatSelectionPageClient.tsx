@@ -1,20 +1,14 @@
-import type { Metadata } from "next";
+"use client";
+
+import { ArrowLeft, Plane } from "lucide-react";
 import Image from "next/image";
-import { SeatSelectionPageClient } from "./SeatSelectionPageClient";
+import { Button } from "@/app/components/ui/button";
+import { UnifiedHeader } from "@/app/components/shared/unified-header";
+import { PageLoader } from "@/app/components/shared/page-loader";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export const metadata: Metadata = {
-  title: 'Выбор места | LenaLink',
-  description: 'Выберите место для вашего рейса с дополнительными опциями комфорта',
-  openGraph: {
-    title: 'Выбор места | LenaLink',
-    description: 'Выберите место для вашего рейса',
-  },
-};
-
-export default function SeatSelectionPage() {
-  return <SeatSelectionPageClient />;
-}
-
+export function SeatSelectionPageClient() {
   const router = useRouter();
   const [selectedOutbound, setSelectedOutbound] = useState<string>("random");
 
@@ -105,10 +99,12 @@ export default function SeatSelectionPage() {
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
-                        <img
+                        <Image
                           className="h-8 w-8 text-[#558DCA]"
-                          src={"/random-svgrepo-com.svg"}
+                          src="/random-svgrepo-com.svg"
                           alt="dots icon"
+                          width={32}
+                          height={32}
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
@@ -136,10 +132,12 @@ export default function SeatSelectionPage() {
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
-                        <img
+                        <Image
                           className="h-8 w-8 text-[#558DCA]"
-                          src={"/window-seat-svgrepo-com.svg"}
-                          alt="dots icon"
+                          src="/window-seat-svgrepo-com.svg"
+                          alt="window seat icon"
+                          width={32}
+                          height={32}
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
@@ -167,10 +165,12 @@ export default function SeatSelectionPage() {
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
-                        <img
+                        <Image
                           className="h-8 w-8 text-[#558DCA]"
-                          src={"/massage-chair-one-svgrepo-com.svg"}
-                          alt="dots icon"
+                          src="/massage-chair-one-svgrepo-com.svg"
+                          alt="aisle seat icon"
+                          width={32}
+                          height={32}
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
@@ -198,10 +198,12 @@ export default function SeatSelectionPage() {
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
-                        <img
+                        <Image
                           className="h-8 w-8 text-[#558DCA]"
-                          src={"/massage-chair-one-svgrepo-com.svg"}
-                          alt="dots icon"
+                          src="/massage-chair-one-svgrepo-com.svg"
+                          alt="extra legroom icon"
+                          width={32}
+                          height={32}
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
@@ -270,3 +272,4 @@ export default function SeatSelectionPage() {
     </>
   );
 }
+
