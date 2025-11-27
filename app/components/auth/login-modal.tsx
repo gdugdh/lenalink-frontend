@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/app/components/ui/dialog';
 import { Separator } from '@/app/components/ui/separator';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginModalProps {
   open: boolean;
@@ -29,6 +30,7 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Close modal if user is already logged in
@@ -67,6 +69,7 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
         // Reset form
         setEmail('');
         setPassword('');
+        setShowPassword(false);
         
         // Redirect to dashboard
         router.push(`/dashboard/${sessionData.user.role}`);
@@ -83,6 +86,7 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
         // Reset form
         setEmail('');
         setPassword('');
+        setShowPassword(false);
       }
     } catch (error) {
       toast({
@@ -101,6 +105,7 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
     if (!newOpen) {
       setEmail('');
       setPassword('');
+      setShowPassword(false);
     }
   };
 
@@ -128,15 +133,31 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
 
           <div className="space-y-2">
             <Label htmlFor="modal-password">Пароль</Label>
-            <Input
-              id="modal-password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isSubmitting}
-            />
+            <div className="relative">
+              <Input
+                id="modal-password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isSubmitting}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                disabled={isSubmitting}
+                aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           </div>
 
           <Button

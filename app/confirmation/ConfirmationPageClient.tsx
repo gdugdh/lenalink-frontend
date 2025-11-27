@@ -5,9 +5,17 @@ import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { routes } from "@/app/lib/routes";
+import { useBooking } from "@/app/lib/booking-context";
+import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName } from "@/app/lib/price-calculator";
 
 export function ConfirmationPageClient() {
   const router = useRouter();
+  const { bookingState } = useBooking();
+  const priceBreakdown = calculatePrice(
+    bookingState.passengerType,
+    bookingState.tariff,
+    bookingState.seatType
+  );
 
   return (
     <>
@@ -261,23 +269,45 @@ export function ConfirmationPageClient() {
 
               <div className="space-y-3 border-b pb-4 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[#022444]">Билеты (1 взрослый)</span>
-                  <span className="font-medium text-[#022444]">41 256₽</span>
+                  <span className="text-[#022444]">
+                    Билеты (1 {getPassengerTypeLabel(bookingState.passengerType)})
+                  </span>
+                  <span className="font-medium text-[#022444]">
+                    {priceBreakdown.basePrice.toLocaleString('ru-RU')}₽
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-[#022444]">1x место (доп. пространство)</span>
-                  <span className="font-medium text-[#022444]">7 900₽</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#022444]">1x тариф Standard</span>
-                  <span className="font-medium text-[#022444]">2 244₽</span>
-                </div>
+                {priceBreakdown.tariffFee > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-[#022444]">
+                      1x {getTariffName(bookingState.tariff)}
+                    </span>
+                    <span className="font-medium text-[#022444]">
+                      {priceBreakdown.tariffFee.toLocaleString('ru-RU')}₽
+                    </span>
+                  </div>
+                )}
+                {priceBreakdown.seatFee > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-[#022444]">
+                      1x место {bookingState.seatType === 'legroom' 
+                        ? '(доп. пространство)'
+                        : bookingState.seatType === 'window'
+                        ? '(у окна)'
+                        : bookingState.seatType === 'aisle'
+                        ? '(у прохода)'
+                        : ''}
+                    </span>
+                    <span className="font-medium text-[#022444]">
+                      {priceBreakdown.seatFee.toLocaleString('ru-RU')}₽
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="mt-4 flex justify-between text-lg">
                 <span className="font-bold text-[#022444]">Итого</span>
                 <span className="text-2xl font-bold text-[#7B91FF]">
-                  51 400₽
+                  {priceBreakdown.total.toLocaleString('ru-RU')}₽
                 </span>
               </div>
 

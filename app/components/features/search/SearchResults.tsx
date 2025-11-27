@@ -2,12 +2,31 @@
 
 import { RouteCard } from './RouteCard';
 
+export interface RouteData {
+  id: string;
+  badge: string;
+  price: string;
+  priceDetails: string;
+  carrier: string;
+  carrierCode?: string;
+  departureTime: string;
+  departureCity: string;
+  departureDate: string;
+  arrivalTime: string;
+  arrivalCity: string;
+  arrivalDate: string;
+  duration: string;
+  transfers?: string;
+  routeCodes?: string[];
+  showClock?: boolean;
+}
+
 interface SearchResultsProps {
-  onRouteClick?: (routeId: string) => void;
+  onRouteClick?: (route: RouteData) => void;
 }
 
 export function SearchResults({ onRouteClick }: SearchResultsProps) {
-  const routes = [
+  const routes: RouteData[] = [
     {
       id: '1',
       badge: 'Оптимальный',
@@ -84,7 +103,7 @@ export function SearchResults({ onRouteClick }: SearchResultsProps) {
             transfers={route.transfers}
             routeCodes={route.routeCodes}
             showClock={route.showClock}
-            onClick={() => onRouteClick?.(route.id)}
+            onClick={() => onRouteClick?.(route)}
           />
         ))}
       </div>

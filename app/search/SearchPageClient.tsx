@@ -8,7 +8,7 @@ import { InsuranceModal } from '@/app/components/features/insurance/InsuranceMod
 import { SearchBar } from '@/app/components/features/search/SearchBar';
 import { DatePriceBand } from '@/app/components/features/search/DatePriceBand';
 import { SearchFilters, SearchFiltersButton } from '@/app/components/features/search/SearchFilters';
-import { SearchResults } from '@/app/components/features/search/SearchResults';
+import { SearchResults, type RouteData } from '@/app/components/features/search/SearchResults';
 import { routes } from '@/app/lib/routes';
 import { useRouter } from 'next/navigation';
 import { extractCityName, getCityCode } from '@/app/lib/cities';
@@ -18,6 +18,7 @@ function SearchPageContent() {
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState<RouteData | null>(null);
 
   // Получаем параметры из URL
   const fromParam = searchParams.get('from') || '';
@@ -28,7 +29,8 @@ function SearchPageContent() {
   const fromCode = getCityCode(fromCity);
   const toCode = getCityCode(toCity);
 
-  const handleRouteClick = (routeId: string) => {
+  const handleRouteClick = (route: RouteData) => {
+    setSelectedRoute(route);
     setIsModalOpen(true);
   };
 
@@ -58,7 +60,11 @@ function SearchPageContent() {
 
         <InsuranceModal
           isOpen={isModalOpen}
-          onCloseAction={() => setIsModalOpen(false)}
+          onCloseAction={() => {
+            setIsModalOpen(false);
+            setSelectedRoute(null);
+          }}
+          route={selectedRoute}
         />
 
         {/* Mobile Filters Sheet */}

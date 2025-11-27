@@ -8,9 +8,18 @@ import { BookingForm } from '@/app/components/features/booking/BookingForm';
 import { MapView } from '@/app/components/features/booking/MapView';
 import { PriceSummary } from '@/app/components/features/booking/PriceSummary';
 import { useRouter } from 'next/navigation';
+import { useBooking } from '@/app/lib/booking-context';
 
 export function BookingPageClient() {
   const router = useRouter();
+  const { bookingState } = useBooking();
+  const route = bookingState.selectedRoute;
+
+  // Default route if none selected
+  const displayRoute = route || {
+    departureCity: 'Москва',
+    arrivalCity: 'Олекминск',
+  };
 
   return (
     <>
@@ -21,7 +30,7 @@ export function BookingPageClient() {
         <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 md:py-8">
           <div className="mb-4 sm:mb-6">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#022444]">
-              Москва → Олекминск
+              {displayRoute.departureCity} → {displayRoute.arrivalCity}
             </h1>
           </div>
 

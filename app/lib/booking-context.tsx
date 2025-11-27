@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import type { RouteData } from '@/app/components/features/search/SearchResults';
 
 export type PassengerType = 'adult' | 'child' | 'infant';
 export type TariffType = 'tariff1' | 'tariff2' | 'tariff3' | 'tariff4';
@@ -10,6 +11,7 @@ interface BookingState {
   passengerType: PassengerType;
   tariff: TariffType;
   seatType: SeatType;
+  selectedRoute: RouteData | null;
 }
 
 interface BookingContextType {
@@ -17,6 +19,7 @@ interface BookingContextType {
   setPassengerType: (type: PassengerType) => void;
   setTariff: (tariff: TariffType) => void;
   setSeatType: (seat: SeatType) => void;
+  setSelectedRoute: (route: RouteData | null) => void;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -26,6 +29,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     passengerType: 'adult',
     tariff: 'tariff2',
     seatType: 'random',
+    selectedRoute: null,
   });
 
   const setPassengerType = (type: PassengerType) => {
@@ -40,6 +44,10 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     setBookingState((prev) => ({ ...prev, seatType: seat }));
   };
 
+  const setSelectedRoute = (route: RouteData | null) => {
+    setBookingState((prev) => ({ ...prev, selectedRoute: route }));
+  };
+
   return (
     <BookingContext.Provider
       value={{
@@ -47,6 +55,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         setPassengerType,
         setTariff,
         setSeatType,
+        setSelectedRoute,
       }}
     >
       {children}

@@ -15,7 +15,7 @@ import {
 } from '@/app/components/ui/dialog';
 import { Progress } from '@/app/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group';
-import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import type { UserRole } from '@/app/lib/mockUsers';
 
 interface RegisterModalProps {
@@ -37,6 +37,8 @@ export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterM
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Close modal if user is already logged in
@@ -55,6 +57,8 @@ export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterM
       setPassword('');
       setConfirmPassword('');
       setName('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
     }
   }, [open]);
 
@@ -177,6 +181,8 @@ export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterM
       setPassword('');
       setConfirmPassword('');
       setName('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
     }
   };
 
@@ -266,16 +272,32 @@ export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterM
 
             <div className="space-y-2">
               <Label htmlFor="modal-register-password">Пароль</Label>
-              <Input
-                id="modal-register-password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isSubmitting}
-                minLength={6}
-              />
+              <div className="relative">
+                <Input
+                  id="modal-register-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  minLength={6}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  disabled={isSubmitting}
+                  aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               <p className="text-xs text-muted-foreground">
                 Минимум 6 символов
               </p>
@@ -283,16 +305,32 @@ export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterM
 
             <div className="space-y-2">
               <Label htmlFor="modal-register-confirm-password">Подтвердите пароль</Label>
-              <Input
-                id="modal-register-confirm-password"
-                type="password"
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                disabled={isSubmitting}
-                minLength={6}
-              />
+              <div className="relative">
+                <Input
+                  id="modal-register-confirm-password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  minLength={6}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  disabled={isSubmitting}
+                  aria-label={showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex gap-2">
