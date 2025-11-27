@@ -218,16 +218,13 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
               Зарегистрироваться
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => {
-                handleOpenChange(false);
-                onSwitchToRegister?.();
-              }}
+            <Link 
+              href="/auth/register" 
               className="text-primary hover:underline"
+              onClick={() => handleOpenChange(false)}
             >
               Зарегистрироваться
-            </button>
+            </Link>
           )}
         </div>
       </DialogContent>

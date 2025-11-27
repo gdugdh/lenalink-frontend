@@ -15,10 +15,18 @@ export function BookingPageClient() {
   const { bookingState } = useBooking();
   const route = bookingState.selectedRoute;
 
-  // Default route if none selected
+  // Default route if none selected - matches RouteOverview default
   const displayRoute = route || {
+    departureTime: '09:00',
     departureCity: 'Москва',
+    departureDate: '2 дек, вт',
+    arrivalTime: '19:30',
     arrivalCity: 'Олекминск',
+    arrivalDate: '2 дек, вт',
+    duration: '10 ч 30 мин',
+    carrier: 'S7 Airlines',
+    carrierCode: 'S7',
+    routeCodes: ['MOW', 'YKS'],
   };
 
   return (
