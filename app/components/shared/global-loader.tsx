@@ -35,10 +35,7 @@ export function GlobalLoader() {
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
-      <div className="flex flex-col items-center gap-4">
-        <Spinner className="h-12 w-12 text-[#7B91FF]" />
-        <p className="text-lg font-medium text-[#022444]">Loading...</p>
-      </div>
+      <Spinner className="h-12 w-12 text-[#7B91FF]" />
     </div>
   );
 }
