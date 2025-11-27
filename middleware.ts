@@ -25,11 +25,12 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/api/auth/')
   );
   
-  // If accessing a protected route without session, redirect to login
+  // If accessing a protected route without session, redirect to home with login modal
   if (!isPublicRoute && !sessionCookie) {
-    const loginUrl = new URL('/auth/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+    const homeUrl = new URL('/', request.url);
+    homeUrl.searchParams.set('modal', 'login');
+    homeUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(homeUrl);
   }
   
   // If accessing auth pages while already logged in, redirect to appropriate dashboard
@@ -47,7 +48,10 @@ export function middleware(request: NextRequest) {
   // Role-based access control for dashboard routes
   if (pathname.startsWith('/dashboard/')) {
     if (!sessionCookie) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+      const homeUrl = new URL('/', request.url);
+      homeUrl.searchParams.set('modal', 'login');
+      homeUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(homeUrl);
     }
     
     try {
@@ -59,8 +63,10 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(`/dashboard/${session.user.role}`, request.url));
       }
     } catch {
-      // Invalid session, redirect to login
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+      // Invalid session, redirect to home with login modal
+      const homeUrl = new URL('/', request.url);
+      homeUrl.searchParams.set('modal', 'login');
+      return NextResponse.redirect(homeUrl);
     }
   }
   

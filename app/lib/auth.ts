@@ -141,7 +141,7 @@ export async function requireAuth(): Promise<Session> {
   const session = await getSession();
 
   if (!session) {
-    redirect('/auth/login');
+    redirect('/?modal=login');
   }
 
   return session;
@@ -154,7 +154,7 @@ export async function requireRole(requiredRole: UserRole): Promise<Session> {
   const session = await requireAuth();
 
   if (session.user.role !== requiredRole) {
-    redirect('/auth/login?error=unauthorized');
+    redirect('/?modal=login&error=unauthorized');
   }
 
   return session;

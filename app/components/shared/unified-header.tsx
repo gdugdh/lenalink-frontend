@@ -38,12 +38,19 @@ export function UnifiedHeader() {
 
   const handleLogout = async () => {
     try {
+      // Close modals before logout
+      setLoginModalOpen(false);
+      setRegisterModalOpen(false);
+      
       await logout();
       toast({
         title: 'Выход выполнен',
         description: 'Вы успешно вышли из системы',
       });
-      router.push('/');
+      
+      // Navigate to home without any query parameters
+      router.replace('/', { scroll: false });
+      router.refresh();
     } catch (error) {
       toast({
         title: 'Ошибка',

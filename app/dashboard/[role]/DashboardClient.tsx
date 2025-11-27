@@ -18,8 +18,8 @@ export function DashboardClient() {
   useEffect(() => {
     if (!loading) {
       if (!session) {
-        // No session, redirect to login
-        router.push('/auth/login');
+        // No session, redirect to home with login modal
+        router.push('/?modal=login');
         return;
       }
 
@@ -29,9 +29,9 @@ export function DashboardClient() {
         return;
       }
 
-      // Invalid role, redirect to login
+      // Invalid role, redirect to home with login modal
       if (!['user', 'admin', 'partner'].includes(session.user.role)) {
-        router.push('/auth/login');
+        router.push('/?modal=login');
       }
     }
   }, [session, loading, roleParam, router]);

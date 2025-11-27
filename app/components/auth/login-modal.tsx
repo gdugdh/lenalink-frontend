@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/hooks/use-toast';
@@ -25,6 +25,7 @@ interface LoginModalProps {
 
 export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModalProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, session } = useAuth();
   const { toast } = useToast();
 
@@ -71,8 +72,9 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
         setPassword('');
         setShowPassword(false);
         
-        // Redirect to dashboard
-        router.push(`/dashboard/${sessionData.user.role}`);
+        // Get redirect parameter or default to dashboard
+        const redirectTo = searchParams.get('redirect') || `/dashboard/${sessionData.user.role}`;
+        router.push(redirectTo);
         router.refresh(); // Refresh to update header
       } else {
         // Handle case when session fetch fails after successful login
@@ -216,13 +218,16 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
               Зарегистрироваться
             </button>
           ) : (
-            <Link 
-              href="/auth/register" 
+            <button
+              type="button"
+              onClick={() => {
+                handleOpenChange(false);
+                onSwitchToRegister?.();
+              }}
               className="text-primary hover:underline"
-              onClick={() => handleOpenChange(false)}
             >
               Зарегистрироваться
-            </Link>
+            </button>
           )}
         </div>
       </DialogContent>

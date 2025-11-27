@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/app/context/AuthContext';
@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
 import { LogOut, User, Settings } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/app/hooks/use-toast';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import { LoginModal } from '@/app/components/auth/login-modal';
@@ -24,18 +24,36 @@ import { RegisterModal } from '@/app/components/auth/register-modal';
 export function HomeHeader() {
   const { session, loading, logout } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
 
+  // Check URL params to open modals
+  const modalParam = searchParams.get('modal');
+  useEffect(() => {
+    if (modalParam === 'login') {
+      setLoginModalOpen(true);
+    } else if (modalParam === 'register') {
+      setRegisterModalOpen(true);
+    }
+  }, [modalParam]);
+
   const handleLogout = async () => {
     try {
+      // Close modals before logout
+      setLoginModalOpen(false);
+      setRegisterModalOpen(false);
+      
       await logout();
       toast({
         title: 'Выход выполнен',
         description: 'Вы успешно вышли из системы',
       });
-      router.push('/');
+      
+      // Navigate to home without any query parameters
+      router.replace('/', { scroll: false });
+      router.refresh();
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -120,7 +138,16 @@ export function HomeHeader() {
               </Button>
               <LoginModal 
                 open={loginModalOpen} 
-                onOpenChange={setLoginModalOpen}
+                onOpenChange={(open) => {
+                  setLoginModalOpen(open);
+                  if (!open) {
+                    // Clean URL when closing
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('modal');
+                    url.searchParams.delete('redirect');
+                    router.replace(url.pathname + url.search, { scroll: false });
+                  }
+                }}
                 onSwitchToRegister={() => {
                   setLoginModalOpen(false);
                   setRegisterModalOpen(true);
@@ -128,7 +155,15 @@ export function HomeHeader() {
               />
               <RegisterModal 
                 open={registerModalOpen} 
-                onOpenChange={setRegisterModalOpen}
+                onOpenChange={(open) => {
+                  setRegisterModalOpen(open);
+                  if (!open) {
+                    // Clean URL when closing
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('modal');
+                    router.replace(url.pathname + url.search, { scroll: false });
+                  }
+                }}
                 onSwitchToLogin={() => {
                   setRegisterModalOpen(false);
                   setLoginModalOpen(true);

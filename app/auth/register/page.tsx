@@ -1,11 +1,6 @@
-import type { Metadata } from 'next';
-import { RegisterClient } from './RegisterClient';
-
-export const metadata: Metadata = {
-  title: 'Регистрация | LenaLink',
-  description: 'Создайте новый аккаунт LenaLink',
-};
+import { redirect } from 'next/navigation';
 
 export default function RegisterPage() {
-  return <RegisterClient />;
+  // Redirect to home page with register modal parameter
+  redirect('/?modal=register');
 }
