@@ -8,7 +8,8 @@ import { Skeleton } from '@/app/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/app/components/ui/avatar';
 import { Badge } from '@/app/components/ui/badge';
 import { Separator } from '@/app/components/ui/separator';
-import { LogOut, Wallet, Ticket, Settings, CreditCard, History } from 'lucide-react';
+import { LogOut, Wallet, Ticket, Settings, CreditCard, History, Home } from 'lucide-react';
+import Link from 'next/link';
 import { useToast } from '@/app/hooks/use-toast';
 
 export function UserDashboard() {
@@ -78,10 +79,18 @@ export function UserDashboard() {
               <p className="text-sm sm:text-base text-muted-foreground">{session.user.email}</p>
             </div>
           </div>
-          <Button onClick={handleLogout} variant="outline" className="w-full sm:w-auto">
-            <LogOut className="mr-2 h-4 w-4" />
-            Выйти
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <Link href="/">
+                <Home className="mr-2 h-4 w-4" />
+                На главную
+              </Link>
+            </Button>
+            <Button onClick={handleLogout} variant="outline" className="w-full sm:w-auto">
+              <LogOut className="mr-2 h-4 w-4" />
+              Выйти
+            </Button>
+          </div>
         </div>
 
         <Separator />

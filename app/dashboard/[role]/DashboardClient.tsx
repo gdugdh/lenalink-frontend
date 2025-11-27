@@ -16,10 +16,22 @@ export function DashboardClient() {
   const roleParam = params?.role as string;
 
   useEffect(() => {
-    if (!loading && session) {
+    if (!loading) {
+      if (!session) {
+        // No session, redirect to login
+        router.push('/auth/login');
+        return;
+      }
+
       // If role in URL doesn't match user's role, redirect to correct dashboard
       if (roleParam !== session.user.role) {
         router.replace(`/dashboard/${session.user.role}`);
+        return;
+      }
+
+      // Invalid role, redirect to login
+      if (!['user', 'admin', 'partner'].includes(session.user.role)) {
+        router.push('/auth/login');
       }
     }
   }, [session, loading, roleParam, router]);
@@ -35,8 +47,14 @@ export function DashboardClient() {
   }
 
   if (!session) {
-    router.push('/auth/login');
-    return null;
+    // Show loading state while redirecting
+    return (
+      <div className="container mx-auto p-4 space-y-6">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    );
   }
 
   // Render the appropriate dashboard based on user's role
@@ -48,7 +66,13 @@ export function DashboardClient() {
     case 'partner':
       return <PartnerDashboard />;
     default:
-      router.push('/auth/login');
-      return null;
+      // Show loading state while redirecting
+      return (
+        <div className="container mx-auto p-4 space-y-6">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      );
   }
 }

@@ -13,9 +13,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!['user', 'admin', 'partner'].includes(role)) {
+    // Only allow 'user' and 'partner' roles for registration
+    // 'admin' role should be assigned manually by existing admins
+    if (!['user', 'partner'].includes(role)) {
       return NextResponse.json(
-        { message: 'Недопустимая роль' },
+        { message: 'Недопустимая роль. Доступны только роли: пользователь, партнёр' },
         { status: 400 }
       );
     }

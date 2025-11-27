@@ -19,12 +19,14 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/app/hooks/use-toast';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import { LoginModal } from '@/app/components/auth/login-modal';
+import { RegisterModal } from '@/app/components/auth/register-modal';
 
 export function HomeHeader() {
   const { session, loading, logout } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [registerModalOpen, setRegisterModalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -68,10 +70,10 @@ export function HomeHeader() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="text-white hover:bg-white/10 border border-white/20 h-9 px-3 sm:px-4"
+                  className="bg-white text-[#022444] hover:bg-white/90 border border-white/20 h-9 px-3 sm:px-4 select-none"
                 >
                   <Avatar className="h-6 w-6 sm:h-7 sm:w-7 mr-2">
-                    <AvatarFallback className="bg-white/20 text-white text-xs">
+                    <AvatarFallback className="bg-[#022444] text-white text-xs">
                       {session.user.name
                         .split(' ')
                         .map((n) => n[0])
@@ -79,7 +81,7 @@ export function HomeHeader() {
                         .toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden sm:inline text-sm font-medium">
+                  <span className="hidden sm:inline text-sm font-medium select-none">
                     {session.user.name.split(' ')[0]}
                   </span>
                 </Button>
@@ -116,7 +118,22 @@ export function HomeHeader() {
               >
                 Войти
               </Button>
-              <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
+              <LoginModal 
+                open={loginModalOpen} 
+                onOpenChange={setLoginModalOpen}
+                onSwitchToRegister={() => {
+                  setLoginModalOpen(false);
+                  setRegisterModalOpen(true);
+                }}
+              />
+              <RegisterModal 
+                open={registerModalOpen} 
+                onOpenChange={setRegisterModalOpen}
+                onSwitchToLogin={() => {
+                  setRegisterModalOpen(false);
+                  setLoginModalOpen(true);
+                }}
+              />
             </>
           )}
         </div>
