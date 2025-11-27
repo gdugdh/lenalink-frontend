@@ -68,31 +68,56 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
   const fromSuggestionsRef = useRef<HTMLDivElement>(null);
   const toSuggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Фильтрация городов по введенному тексту
-  const filterCities = (query: string): string[] => {
+  // Извлечение названия города из полной строки (например, "Москва, Россия" -> "Москва")
+  const extractCityName = (fullCity: string): string => {
+    if (!fullCity) return '';
+    const parts = fullCity.split(',');
+    return parts[0]?.trim() || fullCity;
+  };
+
+  // Фильтрация городов по введенному тексту, исключая уже выбранный город из другого поля
+  const filterCities = (query: string, excludeCity?: string): string[] => {
     if (!query.trim()) return [];
     const lowerQuery = query.toLowerCase();
+    const excludeCityName = excludeCity ? extractCityName(excludeCity).toLowerCase() : '';
+    
     return cities
-      .filter(city => city.toLowerCase().includes(lowerQuery))
+      .filter(city => {
+        const cityLower = city.toLowerCase();
+        const cityName = extractCityName(city).toLowerCase();
+        // Исключаем город, если он уже выбран в другом поле
+        if (excludeCityName && cityName === excludeCityName) {
+          return false;
+        }
+        return cityLower.includes(lowerQuery);
+      })
       .slice(0, 5); // Показываем максимум 5 результатов
+  };
+
+  // Проверка, является ли значение валидным городом из списка
+  const isValidCity = (value: string): boolean => {
+    if (!value.trim()) return false;
+    return cities.some(city => city.toLowerCase() === value.toLowerCase());
   };
 
   // Обработка изменения поля "Откуда"
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFromValue(value);
-    const suggestions = filterCities(value);
+    const suggestions = filterCities(value, toValue);
     setFromSuggestions(suggestions);
-    setShowFromSuggestions(suggestions.length > 0 && value.trim().length > 0);
+    // Показываем меню, если есть ввод (даже если нет результатов)
+    setShowFromSuggestions(value.trim().length > 0);
   };
 
   // Обработка изменения поля "Куда"
   const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setToValue(value);
-    const suggestions = filterCities(value);
+    const suggestions = filterCities(value, fromValue);
     setToSuggestions(suggestions);
-    setShowToSuggestions(suggestions.length > 0 && value.trim().length > 0);
+    // Показываем меню, если есть ввод (даже если нет результатов)
+    setShowToSuggestions(value.trim().length > 0);
   };
 
   // Обработка клавиатуры для поля "Откуда"
@@ -168,6 +193,9 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
     };
   }, []);
 
+  // Проверка валидности формы
+  const isFormValid = isValidCity(fromValue) && isValidCity(toValue);
+
   // Формирование URL для поиска
   const searchUrl = `/search?from=${encodeURIComponent(fromValue)}&to=${encodeURIComponent(toValue)}`;
 
@@ -188,29 +216,35 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
                 onKeyDown={handleFromKeyDown}
                 onFocus={() => {
                   if (fromValue.trim().length > 0) {
-                    const suggestions = filterCities(fromValue);
+                    const suggestions = filterCities(fromValue, toValue);
                     setFromSuggestions(suggestions);
-                    setShowFromSuggestions(suggestions.length > 0);
+                    setShowFromSuggestions(true);
                   }
                 }}
                 placeholder="Откуда"
                 className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
               />
-              {showFromSuggestions && fromSuggestions.length > 0 && (
+              {showFromSuggestions && fromValue.trim().length > 0 && (
                 <div
                   ref={fromSuggestionsRef}
                   className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
                 >
-                  {fromSuggestions.map((city, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleFromSelect(city)}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
-                    >
-                      {city}
-                    </button>
-                  ))}
+                  {fromSuggestions.length > 0 ? (
+                    fromSuggestions.map((city, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleFromSelect(city)}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                      >
+                        {city}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                      Мы ничего не нашли
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -240,40 +274,56 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
                 onKeyDown={handleToKeyDown}
                 onFocus={() => {
                   if (toValue.trim().length > 0) {
-                    const suggestions = filterCities(toValue);
+                    const suggestions = filterCities(toValue, fromValue);
                     setToSuggestions(suggestions);
-                    setShowToSuggestions(suggestions.length > 0);
+                    setShowToSuggestions(true);
                   }
                 }}
                 placeholder="Куда"
                 className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
               />
-              {showToSuggestions && toSuggestions.length > 0 && (
+              {showToSuggestions && toValue.trim().length > 0 && (
                 <div
                   ref={toSuggestionsRef}
                   className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
                 >
-                  {toSuggestions.map((city, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleToSelect(city)}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
-                    >
-                      {city}
-                    </button>
-                  ))}
+                  {toSuggestions.length > 0 ? (
+                    toSuggestions.map((city, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleToSelect(city)}
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                      >
+                        {city}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                      Мы ничего не нашли
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           </div>
 
-          <Link href={searchUrl}>
-            <Button className="w-full bg-[#7B91FF] hover:bg-[#E16D32] text-white text-sm sm:text-base font-medium py-3 sm:py-4 md:py-6 h-auto">
+          {isFormValid ? (
+            <Link href={searchUrl}>
+              <Button className="w-full bg-[#7B91FF] hover:bg-[#E16D32] text-white text-sm sm:text-base font-medium py-3 sm:py-4 md:py-6 h-auto">
+                <Search className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                Найти варианты
+              </Button>
+            </Link>
+          ) : (
+            <Button 
+              disabled 
+              className="w-full bg-gray-400 cursor-not-allowed text-white text-sm sm:text-base font-medium py-3 sm:py-4 md:py-6 h-auto"
+            >
               <Search className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               Найти варианты
             </Button>
-          </Link>
+          )}
         </div>
       </div>
     </div>
