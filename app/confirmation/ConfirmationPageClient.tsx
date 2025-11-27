@@ -32,7 +32,7 @@ export function ConfirmationPageClient() {
 
         <div className="mx-auto max-w-7xl px-4 py-8">
           <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-6">
             <div className="rounded-lg border bg-white p-6">
               <h2 className="mb-4 text-xl font-bold text-[#022444]">
                 Номер бронирования
@@ -251,9 +251,9 @@ export function ConfirmationPageClient() {
                 <li>• Детали бронирования отправлены на ваш email</li>
               </ul>
             </div>
-          </div>
+            </div>
 
-          <div className="space-y-6">
+            <div className="lg:col-span-1 space-y-6">
             <div className="rounded-lg border bg-white p-6">
               <h2 className="mb-4 text-xl font-bold text-[#022444]">
                 Сводка по стоимости
