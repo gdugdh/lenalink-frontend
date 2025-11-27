@@ -5,41 +5,24 @@ import { Button } from "@/app/components/ui/button";
 import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { routes } from "@/app/lib/routes";
+import { useBooking, type TariffType } from "@/app/lib/booking-context";
+import { calculatePrice, getTariffName, getPassengerTypeLabel } from "@/app/lib/price-calculator";
 
 export function InsuranceSelectionPageClient() {
   const router = useRouter();
-  const [selectedPlan, setSelectedPlan] = useState<string>("tariff2");
+  const { bookingState, setTariff } = useBooking();
+  const selectedPlan = bookingState.tariff;
 
   const handleContinue = () => {
     router.push(routes.seatSelection);
   };
 
-  const getTariffName = (plan: string): string => {
-    const tariffMap: Record<string, string> = {
-      tariff1: "Тариф 1",
-      tariff2: "Тариф 2",
-      tariff3: "Тариф 3",
-      tariff4: "Тариф 4",
-    };
-    return tariffMap[plan] || "Тариф";
-  };
-
-  const getTariffPrice = (plan: string): number => {
-    const priceMap: Record<string, number> = {
-      tariff1: 41256,
-      tariff2: 43500,
-      tariff3: 45500,
-      tariff4: 47500,
-    };
-    return priceMap[plan] || 41256;
-  };
-
-  const basePrice = 41256;
-  const selectedTariffPrice = getTariffPrice(selectedPlan);
-  const tariffFee = selectedTariffPrice - basePrice;
-  const totalPrice = selectedTariffPrice;
+  const priceBreakdown = calculatePrice(
+    bookingState.passengerType,
+    bookingState.tariff,
+    bookingState.seatType
+  );
 
   return (
     <>
@@ -83,7 +66,7 @@ export function InsuranceSelectionPageClient() {
                     name="plan"
                     value="tariff1"
                     checked={selectedPlan === "tariff1"}
-                    onChange={(e) => setSelectedPlan(e.target.value)}
+                    onChange={(e) => setTariff(e.target.value as TariffType)}
                     className="sr-only"
                   />
                   <div className="mb-4 text-center">
@@ -132,7 +115,7 @@ export function InsuranceSelectionPageClient() {
                     name="plan"
                     value="tariff2"
                     checked={selectedPlan === "tariff2"}
-                    onChange={(e) => setSelectedPlan(e.target.value)}
+                    onChange={(e) => setTariff(e.target.value as TariffType)}
                     className="sr-only"
                   />
                   <div className="mb-2 flex justify-center">
@@ -188,7 +171,7 @@ export function InsuranceSelectionPageClient() {
                     name="plan"
                     value="tariff3"
                     checked={selectedPlan === "tariff3"}
-                    onChange={(e) => setSelectedPlan(e.target.value)}
+                    onChange={(e) => setTariff(e.target.value as TariffType)}
                     className="sr-only"
                   />
                   <div className="mb-4 text-center">
@@ -236,7 +219,7 @@ export function InsuranceSelectionPageClient() {
                     name="plan"
                     value="tariff4"
                     checked={selectedPlan === "tariff4"}
-                    onChange={(e) => setSelectedPlan(e.target.value)}
+                    onChange={(e) => setTariff(e.target.value as TariffType)}
                     className="sr-only"
                   />
                   <div className="mb-4 text-center">
@@ -308,14 +291,24 @@ export function InsuranceSelectionPageClient() {
 
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#022444]">1x взрослый</span>
-                    <span className="font-medium text-[#022444]">41 256₽</span>
+                    <span className="text-[#022444]">1x {getPassengerTypeLabel(bookingState.passengerType)}</span>
+                    <span className="font-medium text-[#022444]">
+                      {priceBreakdown.basePrice.toLocaleString('ru-RU')}₽
+                    </span>
                   </div>
-                  {tariffFee > 0 && (
+                  {priceBreakdown.tariffFee > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-[#022444]">1x {getTariffName(selectedPlan)}</span>
                       <span className="font-medium text-[#022444]">
-                        {tariffFee.toLocaleString('ru-RU')}₽
+                        {priceBreakdown.tariffFee.toLocaleString('ru-RU')}₽
+                      </span>
+                    </div>
+                  )}
+                  {priceBreakdown.seatFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#022444]">1x место</span>
+                      <span className="font-medium text-[#022444]">
+                        {priceBreakdown.seatFee.toLocaleString('ru-RU')}₽
                       </span>
                     </div>
                   )}
@@ -326,7 +319,7 @@ export function InsuranceSelectionPageClient() {
                 <div className="flex justify-between">
                   <span className="font-bold text-[#022444]">Итого</span>
                   <span className="text-2xl font-bold text-[#7B91FF]">
-                    {totalPrice.toLocaleString('ru-RU')}₽
+                    {priceBreakdown.total.toLocaleString('ru-RU')}₽
                   </span>
                 </div>
 

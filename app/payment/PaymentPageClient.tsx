@@ -7,10 +7,18 @@ import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { routes } from "@/app/lib/routes";
+import { useBooking } from "@/app/lib/booking-context";
+import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName } from "@/app/lib/price-calculator";
 
 export function PaymentPageClient() {
   const router = useRouter();
   const [selectedPayment, setSelectedPayment] = useState<string>("card");
+  const { bookingState } = useBooking();
+  const priceBreakdown = calculatePrice(
+    bookingState.passengerType,
+    bookingState.tariff,
+    bookingState.seatType
+  );
 
   const handlePayment = () => {
     router.push(routes.confirmation);
@@ -129,12 +137,14 @@ export function PaymentPageClient() {
                       <div>
                         <div className="font-medium text-[#022444]">Пассажир</div>
                         <div className="text-sm text-[#022444]">
-                          1 взрослый • Иван Петров
+                          1 {getPassengerTypeLabel(bookingState.passengerType)} • Иван Петров
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-[#022444]">41 256₽</div>
+                      <div className="font-bold text-[#022444]">
+                        {priceBreakdown.basePrice.toLocaleString('ru-RU')}₽
+                      </div>
                     </div>
                   </div>
 
@@ -145,36 +155,52 @@ export function PaymentPageClient() {
                       </div>
                       <div>
                         <div className="font-medium text-[#022444]">
-                          Тариф Standard (Тариф 2)
+                          {getTariffName(bookingState.tariff)}
                         </div>
                         <div className="text-sm text-[#022444]">
-                          Изменения разрешены • Возврат возможен
+                          {bookingState.tariff === 'tariff1' 
+                            ? 'Базовый тариф'
+                            : bookingState.tariff === 'tariff2'
+                            ? 'Изменения разрешены • Возврат возможен'
+                            : bookingState.tariff === 'tariff3'
+                            ? 'Максимальная гибкость • Возврат ~80%'
+                            : 'Полный возврат 100%'}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold text-[#022444]">2 244₽</div>
+                      <div className="font-bold text-[#022444]">
+                        {priceBreakdown.tariffFee > 0 ? `${priceBreakdown.tariffFee.toLocaleString('ru-RU')}₽` : 'Включено'}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
-                        <Check className="h-5 w-5 text-orange-600" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#022444]">
-                          Место с доп. пространством
+                  {priceBreakdown.seatFee > 0 && (
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                          <Check className="h-5 w-5 text-orange-600" />
                         </div>
-                        <div className="text-sm text-[#022444]">
-                          Дополнительное пространство для ног (1A)
+                        <div>
+                          <div className="font-medium text-[#022444]">
+                            {getSeatName(bookingState.seatType)}
+                          </div>
+                          <div className="text-sm text-[#022444]">
+                            {bookingState.seatType === 'legroom' 
+                              ? 'Дополнительное пространство для ног (1A)'
+                              : bookingState.seatType === 'window'
+                              ? 'Место у окна'
+                              : 'Место у прохода'}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-[#022444]">
+                          {priceBreakdown.seatFee.toLocaleString('ru-RU')}₽
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-[#022444]">7 900₽</div>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -338,7 +364,7 @@ export function PaymentPageClient() {
                   onClick={handlePayment}
                   className="bg-[#7B91FF] hover:bg-[#E16D32] px-8"
                 >
-                  Оплатить 51 400₽
+                  Оплатить {priceBreakdown.total.toLocaleString('ru-RU')}₽
                 </Button>
               </div>
             </div>
@@ -352,23 +378,33 @@ export function PaymentPageClient() {
 
                 <div className="space-y-3 border-b pb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#022444]">Пассажир</span>
-                    <span className="font-medium text-[#022444]">41 256₽</span>
+                    <span className="text-[#022444]">1x {getPassengerTypeLabel(bookingState.passengerType)}</span>
+                    <span className="font-medium text-[#022444]">
+                      {priceBreakdown.basePrice.toLocaleString('ru-RU')}₽
+                    </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#022444]">Тариф Standard</span>
-                    <span className="font-medium text-[#022444]">2 244₽</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#022444]">Доп. место</span>
-                    <span className="font-medium text-[#022444]">7 900₽</span>
-                  </div>
+                  {priceBreakdown.tariffFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#022444]">1x {getTariffName(bookingState.tariff)}</span>
+                      <span className="font-medium text-[#022444]">
+                        {priceBreakdown.tariffFee.toLocaleString('ru-RU')}₽
+                      </span>
+                    </div>
+                  )}
+                  {priceBreakdown.seatFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#022444]">1x место</span>
+                      <span className="font-medium text-[#022444]">
+                        {priceBreakdown.seatFee.toLocaleString('ru-RU')}₽
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="my-4 flex justify-between">
                   <span className="text-xl font-bold text-[#022444]">Итого</span>
                   <span className="text-3xl font-bold text-[#7B91FF]">
-                    51 400₽
+                    {priceBreakdown.total.toLocaleString('ru-RU')}₽
                   </span>
                 </div>
 
@@ -389,8 +425,13 @@ export function PaymentPageClient() {
               <div className="rounded-lg bg-gradient-to-br from-[#558DCA] to-[#96FFFF] p-6 text-white">
                 <h3 className="mb-3 font-semibold">Гарантия возврата</h3>
                 <p className="text-sm">
-                  С выбранным тарифом Standard вы можете отменить бронирование за
-                  48 часов до вылета и получить возврат средств.
+                  {bookingState.tariff === 'tariff1' 
+                    ? 'С базовым тарифом возврат минимальный и только по правилам перевозчиков.'
+                    : bookingState.tariff === 'tariff2'
+                    ? 'С выбранным тарифом вы можете отменить бронирование за 48 часов до вылета и получить возврат средств.'
+                    : bookingState.tariff === 'tariff3'
+                    ? 'С выбранным тарифом вы можете отменить бронирование в любой момент и получить возврат около 80% от стоимости.'
+                    : 'С выбранным тарифом вы можете отменить бронирование в любой момент и получить полный возврат 100% стоимости.'}
                 </p>
               </div>
             </div>

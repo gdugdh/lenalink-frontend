@@ -13,9 +13,11 @@ import {
 } from '@/app/components/ui/select';
 import { routes } from '@/app/lib/routes';
 import { useRouter } from 'next/navigation';
+import { useBooking, type PassengerType } from '@/app/lib/booking-context';
 
 export function BookingForm() {
   const router = useRouter();
+  const { bookingState, setPassengerType } = useBooking();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,10 @@ export function BookingForm() {
           <h2 className="text-base sm:text-lg md:text-xl font-bold text-[#022444]">
             Данные пассажира
           </h2>
-          <Select defaultValue="adult">
+          <Select 
+            value={bookingState.passengerType} 
+            onValueChange={(value) => setPassengerType(value as PassengerType)}
+          >
             <SelectTrigger className="w-full sm:w-[200px] md:w-[250px] h-8 sm:h-9 text-sm">
               <SelectValue />
             </SelectTrigger>

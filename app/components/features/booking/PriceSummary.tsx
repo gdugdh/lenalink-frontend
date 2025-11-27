@@ -1,6 +1,16 @@
 'use client';
 
+import { useBooking } from '@/app/lib/booking-context';
+import { calculatePrice, getPassengerTypeLabel } from '@/app/lib/price-calculator';
+
 export function PriceSummary() {
+  const { bookingState } = useBooking();
+  const priceBreakdown = calculatePrice(
+    bookingState.passengerType,
+    bookingState.tariff,
+    bookingState.seatType
+  );
+
   return (
     <div className="rounded-lg border bg-white p-3 sm:p-4 md:p-6">
       <h3 className="mb-3 sm:mb-4 text-base sm:text-lg font-bold text-[#022444]">
@@ -9,9 +19,27 @@ export function PriceSummary() {
 
       <div className="space-y-1.5 sm:space-y-2">
         <div className="flex justify-between text-xs sm:text-sm">
-          <span className="text-[#022444]">1x взрослый</span>
-          <span className="font-medium text-[#022444]">41 256₽</span>
+          <span className="text-[#022444]">1x {getPassengerTypeLabel(bookingState.passengerType)}</span>
+          <span className="font-medium text-[#022444]">
+            {priceBreakdown.basePrice.toLocaleString('ru-RU')}₽
+          </span>
         </div>
+        {priceBreakdown.tariffFee > 0 && (
+          <div className="flex justify-between text-xs sm:text-sm">
+            <span className="text-[#022444]">1x тариф</span>
+            <span className="font-medium text-[#022444]">
+              {priceBreakdown.tariffFee.toLocaleString('ru-RU')}₽
+            </span>
+          </div>
+        )}
+        {priceBreakdown.seatFee > 0 && (
+          <div className="flex justify-between text-xs sm:text-sm">
+            <span className="text-[#022444]">1x место</span>
+            <span className="font-medium text-[#022444]">
+              {priceBreakdown.seatFee.toLocaleString('ru-RU')}₽
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="my-3 sm:my-4 border-t"></div>
@@ -19,7 +47,7 @@ export function PriceSummary() {
       <div className="flex justify-between items-center">
         <span className="font-bold text-sm sm:text-base text-[#022444]">Итого</span>
         <span className="text-xl sm:text-2xl font-bold text-[#7B91FF]">
-          41 256₽
+          {priceBreakdown.total.toLocaleString('ru-RU')}₽
         </span>
       </div>
 

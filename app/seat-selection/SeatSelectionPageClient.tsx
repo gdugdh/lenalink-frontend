@@ -6,12 +6,14 @@ import { Button } from "@/app/components/ui/button";
 import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { routes } from "@/app/lib/routes";
+import { useBooking, type SeatType } from "@/app/lib/booking-context";
+import { calculatePrice, getTariffName, getPassengerTypeLabel, getSeatName, getSeatPrice } from "@/app/lib/price-calculator";
 
 export function SeatSelectionPageClient() {
   const router = useRouter();
-  const [selectedOutbound, setSelectedOutbound] = useState<string>("random");
+  const { bookingState, setSeatType } = useBooking();
+  const selectedOutbound = bookingState.seatType;
 
   const handleContinue = () => {
     router.push(routes.payment);
@@ -96,7 +98,7 @@ export function SeatSelectionPageClient() {
                         name="outbound"
                         value="random"
                         checked={selectedOutbound === "random"}
-                        onChange={(e) => setSelectedOutbound(e.target.value)}
+                        onChange={(e) => setSeatType(e.target.value as SeatType)}
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
@@ -109,10 +111,10 @@ export function SeatSelectionPageClient() {
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
-                        Случайный выбор места
+                        {getSeatName("random")}
                       </div>
                       <div className="text-sm font-bold text-[#7B91FF]">
-                        Бесплатно
+                        {getSeatPrice("random") === 0 ? "Бесплатно" : `${getSeatPrice("random").toLocaleString('ru-RU')}₽`}
                       </div>
                     </label>
 
@@ -129,7 +131,7 @@ export function SeatSelectionPageClient() {
                         name="outbound"
                         value="window"
                         checked={selectedOutbound === "window"}
-                        onChange={(e) => setSelectedOutbound(e.target.value)}
+                        onChange={(e) => setSeatType(e.target.value as SeatType)}
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
@@ -142,10 +144,10 @@ export function SeatSelectionPageClient() {
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
-                        Окно
+                        {getSeatName("window")}
                       </div>
                       <div className="text-sm font-bold text-[#7B91FF]">
-                        3 000₽
+                        {getSeatPrice("window").toLocaleString('ru-RU')}₽
                       </div>
                     </label>
 
@@ -162,7 +164,7 @@ export function SeatSelectionPageClient() {
                         name="outbound"
                         value="aisle"
                         checked={selectedOutbound === "aisle"}
-                        onChange={(e) => setSelectedOutbound(e.target.value)}
+                        onChange={(e) => setSeatType(e.target.value as SeatType)}
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
@@ -175,10 +177,10 @@ export function SeatSelectionPageClient() {
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
-                        Проход
+                        {getSeatName("aisle")}
                       </div>
                       <div className="text-sm font-bold text-[#7B91FF]">
-                        2 300₽
+                        {getSeatPrice("aisle").toLocaleString('ru-RU')}₽
                       </div>
                     </label>
 
@@ -195,7 +197,7 @@ export function SeatSelectionPageClient() {
                         name="outbound"
                         value="legroom"
                         checked={selectedOutbound === "legroom"}
-                        onChange={(e) => setSelectedOutbound(e.target.value)}
+                        onChange={(e) => setSeatType(e.target.value as SeatType)}
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
@@ -208,10 +210,10 @@ export function SeatSelectionPageClient() {
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
-                        Дополнительное пространство для ног
+                        {getSeatName("legroom")}
                       </div>
                       <div className="text-sm font-bold text-[#7B91FF]">
-                        7 900₽
+                        {getSeatPrice("legroom").toLocaleString('ru-RU')}₽
                       </div>
                     </label>
                   </div>
@@ -240,31 +242,53 @@ export function SeatSelectionPageClient() {
               <div className="rounded-lg border bg-white p-6">
                 <h3 className="mb-4 text-lg font-bold text-[#022444]">Итого</h3>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#022444]">1x взрослый</span>
-                    <span className="font-medium text-[#022444]">41 256₽</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#022444]">1x тариф Standard</span>
-                    <span className="font-medium text-[#022444]">2 244₽</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#022444]">
-                      1x место (доп. пространство)
-                    </span>
-                    <span className="font-medium text-[#022444]">7 900₽</span>
-                  </div>
-                </div>
+                {(() => {
+                  const priceBreakdown = calculatePrice(
+                    bookingState.passengerType,
+                    bookingState.tariff,
+                    bookingState.seatType
+                  );
+                  
+                  return (
+                    <>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-[#022444]">1x {getPassengerTypeLabel(bookingState.passengerType)}</span>
+                          <span className="font-medium text-[#022444]">
+                            {priceBreakdown.basePrice.toLocaleString('ru-RU')}₽
+                          </span>
+                        </div>
+                        {priceBreakdown.tariffFee > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-[#022444]">1x {getTariffName(bookingState.tariff)}</span>
+                            <span className="font-medium text-[#022444]">
+                              {priceBreakdown.tariffFee.toLocaleString('ru-RU')}₽
+                            </span>
+                          </div>
+                        )}
+                        {priceBreakdown.seatFee > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-[#022444]">
+                              1x место
+                            </span>
+                            <span className="font-medium text-[#022444]">
+                              {priceBreakdown.seatFee.toLocaleString('ru-RU')}₽
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
-                <div className="my-4 border-t"></div>
+                      <div className="my-4 border-t"></div>
 
-                <div className="flex justify-between">
-                  <span className="font-bold text-[#022444]">Итого</span>
-                  <span className="text-2xl font-bold text-[#7B91FF]">
-                    43 500₽
-                  </span>
-                </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold text-[#022444]">Итого</span>
+                        <span className="text-2xl font-bold text-[#7B91FF]">
+                          {priceBreakdown.total.toLocaleString('ru-RU')}₽
+                        </span>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { BookingProvider } from "./lib/booking-context";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"] });
@@ -34,7 +35,9 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${geist.className} overflow-x-hidden`}>
       <body className={`${geist.className} antialiased overflow-x-hidden`} suppressHydrationWarning>
-        {children}
+        <BookingProvider>
+          {children}
+        </BookingProvider>
         <Analytics />
       </body>
     </html>
