@@ -82,7 +82,7 @@ export function SeatSelectionPageClient() {
                     Выберите предпочитаемый вариант ниже.
                   </p>
 
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Random seat */}
                     <label
                       className={`cursor-pointer rounded-lg border-2 p-4 text-center transition-all ${

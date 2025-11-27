@@ -69,7 +69,7 @@ export function InsuranceSelectionPageClient() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Left Side - Tariff Options */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Tariff 1 */}
                 <label
                   className={`cursor-pointer rounded-lg border-2 p-6 transition-all ${
