@@ -22,6 +22,8 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
   const [toSuggestions, setToSuggestions] = useState<string[]>([]);
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
+  const [fromSuggestionsPosition, setFromSuggestionsPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [toSuggestionsPosition, setToSuggestionsPosition] = useState({ top: 0, left: 0, width: 0 });
   const fromInputRef = useRef<HTMLInputElement>(null);
   const toInputRef = useRef<HTMLInputElement>(null);
   const fromSuggestionsRef = useRef<HTMLDivElement>(null);
@@ -52,6 +54,18 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
       .slice(0, 5); // Показываем максимум 5 результатов
   };
 
+  // Обновление позиции выпадающего меню для "Откуда"
+  const updateFromSuggestionsPosition = () => {
+    if (fromInputRef.current) {
+      const rect = fromInputRef.current.getBoundingClientRect();
+      setFromSuggestionsPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  };
+
   // Обработка изменения поля "Откуда"
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -59,6 +73,21 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     const suggestions = filterCities(value, toValue);
     setFromSuggestions(suggestions);
     setShowFromSuggestions(value.trim().length > 0);
+    if (value.trim().length > 0) {
+      setTimeout(updateFromSuggestionsPosition, 0);
+    }
+  };
+
+  // Обновление позиции выпадающего меню для "Куда"
+  const updateToSuggestionsPosition = () => {
+    if (toInputRef.current) {
+      const rect = toInputRef.current.getBoundingClientRect();
+      setToSuggestionsPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
   };
 
   // Обработка изменения поля "Куда"
@@ -68,6 +97,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     const suggestions = filterCities(value, fromValue);
     setToSuggestions(suggestions);
     setShowToSuggestions(value.trim().length > 0);
+    if (value.trim().length > 0) {
+      setTimeout(updateToSuggestionsPosition, 0);
+    }
   };
 
   // Выбор города из списка для "Откуда"
@@ -148,6 +180,26 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     }, 200);
   };
 
+  // Обновление позиций при скролле или изменении размера окна
+  useEffect(() => {
+    const updatePositions = () => {
+      if (showFromSuggestions && fromInputRef.current) {
+        updateFromSuggestionsPosition();
+      }
+      if (showToSuggestions && toInputRef.current) {
+        updateToSuggestionsPosition();
+      }
+    };
+
+    window.addEventListener('scroll', updatePositions, true);
+    window.addEventListener('resize', updatePositions);
+    
+    return () => {
+      window.removeEventListener('scroll', updatePositions, true);
+      window.removeEventListener('resize', updatePositions);
+    };
+  }, [showFromSuggestions, showToSuggestions]);
+
   // Закрытие выпадающих меню при клике вне их
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -197,6 +249,7 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                         const suggestions = filterCities(fromValue, toValue);
                         setFromSuggestions(suggestions);
                         setShowFromSuggestions(true);
+                        setTimeout(updateFromSuggestionsPosition, 0);
                       }
                     }}
                     className="w-full text-xs sm:text-sm font-medium text-[#022444] bg-transparent border-none outline-none"
@@ -206,7 +259,12 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                   {showFromSuggestions && fromValue.trim().length > 0 && (
                     <div
                       ref={fromSuggestionsRef}
-                      className="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto top-full left-0"
+                      className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
+                      style={{
+                        top: `${fromSuggestionsPosition.top}px`,
+                        left: `${fromSuggestionsPosition.left}px`,
+                        width: `${fromSuggestionsPosition.width}px`,
+                      }}
                     >
                       {fromSuggestions.length > 0 ? (
                         fromSuggestions.map((city, index) => (
@@ -258,6 +316,7 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                         const suggestions = filterCities(toValue, fromValue);
                         setToSuggestions(suggestions);
                         setShowToSuggestions(true);
+                        setTimeout(updateToSuggestionsPosition, 0);
                       }
                     }}
                     className="w-full text-xs sm:text-sm font-medium text-[#022444] bg-transparent border-none outline-none"
@@ -267,7 +326,12 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                   {showToSuggestions && toValue.trim().length > 0 && (
                     <div
                       ref={toSuggestionsRef}
-                      className="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto top-full left-0"
+                      className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
+                      style={{
+                        top: `${toSuggestionsPosition.top}px`,
+                        left: `${toSuggestionsPosition.left}px`,
+                        width: `${toSuggestionsPosition.width}px`,
+                      }}
                     >
                       {toSuggestions.length > 0 ? (
                         toSuggestions.map((city, index) => (
