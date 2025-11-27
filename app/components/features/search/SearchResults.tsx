@@ -22,65 +22,24 @@ export interface RouteData {
 }
 
 interface SearchResultsProps {
+  routes?: RouteData[];
   onRouteClick?: (route: RouteData) => void;
 }
 
-export function SearchResults({ onRouteClick }: SearchResultsProps) {
-  const routes: RouteData[] = [
-    {
-      id: '1',
-      badge: 'Оптимальный',
-      price: '41 256₽',
-      priceDetails:
-        '45 854₽ с багажом 23кг — 1 шт Ручная кладь 8кг — 1 шт',
-      carrier: 'S7 Airlines',
-      carrierCode: 'S7',
-      departureTime: '09:00',
-      departureCity: 'Москва',
-      departureDate: '2 дек, вт',
-      arrivalTime: '06:00',
-      arrivalCity: 'Олекминск',
-      arrivalDate: '3 дек, ср',
-      duration: '21ч в пути',
-      transfers: '1 пересадка',
-      routeCodes: ['MOW', 'YKS', 'OLZ'],
-    },
-    {
-      id: '2',
-      badge: 'Самый дешёвый',
-      price: '20 884₽',
-      priceDetails: '26 818₽ с багажом 10кг — 1 шт Ручная кладь — 1 шт',
-      carrier: '',
-      carrierCode: undefined,
-      departureTime: '13:55',
-      departureCity: 'Франкфурт-на-...',
-      departureDate: '2 дек, вт',
-      arrivalTime: '20:40',
-      arrivalCity: 'Казань',
-      arrivalDate: '3 дек, ср',
-      duration: '1д4ч45м в пути',
-      transfers: '1 пересадка',
-      routeCodes: ['FRA', 'SAW - IST', 'KZN'],
-      showClock: true,
-    },
-    {
-      id: '3',
-      badge: 'Самый быстрый',
-      price: '41 218₽',
-      priceDetails: '45 854₽ с багажом 23кг — 1 шт Ручная кладь 8кг — 1 шт',
-      carrier: '',
-      carrierCode: 'T',
-      departureTime: '18:25',
-      departureCity: 'Франкфурт-на-...',
-      departureDate: '2 дек, вт',
-      arrivalTime: '06:20',
-      arrivalCity: 'Казань',
-      arrivalDate: '3 дек, ср',
-      duration: '9ч55м в пути',
-      transfers: '1 пересадка',
-      routeCodes: ['FRA', 'IST', 'KZN'],
-    },
-  ];
+export function SearchResults({ routes = [], onRouteClick }: SearchResultsProps) {
+  // Если маршрутов нет, показываем сообщение
+  if (routes.length === 0) {
+    return (
+      <main className="flex-1 min-w-0 overflow-x-hidden">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-gray-500 text-lg">Маршруты не найдены</p>
+            <p className="text-gray-400 text-sm mt-2">Попробуйте изменить параметры поиска</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex-1 min-w-0 overflow-x-hidden">

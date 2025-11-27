@@ -1,7 +1,20 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { Session, UserRole } from '../lib/auth';
+import { backendApi, type BackendUser } from '../lib/backend-api';
+import type { UserRole } from '../lib/mockUsers';
+
+// Адаптируем BackendUser к нашему формату Session
+export interface Session {
+  user: {
+    id: string;
+    email: string;
+    role: UserRole;
+    name: string;
+    balance?: number;
+  };
+  expiresAt: number;
+}
 
 interface AuthContextType {
   session: Session | null;
@@ -11,80 +24,99 @@ interface AuthContextType {
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   hasRole: (role: UserRole) => boolean;
+  token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Преобразуем BackendUser в наш формат Session
+function backendUserToSession(backendUser: BackendUser, token: string): Session {
+  // По умолчанию роль 'user', так как бэкенд не возвращает роль
+  // В будущем можно добавить поле role в бэкенд или получать из токена
+  return {
+    user: {
+      id: backendUser.id,
+      email: backendUser.email,
+      role: 'user' as UserRole, // По умолчанию user
+      name: backendUser.name,
+    },
+    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 дней
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
 
   const refreshSession = async () => {
     try {
-      const response = await fetch('/api/auth/session', {
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSession(data);
-      } else {
+      const currentToken = backendApi.getToken();
+      if (!currentToken) {
         setSession(null);
+        setToken(null);
+        setLoading(false);
+        return;
+      }
+
+      // Проверяем токен, пытаясь получить список бронирований
+      // Если токен валиден, значит пользователь авторизован
+      try {
+        const { bookings } = await backendApi.getMyBookings();
+        // Если запрос успешен, токен валиден
+        // Но нам нужно получить данные пользователя
+        // Пока используем токен как индикатор авторизации
+        // В будущем можно добавить эндпоинт /api/me для получения текущего пользователя
+        setToken(currentToken);
+        // Сохраняем минимальную сессию на основе токена
+        // В реальном приложении нужно добавить эндпоинт для получения данных пользователя
+      } catch (error) {
+        // Токен невалиден
+        backendApi.setToken(null);
+        setSession(null);
+        setToken(null);
       }
     } catch (error) {
       setSession(null);
+      setToken(null);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    refreshSession();
+    // Загружаем токен из localStorage при монтировании
+    if (typeof window !== 'undefined') {
+      const savedToken = localStorage.getItem('backend_token');
+      if (savedToken) {
+        backendApi.setToken(savedToken);
+        setToken(savedToken);
+        refreshSession();
+      } else {
+        setLoading(false);
+      }
+    }
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Ошибка входа');
-    }
-
-    const data = await response.json();
-    setSession(data.session);
+    const response = await backendApi.login({ email, password });
+    const session = backendUserToSession(response.user, response.token);
+    setSession(session);
+    setToken(response.token);
   };
 
   const register = async (email: string, password: string, name: string, role: UserRole) => {
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ email, password, name, role }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Ошибка регистрации');
-    }
-
-    const data = await response.json();
-    setSession(data.session);
+    // Бэкенд не принимает role при регистрации, только name, email, password
+    const response = await backendApi.register({ name, email, password });
+    const session = backendUserToSession(response.user, response.token);
+    setSession(session);
+    setToken(response.token);
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-    });
+    backendApi.setToken(null);
     setSession(null);
+    setToken(null);
   };
 
   const hasRole = (role: UserRole): boolean => {
@@ -101,6 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         refreshSession,
         hasRole,
+        token,
       }}
     >
       {children}

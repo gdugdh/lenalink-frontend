@@ -14,11 +14,11 @@ import {
 } from '@/app/components/ui/select';
 import { routes } from '@/app/lib/routes';
 import { useRouter } from 'next/navigation';
-import { useBooking, type PassengerType } from '@/app/lib/booking-context';
+import { useBooking, type PassengerType, type PassengerData } from '@/app/lib/booking-context';
 
 export function BookingForm() {
   const router = useRouter();
-  const { bookingState, setPassengerType } = useBooking();
+  const { bookingState, setPassengerType, setPassengerData } = useBooking();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -47,7 +47,25 @@ export function BookingForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Здесь можно добавить валидацию и отправку данных
+    
+    // Валидация
+    if (!formData.firstName || !formData.lastName || !formData.citizenship || !formData.gender || 
+        !formData.birthDay || !formData.birthMonth || !formData.birthYear) {
+      return;
+    }
+    
+    // Сохраняем данные пассажира в контекст
+    const passengerData: PassengerData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      citizenship: formData.citizenship,
+      gender: formData.gender,
+      birthDay: formData.birthDay,
+      birthMonth: formData.birthMonth,
+      birthYear: formData.birthYear,
+    };
+    
+    setPassengerData(passengerData);
     router.push(routes.insuranceSelection);
   };
 

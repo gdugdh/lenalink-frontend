@@ -7,11 +7,27 @@ export type PassengerType = 'adult' | 'child' | 'infant';
 export type TariffType = 'tariff1' | 'tariff2' | 'tariff3' | 'tariff4';
 export type SeatType = 'random' | 'window' | 'aisle' | 'legroom';
 
+export interface PassengerData {
+  firstName: string;
+  lastName: string;
+  middleName?: string;
+  citizenship: string;
+  gender: string;
+  birthDay: string;
+  birthMonth: string;
+  birthYear: string;
+  passportNumber?: string;
+  email?: string;
+  phone?: string;
+}
+
 interface BookingState {
   passengerType: PassengerType;
   tariff: TariffType;
   seatType: SeatType;
   selectedRoute: RouteData | null;
+  passengerData: PassengerData | null;
+  bookingId: string | null;
 }
 
 interface BookingContextType {
@@ -20,6 +36,8 @@ interface BookingContextType {
   setTariff: (tariff: TariffType) => void;
   setSeatType: (seat: SeatType) => void;
   setSelectedRoute: (route: RouteData | null) => void;
+  setPassengerData: (data: PassengerData | null) => void;
+  setBookingId: (id: string | null) => void;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -30,6 +48,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     tariff: 'tariff2',
     seatType: 'random',
     selectedRoute: null,
+    passengerData: null,
+    bookingId: null,
   });
 
   const setPassengerType = (type: PassengerType) => {
@@ -48,6 +68,14 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     setBookingState((prev) => ({ ...prev, selectedRoute: route }));
   };
 
+  const setPassengerData = (data: PassengerData | null) => {
+    setBookingState((prev) => ({ ...prev, passengerData: data }));
+  };
+
+  const setBookingId = (id: string | null) => {
+    setBookingState((prev) => ({ ...prev, bookingId: id }));
+  };
+
   return (
     <BookingContext.Provider
       value={{
@@ -56,6 +84,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         setTariff,
         setSeatType,
         setSelectedRoute,
+        setPassengerData,
+        setBookingId,
       }}
     >
       {children}

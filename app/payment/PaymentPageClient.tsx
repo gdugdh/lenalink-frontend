@@ -9,19 +9,103 @@ import { useState } from "react";
 import { routes } from "@/app/lib/routes";
 import { useBooking } from "@/app/lib/booking-context";
 import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName } from "@/app/lib/price-calculator";
+import { backendApi } from "@/app/lib/backend-api";
+import { useAuth } from "@/app/context/AuthContext";
+import { useToast } from "@/app/hooks/use-toast";
 
 export function PaymentPageClient() {
   const router = useRouter();
+  const { toast } = useToast();
+  const { session } = useAuth();
   const [selectedPayment, setSelectedPayment] = useState<string>("card");
-  const { bookingState } = useBooking();
+  const [isCreatingBooking, setIsCreatingBooking] = useState(false);
+  const { bookingState, setBookingId } = useBooking();
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
     bookingState.seatType
   );
 
-  const handlePayment = () => {
-    router.push(routes.confirmation);
+  const handlePayment = async () => {
+    // Проверяем что все данные есть
+    if (!bookingState.selectedRoute) {
+      toast({
+        title: 'Ошибка',
+        description: 'Маршрут не выбран',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!bookingState.passengerData) {
+      toast({
+        title: 'Ошибка',
+        description: 'Данные пассажира не заполнены',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!session) {
+      toast({
+        title: 'Ошибка',
+        description: 'Необходимо войти в систему для создания бронирования',
+        variant: 'destructive',
+      });
+      router.push('/?modal=login');
+      return;
+    }
+
+    setIsCreatingBooking(true);
+
+    try {
+      // Преобразуем данные пассажира в формат API
+      const birthDate = `${bookingState.passengerData.birthYear}-${bookingState.passengerData.birthMonth.padStart(2, '0')}-${bookingState.passengerData.birthDay.padStart(2, '0')}`;
+      
+      // Преобразуем payment_method
+      const paymentMethodMap: Record<string, 'card' | 'yookassa' | 'cloudpay' | 'sberpay'> = {
+        card: 'card',
+        yookassa: 'yookassa',
+        cloudpay: 'cloudpay',
+        sberpay: 'sberpay',
+      };
+
+      const bookingRequest = {
+        route_id: bookingState.selectedRoute.id,
+        passenger: {
+          first_name: bookingState.passengerData.firstName,
+          last_name: bookingState.passengerData.lastName,
+          middle_name: bookingState.passengerData.middleName || '',
+          date_of_birth: birthDate,
+          passport_number: bookingState.passengerData.passportNumber || '0000 000000', // Заглушка, если не указан
+          email: bookingState.passengerData.email || session.user.email,
+          phone: bookingState.passengerData.phone || '+79000000000', // Заглушка, если не указан
+        },
+        include_insurance: bookingState.tariff !== 'tariff1', // Включаем страховку если не базовый тариф
+        payment_method: paymentMethodMap[selectedPayment] || 'card',
+      };
+
+      const booking = await backendApi.createBooking(bookingRequest);
+      
+      // Сохраняем ID бронирования
+      setBookingId(booking.id);
+
+      toast({
+        title: 'Бронирование создано',
+        description: 'Ваше бронирование успешно создано',
+      });
+
+      router.push(routes.confirmation);
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      toast({
+        title: 'Ошибка создания бронирования',
+        description: error instanceof Error ? error.message : 'Не удалось создать бронирование',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCreatingBooking(false);
+    }
   };
 
   return (
@@ -353,9 +437,10 @@ export function PaymentPageClient() {
                 </Button>
                 <Button
                   onClick={handlePayment}
+                  disabled={isCreatingBooking}
                   className="bg-[#7B91FF] hover:bg-[#E16D32] px-8"
                 >
-                  Оплатить {priceBreakdown.total.toLocaleString('ru-RU')}₽
+                  {isCreatingBooking ? 'Создание бронирования...' : `Оплатить ${priceBreakdown.total.toLocaleString('ru-RU')}₽`}
                 </Button>
               </div>
             </div>
