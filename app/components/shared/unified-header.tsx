@@ -24,8 +24,8 @@ export function UnifiedHeader() {
                 <Image 
                   src="/logo.png" 
                   alt="LenaLink Logo" 
-                  width={32} 
-                  height={32} 
+                  width={40} 
+                  height={40} 
                   className="w-full h-full object-contain p-1"
                   priority
                 />
