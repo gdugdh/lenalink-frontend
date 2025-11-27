@@ -50,7 +50,7 @@ export function SeatSelectionPageClient() {
                 </div>
 
                 <div className="mb-4 rounded-lg border bg-white p-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <div className="font-medium text-[#022444]">
                         Москва DME → Якутск YKS
