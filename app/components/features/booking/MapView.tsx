@@ -73,8 +73,10 @@ export function MapView() {
     }
 
     const script = document.createElement('script');
-    script.src =
-      'https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=your_api_key_here';
+    const apiKey = process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY;
+    script.src = apiKey
+      ? `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${apiKey}`
+      : 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
     script.async = true;
     script.onload = () => {
       if (
