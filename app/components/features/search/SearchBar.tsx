@@ -104,6 +104,22 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     setIsReturnDatePickerOpen(false);
   };
 
+  // Обработка удаления обратной даты
+  const handleRemoveReturnDate = () => {
+    const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : '';
+    const currentTo = toValue ? cities.find(c => extractCityName(c).toLowerCase() === toValue.toLowerCase()) || `${toValue}, Россия` : '';
+    
+    const departureDateString = dateParam || formatDateToString(selectedDate);
+    const queryParams = new URLSearchParams();
+    queryParams.set('from', currentFrom);
+    queryParams.set('to', currentTo);
+    queryParams.set('date', departureDateString);
+    // Не добавляем return_date, что удалит его из URL
+    
+    router.push(`/search?${queryParams.toString()}`);
+    setIsReturnDatePickerOpen(false);
+  };
+
   // Обработка нажатия на кнопку "Найти билеты"
   const handleSearchClick = () => {
     // Получаем полные названия городов
@@ -500,6 +516,16 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                   }}
                   initialFocus
                 />
+                {selectedReturnDate && (
+                  <div className="p-3 border-t">
+                    <button
+                      onClick={handleRemoveReturnDate}
+                      className="w-full text-sm text-[#7B91FF] hover:text-[#E16D32] transition-colors text-center"
+                    >
+                      Обратный билет ненужен
+                    </button>
+                  </div>
+                )}
               </PopoverContent>
             </Popover>
             <div className="flex items-center border-l px-2 sm:px-4 py-2 sm:py-3 shrink-0">

@@ -25,7 +25,7 @@ export function DatePriceBand({ currentDate, prices = [] }: DatePriceBandProps) 
   const searchParams = useSearchParams();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [dates, setDates] = useState<DateItem[]>([]);
-  const [visibleRange, setVisibleRange] = useState({ start: -3, end: 10 }); // Показываем 3 дня назад и 10 дней вперед
+  const [visibleRange, setVisibleRange] = useState({ start: -3, end: 3 }); // Показываем 3 дня назад и 3 дня вперед (всего 7 дат)
   const [selectedDate, setSelectedDate] = useState<string | null>(currentDate || null);
 
   // Обновляем selectedDate при изменении currentDate
@@ -117,15 +117,6 @@ export function DatePriceBand({ currentDate, prices = [] }: DatePriceBandProps) 
         left: -scrollAmount,
         behavior: 'smooth',
       });
-      
-      // Проверяем, достигли ли мы начала списка, и добавляем новые даты назад
-      const { scrollLeft } = container;
-      const isNearStart = scrollLeft <= 100; // 100px от начала
-      
-      if (isNearStart) {
-        // Добавляем еще 5 дат назад
-        setVisibleRange(prev => ({ ...prev, start: prev.start - 5 }));
-      }
     }
   };
 
@@ -137,15 +128,6 @@ export function DatePriceBand({ currentDate, prices = [] }: DatePriceBandProps) 
         left: scrollAmount,
         behavior: 'smooth',
       });
-      
-      // Проверяем, достигли ли мы конца списка, и добавляем новые даты
-      const { scrollLeft, scrollWidth, clientWidth } = container;
-      const isNearEnd = scrollLeft + clientWidth >= scrollWidth - 100; // 100px до конца
-      
-      if (isNearEnd) {
-        // Добавляем еще 5 дат вперед
-        setVisibleRange(prev => ({ ...prev, end: prev.end + 5 }));
-      }
     }
   };
 
@@ -171,21 +153,21 @@ export function DatePriceBand({ currentDate, prices = [] }: DatePriceBandProps) 
   return (
     <div className="bg-[#1A1A1A] text-white overflow-x-hidden">
       <div className="container mx-auto px-2 sm:px-4 max-w-full">
-        <div className="flex items-center justify-center gap-2 sm:gap-4 py-3 sm:py-4 overflow-x-auto scrollbar-hide">
-          <div className="hidden sm:flex items-center gap-2 shrink-0">
+        <div className="flex items-center justify-center gap-2 sm:gap-4 py-3 sm:py-4 max-w-4xl mx-auto">
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
             <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="text-xs sm:text-sm">Цены на соседние даты</span>
           </div>
           <button
             onClick={scrollLeft}
-            className="rounded-full p-2 hover:bg-white/10 shrink-0 transition-colors"
+            className="sm:hidden rounded-full p-2 hover:bg-white/10 shrink-0 transition-colors"
             aria-label="Прокрутить влево"
           >
             <ChevronLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
           </button>
           <div
             ref={scrollContainerRef}
-            className="flex gap-1 sm:gap-2 overflow-x-auto scrollbar-hide"
+            className="flex gap-1 sm:gap-2 overflow-x-auto scrollbar-hide sm:overflow-x-visible sm:justify-center sm:flex-nowrap"
           >
             {dates.map((dateItem, index) => (
               <button
@@ -216,7 +198,7 @@ export function DatePriceBand({ currentDate, prices = [] }: DatePriceBandProps) 
           </div>
           <button
             onClick={scrollRight}
-            className="rounded-full p-2 hover:bg-white/10 shrink-0 transition-colors"
+            className="sm:hidden rounded-full p-2 hover:bg-white/10 shrink-0 transition-colors"
             aria-label="Прокрутить вправо"
           >
             <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
