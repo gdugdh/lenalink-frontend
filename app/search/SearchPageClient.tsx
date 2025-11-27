@@ -107,6 +107,29 @@ function SearchPageContent() {
           passengers: 1,
         });
 
+        // Проверяем, что response и routes существуют
+        if (!response) {
+          console.error('API returned null or undefined response');
+          setRoutes([]);
+          toast({
+            title: 'Ошибка загрузки маршрутов',
+            description: 'Сервер вернул неожиданный ответ',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        if (!response.routes || !Array.isArray(response.routes)) {
+          console.warn('API response missing routes array:', response);
+          setRoutes([]);
+          toast({
+            title: 'Нет доступных маршрутов',
+            description: 'По вашему запросу маршруты не найдены',
+            variant: 'default',
+          });
+          return;
+        }
+
         const transformedRoutes = response.routes.map((route, index) =>
           transformBackendRouteToRouteData(route, index)
         );
