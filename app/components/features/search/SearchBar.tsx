@@ -206,7 +206,7 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                   {showFromSuggestions && fromValue.trim().length > 0 && (
                     <div
                       ref={fromSuggestionsRef}
-                      className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto top-full left-0"
+                      className="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto top-full left-0"
                     >
                       {fromSuggestions.length > 0 ? (
                         fromSuggestions.map((city, index) => (
@@ -267,7 +267,7 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                   {showToSuggestions && toValue.trim().length > 0 && (
                     <div
                       ref={toSuggestionsRef}
-                      className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto top-full left-0"
+                      className="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto top-full left-0"
                     >
                       {toSuggestions.length > 0 ? (
                         toSuggestions.map((city, index) => (
