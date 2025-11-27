@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { HomeSearchForm } from "@/app/components/features/search/HomeSearchForm";
+import { HomeHeader } from "@/app/components/shared/home-header";
 
 export const metadata: Metadata = {
   title: 'Главная | LenaLink',
@@ -29,21 +29,7 @@ export default function Page() {
         </div>
 
         {/* Header */}
-        <header className="relative z-10 px-3 sm:px-6 py-3 sm:py-6">
-          <div className="flex items-center gap-2 text-white">
-            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-[#022444] relative">
-              <Image 
-                src="/logo.png" 
-                alt="LenaLink Logo" 
-                width={32} 
-                height={32} 
-                className="w-full h-full object-contain"
-                priority
-              />
-            </div>
-            <span className="text-lg sm:text-2xl font-semibold">LenaLink</span>
-          </div>
-        </header>
+        <HomeHeader />
 
         {/* Hero Content */}
         <div className="relative z-10 flex h-full items-center justify-center px-3 sm:px-6 pb-6">

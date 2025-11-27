@@ -41,9 +41,6 @@ export function UnifiedHeader() {
                 Помощь и поддержка
               </button>
               <button className="flex items-center gap-2 text-xs sm:text-sm text-white hover:text-white/80 whitespace-nowrap">
-                Регистрация
-              </button>
-              <button className="flex items-center gap-2 text-xs sm:text-sm text-white hover:text-white/80 whitespace-nowrap">
                 Вход
               </button>
             </div>
@@ -78,12 +75,6 @@ export function UnifiedHeader() {
               className="text-left text-base text-[#022444] hover:text-[#7B91FF] py-2"
             >
               Помощь и поддержка
-            </button>
-            <button
-              onClick={() => setIsMenuOpen(false)}
-              className="text-left text-base text-[#022444] hover:text-[#7B91FF] py-2"
-            >
-              Регистрация
             </button>
             <button
               onClick={() => setIsMenuOpen(false)}
