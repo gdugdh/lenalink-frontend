@@ -26,6 +26,21 @@ export function InsuranceSelectionPageClient() {
     return tariffMap[plan] || "Тариф";
   };
 
+  const getTariffPrice = (plan: string): number => {
+    const priceMap: Record<string, number> = {
+      tariff1: 41256,
+      tariff2: 43500,
+      tariff3: 45500,
+      tariff4: 47500,
+    };
+    return priceMap[plan] || 41256;
+  };
+
+  const basePrice = 41256;
+  const selectedTariffPrice = getTariffPrice(selectedPlan);
+  const tariffFee = selectedTariffPrice - basePrice;
+  const totalPrice = selectedTariffPrice;
+
   return (
     <>
       <PageLoader />
@@ -296,10 +311,14 @@ export function InsuranceSelectionPageClient() {
                     <span className="text-[#022444]">1x взрослый</span>
                     <span className="font-medium text-[#022444]">41 256₽</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#022444]">1x тариф Standard</span>
-                    <span className="font-medium text-[#022444]">2 244₽</span>
-                  </div>
+                  {tariffFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#022444]">1x {getTariffName(selectedPlan)}</span>
+                      <span className="font-medium text-[#022444]">
+                        {tariffFee.toLocaleString('ru-RU')}₽
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="my-4 border-t"></div>
@@ -307,7 +326,7 @@ export function InsuranceSelectionPageClient() {
                 <div className="flex justify-between">
                   <span className="font-bold text-[#022444]">Итого</span>
                   <span className="text-2xl font-bold text-[#7B91FF]">
-                    41 256₽
+                    {totalPrice.toLocaleString('ru-RU')}₽
                   </span>
                 </div>
 
