@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CreditCard, Smartphone, Check } from "lucide-react";
+import { CreditCard, Smartphone, Check } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
@@ -31,15 +31,6 @@ export function PaymentPageClient() {
         <UnifiedHeader />
 
         <div className="container mx-auto px-4 py-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-4 text-[#022444] hover:text-[#7B91FF]"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Назад
-          </Button>
-
           <h1 className="mb-2 text-3xl font-bold text-[#022444]">
             Оплата бронирования
           </h1>

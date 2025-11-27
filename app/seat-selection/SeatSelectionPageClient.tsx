@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Plane } from "lucide-react";
+import { Plane } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
 import { UnifiedHeader } from "@/app/components/shared/unified-header";
@@ -26,15 +26,6 @@ export function SeatSelectionPageClient() {
         <UnifiedHeader />
 
         <div className="container mx-auto px-4 py-8">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-4 text-[#022444] hover:text-[#7B91FF]"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Назад
-          </Button>
-
           <h1 className="mb-8 text-3xl font-bold text-[#022444]">
             Москва → Олекминск
           </h1>
