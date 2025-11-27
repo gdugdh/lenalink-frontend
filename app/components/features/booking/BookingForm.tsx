@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
@@ -15,10 +15,12 @@ import {
 import { routes } from '@/app/lib/routes';
 import { useRouter } from 'next/navigation';
 import { useBooking, type PassengerType, type PassengerData } from '@/app/lib/booking-context';
+import { useAuth } from '@/app/context/AuthContext';
 
 export function BookingForm() {
   const router = useRouter();
   const { bookingState, setPassengerType, setPassengerData } = useBooking();
+  const { session } = useAuth();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -29,6 +31,35 @@ export function BookingForm() {
     birthMonth: '',
     birthYear: '',
   });
+
+  // Инициализация формы из сохраненных данных или данных пользователя
+  useEffect(() => {
+    // Если есть сохраненные данные пассажира, используем их
+    if (bookingState.passengerData) {
+      setFormData({
+        firstName: bookingState.passengerData.firstName || '',
+        lastName: bookingState.passengerData.lastName || '',
+        citizenship: bookingState.passengerData.citizenship || '',
+        gender: bookingState.passengerData.gender || '',
+        birthDay: bookingState.passengerData.birthDay || '',
+        birthMonth: bookingState.passengerData.birthMonth || '',
+        birthYear: bookingState.passengerData.birthYear || '',
+      });
+    } else if (session?.user) {
+      // Если нет сохраненных данных, но пользователь авторизован, заполняем из сессии
+      const nameParts = session.user.name.trim().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
+      setFormData(prev => ({
+        ...prev,
+        firstName: prev.firstName || firstName,
+        lastName: prev.lastName || lastName,
+        // Гражданство по умолчанию - Россия, если не заполнено
+        citizenship: prev.citizenship || 'ru',
+      }));
+    }
+  }, [session, bookingState.passengerData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;

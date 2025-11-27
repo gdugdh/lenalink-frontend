@@ -43,10 +43,6 @@ export function UnifiedHeader() {
       setRegisterModalOpen(false);
       
       await logout();
-      toast({
-        title: 'Выход выполнен',
-        description: 'Вы успешно вышли из системы',
-      });
       
       // Navigate to home without any query parameters
       router.replace('/', { scroll: false });

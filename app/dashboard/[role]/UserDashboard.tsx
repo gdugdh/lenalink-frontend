@@ -20,10 +20,6 @@ export function UserDashboard() {
   const handleLogout = async () => {
     try {
       await logout();
-      toast({
-        title: 'Выход выполнен',
-        description: 'Вы успешно вышли из системы',
-      });
       router.push('/');
     } catch (error) {
       toast({
