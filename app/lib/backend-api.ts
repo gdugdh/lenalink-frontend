@@ -233,7 +233,16 @@ class BackendApiClient {
         response = await fetch(url, config);
       } catch (fetchError) {
         // Обработка сетевых ошибок (CORS, недоступный сервер и т.д.)
-        const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+        let errorMessage = 'Неизвестная ошибка сети';
+        
+        if (fetchError instanceof Error) {
+          errorMessage = fetchError.message;
+        } else if (typeof fetchError === 'string') {
+          errorMessage = fetchError;
+        } else if (fetchError && typeof fetchError === 'object') {
+          // Пытаемся извлечь сообщение из объекта ошибки
+          errorMessage = (fetchError as any).message || (fetchError as any).toString() || 'Ошибка сети';
+        }
         
         if (process.env.NODE_ENV === 'development') {
           console.error('Network error (fetch failed):', {
@@ -241,12 +250,13 @@ class BackendApiClient {
             endpoint: endpoint,
             method: options.method || 'GET',
             error: errorMessage,
-            errorObject: fetchError,
+            errorType: fetchError instanceof Error ? fetchError.constructor.name : typeof fetchError,
+            errorString: String(fetchError),
           });
         }
 
         // Определяем тип ошибки и выбрасываем понятное сообщение
-        if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+        if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError') || errorMessage === 'Failed to fetch') {
           throw new Error('Не удалось подключиться к серверу. Проверьте подключение к интернету или попробуйте позже.');
         } else if (errorMessage.includes('CORS')) {
           throw new Error('Ошибка CORS. Сервер не разрешает запросы с этого домена.');
