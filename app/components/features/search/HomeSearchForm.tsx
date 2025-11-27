@@ -1,0 +1,282 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { Search, ArrowUpDown } from 'lucide-react';
+import { Button } from '@/app/components/ui/button';
+import { Input } from '@/app/components/ui/input';
+import { Label } from '@/app/components/ui/label';
+import Link from 'next/link';
+
+// Список популярных городов для автокомплита
+const cities = [
+  'Москва, Россия',
+  'Олекминск, Якутия',
+  'Санкт-Петербург, Россия',
+  'Новосибирск, Россия',
+  'Екатеринбург, Россия',
+  'Казань, Россия',
+  'Нижний Новгород, Россия',
+  'Челябинск, Россия',
+  'Самара, Россия',
+  'Омск, Россия',
+  'Ростов-на-Дону, Россия',
+  'Уфа, Россия',
+  'Красноярск, Россия',
+  'Воронеж, Россия',
+  'Пермь, Россия',
+  'Волгоград, Россия',
+  'Краснодар, Россия',
+  'Саратов, Россия',
+  'Тюмень, Россия',
+  'Тольятти, Россия',
+  'Якутск, Якутия',
+  'Иркутск, Россия',
+  'Барнаул, Россия',
+  'Ульяновск, Россия',
+  'Томск, Россия',
+  'Кемерово, Россия',
+  'Новокузнецк, Россия',
+  'Рязань, Россия',
+  'Астрахань, Россия',
+  'Пенза, Россия',
+  'Липецк, Россия',
+  'Тула, Россия',
+  'Киров, Россия',
+  'Чебоксары, Россия',
+  'Калининград, Россия',
+  'Курск, Россия',
+  'Улан-Удэ, Бурятия',
+  'Ставрополь, Россия',
+  'Сочи, Россия',
+  'Махачкала, Дагестан',
+];
+
+interface HomeSearchFormProps {
+  from?: string;
+  to?: string;
+}
+
+export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
+  const [fromValue, setFromValue] = useState(from);
+  const [toValue, setToValue] = useState(to);
+  const [fromSuggestions, setFromSuggestions] = useState<string[]>([]);
+  const [toSuggestions, setToSuggestions] = useState<string[]>([]);
+  const [showFromSuggestions, setShowFromSuggestions] = useState(false);
+  const [showToSuggestions, setShowToSuggestions] = useState(false);
+  const fromInputRef = useRef<HTMLInputElement>(null);
+  const toInputRef = useRef<HTMLInputElement>(null);
+  const fromSuggestionsRef = useRef<HTMLDivElement>(null);
+  const toSuggestionsRef = useRef<HTMLDivElement>(null);
+
+  // Фильтрация городов по введенному тексту
+  const filterCities = (query: string): string[] => {
+    if (!query.trim()) return [];
+    const lowerQuery = query.toLowerCase();
+    return cities
+      .filter(city => city.toLowerCase().includes(lowerQuery))
+      .slice(0, 5); // Показываем максимум 5 результатов
+  };
+
+  // Обработка изменения поля "Откуда"
+  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFromValue(value);
+    const suggestions = filterCities(value);
+    setFromSuggestions(suggestions);
+    setShowFromSuggestions(suggestions.length > 0 && value.trim().length > 0);
+  };
+
+  // Обработка изменения поля "Куда"
+  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setToValue(value);
+    const suggestions = filterCities(value);
+    setToSuggestions(suggestions);
+    setShowToSuggestions(suggestions.length > 0 && value.trim().length > 0);
+  };
+
+  // Обработка клавиатуры для поля "Откуда"
+  const handleFromKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      setShowFromSuggestions(false);
+    } else if (e.key === 'ArrowDown' && fromSuggestions.length > 0) {
+      e.preventDefault();
+      setShowFromSuggestions(true);
+    }
+  };
+
+  // Обработка клавиатуры для поля "Куда"
+  const handleToKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      setShowToSuggestions(false);
+    } else if (e.key === 'ArrowDown' && toSuggestions.length > 0) {
+      e.preventDefault();
+      setShowToSuggestions(true);
+    }
+  };
+
+  // Выбор города из списка для "Откуда"
+  const handleFromSelect = (city: string) => {
+    setFromValue(city);
+    setFromSuggestions([]);
+    setShowFromSuggestions(false);
+    fromInputRef.current?.blur();
+  };
+
+  // Выбор города из списка для "Куда"
+  const handleToSelect = (city: string) => {
+    setToValue(city);
+    setToSuggestions([]);
+    setShowToSuggestions(false);
+    toInputRef.current?.blur();
+  };
+
+  // Обмен местами значений
+  const handleSwap = () => {
+    const temp = fromValue;
+    setFromValue(toValue);
+    setToValue(temp);
+    // Закрываем выпадающие меню при обмене
+    setShowFromSuggestions(false);
+    setShowToSuggestions(false);
+  };
+
+  // Закрытие выпадающих меню при клике вне их
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        fromSuggestionsRef.current &&
+        !fromSuggestionsRef.current.contains(event.target as Node) &&
+        fromInputRef.current &&
+        !fromInputRef.current.contains(event.target as Node)
+      ) {
+        setShowFromSuggestions(false);
+      }
+      if (
+        toSuggestionsRef.current &&
+        !toSuggestionsRef.current.contains(event.target as Node) &&
+        toInputRef.current &&
+        !toInputRef.current.contains(event.target as Node)
+      ) {
+        setShowToSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Формирование URL для поиска
+  const searchUrl = `/search?from=${encodeURIComponent(fromValue)}&to=${encodeURIComponent(toValue)}`;
+
+  return (
+    <div className="w-full max-w-md">
+      <div className="rounded-xl sm:rounded-2xl bg-white p-3 sm:p-4 md:p-6 shadow-xl">
+        <div className="space-y-3 sm:space-y-4">
+          {/* From Field */}
+          <div className="space-y-1.5 sm:space-y-2 relative">
+            <Label className="text-[10px] sm:text-xs font-normal text-gray-500 uppercase">
+              Откуда
+            </Label>
+            <div className="relative">
+              <Input
+                ref={fromInputRef}
+                value={fromValue}
+                onChange={handleFromChange}
+                onKeyDown={handleFromKeyDown}
+                onFocus={() => {
+                  if (fromValue.trim().length > 0) {
+                    const suggestions = filterCities(fromValue);
+                    setFromSuggestions(suggestions);
+                    setShowFromSuggestions(suggestions.length > 0);
+                  }
+                }}
+                placeholder="Откуда"
+                className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
+              />
+              {showFromSuggestions && fromSuggestions.length > 0 && (
+                <div
+                  ref={fromSuggestionsRef}
+                  className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
+                >
+                  {fromSuggestions.map((city, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleFromSelect(city)}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                    >
+                      {city}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Swap Button */}
+          <div className="flex justify-center -my-1 sm:-my-2">
+            <button
+              type="button"
+              onClick={handleSwap}
+              className="rounded-full bg-white border border-gray-200 p-1.5 sm:p-2 hover:bg-gray-50 transition-colors shadow-sm"
+            >
+              <ArrowUpDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
+            </button>
+          </div>
+
+          {/* To Field */}
+          <div className="space-y-1.5 sm:space-y-2 relative">
+            <Label className="text-[10px] sm:text-xs font-normal text-gray-500 uppercase">
+              Куда
+            </Label>
+            <div className="relative">
+              <Input
+                ref={toInputRef}
+                value={toValue}
+                onChange={handleToChange}
+                onKeyDown={handleToKeyDown}
+                onFocus={() => {
+                  if (toValue.trim().length > 0) {
+                    const suggestions = filterCities(toValue);
+                    setToSuggestions(suggestions);
+                    setShowToSuggestions(suggestions.length > 0);
+                  }
+                }}
+                placeholder="Куда"
+                className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
+              />
+              {showToSuggestions && toSuggestions.length > 0 && (
+                <div
+                  ref={toSuggestionsRef}
+                  className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
+                >
+                  {toSuggestions.map((city, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleToSelect(city)}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                    >
+                      {city}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <Link href={searchUrl}>
+            <Button className="w-full bg-[#7B91FF] hover:bg-[#E16D32] text-white text-sm sm:text-base font-medium py-3 sm:py-4 md:py-6 h-auto">
+              <Search className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              Найти варианты
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+

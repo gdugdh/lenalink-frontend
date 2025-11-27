@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import { Search, ArrowUpDown } from "lucide-react";
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
-import { Checkbox } from "@/app/components/ui/checkbox";
-import Link from "next/link";
 import Image from "next/image";
+import { HomeSearchForm } from "@/app/components/features/search/HomeSearchForm";
 
 export const metadata: Metadata = {
   title: 'Главная | LenaLink',
@@ -64,47 +59,7 @@ export default function Page() {
             </div>
 
             {/* Right side - Search Form */}
-            <div className="w-full max-w-md">
-              <div className="rounded-xl sm:rounded-2xl bg-white p-3 sm:p-4 md:p-6 shadow-xl">
-                <div className="space-y-3 sm:space-y-4">
-                  {/* From Field */}
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <Label className="text-[10px] sm:text-xs font-normal text-gray-500 uppercase">
-                      Откуда
-                    </Label>
-                    <Input
-                      defaultValue="Москва, Россия"
-                      className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
-                    />
-                  </div>
-
-                  {/* Swap Button */}
-                  <div className="flex justify-center -my-1 sm:-my-2">
-                    <button className="rounded-full bg-white border border-gray-200 p-1.5 sm:p-2 hover:bg-gray-50 transition-colors shadow-sm">
-                      <ArrowUpDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-600" />
-                    </button>
-                  </div>
-
-                  {/* To Field */}
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <Label className="text-[10px] sm:text-xs font-normal text-gray-500 uppercase">
-                      Куда
-                    </Label>
-                    <Input
-                      defaultValue="Олекминск, Якутия"
-                      className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
-                    />
-                  </div>
-
-                  <Link href="/search">
-                    <Button className="w-full bg-[#7B91FF] hover:bg-[#E16D32] text-white text-sm sm:text-base font-medium py-3 sm:py-4 md:py-6 h-auto">
-                      <Search className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                      Найти варианты
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <HomeSearchForm />
           </div>
         </div>
       </div>
