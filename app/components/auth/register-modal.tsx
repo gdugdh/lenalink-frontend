@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/hooks/use-toast';
 import { Button } from '@/app/components/ui/button';
@@ -28,6 +28,7 @@ type RegisterStep = 'role' | 'details';
 
 export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterModalProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register, session } = useAuth();
   const { toast } = useToast();
 
@@ -150,9 +151,13 @@ export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterM
         setPassword('');
         setConfirmPassword('');
         setName('');
+        setShowPassword(false);
+        setShowConfirmPassword(false);
         
-        // Refresh the page to update the header with user info
-        router.refresh();
+        // Get redirect parameter or default to dashboard
+        const redirectTo = searchParams.get('redirect') || `/dashboard/${sessionData.user.role}`;
+        router.push(redirectTo);
+        router.refresh(); // Refresh to update header
       } else {
         toast({
           title: 'Ошибка получения сессии',
