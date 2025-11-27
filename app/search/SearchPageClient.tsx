@@ -11,6 +11,7 @@ import { SearchFilters, SearchFiltersButton } from '@/app/components/features/se
 import { SearchResults } from '@/app/components/features/search/SearchResults';
 import { routes } from '@/app/lib/routes';
 import { useRouter } from 'next/navigation';
+import { extractCityName, getCityCode } from '@/app/lib/cities';
 
 function SearchPageContent() {
   const router = useRouter();
@@ -21,60 +22,6 @@ function SearchPageContent() {
   // Получаем параметры из URL
   const fromParam = searchParams.get('from') || '';
   const toParam = searchParams.get('to') || '';
-
-  // Извлекаем название города из полной строки (например, "Москва, Россия" -> "Москва")
-  const extractCityName = (fullCity: string): string => {
-    if (!fullCity) return '';
-    const parts = fullCity.split(',');
-    return parts[0]?.trim() || fullCity;
-  };
-
-  // Маппинг городов на коды аэропортов (можно расширить)
-  const getCityCode = (cityName: string): string => {
-    const cityCodeMap: Record<string, string> = {
-      'Москва': 'MOW',
-      'Олекминск': 'YKS',
-      'Санкт-Петербург': 'LED',
-      'Новосибирск': 'OVB',
-      'Екатеринбург': 'SVX',
-      'Казань': 'KZN',
-      'Нижний Новгород': 'GOJ',
-      'Челябинск': 'CEK',
-      'Самара': 'KUF',
-      'Омск': 'OMS',
-      'Ростов-на-Дону': 'ROV',
-      'Уфа': 'UFA',
-      'Красноярск': 'KJA',
-      'Воронеж': 'VOZ',
-      'Пермь': 'PEE',
-      'Волгоград': 'VOG',
-      'Краснодар': 'KRR',
-      'Саратов': 'RTW',
-      'Тюмень': 'TJM',
-      'Тольятти': 'TOL',
-      'Якутск': 'YKS',
-      'Иркутск': 'IKT',
-      'Барнаул': 'BAX',
-      'Ульяновск': 'ULY',
-      'Томск': 'TOF',
-      'Кемерово': 'KEJ',
-      'Новокузнецк': 'NOZ',
-      'Рязань': 'RZN',
-      'Астрахань': 'ASF',
-      'Пенза': 'PEZ',
-      'Липецк': 'LPK',
-      'Тула': 'TLA',
-      'Киров': 'KVX',
-      'Чебоксары': 'CSY',
-      'Калининград': 'KGD',
-      'Курск': 'URS',
-      'Улан-Удэ': 'UUD',
-      'Ставрополь': 'STW',
-      'Сочи': 'AER',
-      'Махачкала': 'MCX',
-    };
-    return cityCodeMap[cityName] || cityName.substring(0, 3).toUpperCase();
-  };
 
   const fromCity = extractCityName(fromParam);
   const toCity = extractCityName(toParam);

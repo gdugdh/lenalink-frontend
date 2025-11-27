@@ -6,50 +6,7 @@ import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import Link from 'next/link';
-
-// Список популярных городов для автокомплита
-const cities = [
-  'Москва, Россия',
-  'Олекминск, Якутия',
-  'Санкт-Петербург, Россия',
-  'Новосибирск, Россия',
-  'Екатеринбург, Россия',
-  'Казань, Россия',
-  'Нижний Новгород, Россия',
-  'Челябинск, Россия',
-  'Самара, Россия',
-  'Омск, Россия',
-  'Ростов-на-Дону, Россия',
-  'Уфа, Россия',
-  'Красноярск, Россия',
-  'Воронеж, Россия',
-  'Пермь, Россия',
-  'Волгоград, Россия',
-  'Краснодар, Россия',
-  'Саратов, Россия',
-  'Тюмень, Россия',
-  'Тольятти, Россия',
-  'Якутск, Якутия',
-  'Иркутск, Россия',
-  'Барнаул, Россия',
-  'Ульяновск, Россия',
-  'Томск, Россия',
-  'Кемерово, Россия',
-  'Новокузнецк, Россия',
-  'Рязань, Россия',
-  'Астрахань, Россия',
-  'Пенза, Россия',
-  'Липецк, Россия',
-  'Тула, Россия',
-  'Киров, Россия',
-  'Чебоксары, Россия',
-  'Калининград, Россия',
-  'Курск, Россия',
-  'Улан-Удэ, Бурятия',
-  'Ставрополь, Россия',
-  'Сочи, Россия',
-  'Махачкала, Дагестан',
-];
+import { cities, extractCityName } from '@/app/lib/cities';
 
 interface HomeSearchFormProps {
   from?: string;
@@ -68,12 +25,6 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
   const fromSuggestionsRef = useRef<HTMLDivElement>(null);
   const toSuggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Извлечение названия города из полной строки (например, "Москва, Россия" -> "Москва")
-  const extractCityName = (fullCity: string): string => {
-    if (!fullCity) return '';
-    const parts = fullCity.split(',');
-    return parts[0]?.trim() || fullCity;
-  };
 
   // Фильтрация городов по введенному тексту, исключая уже выбранный город из другого поля
   const filterCities = (query: string, excludeCity?: string): string[] => {
