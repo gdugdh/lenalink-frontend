@@ -1,6 +1,7 @@
 'use client';
 
 import type React from 'react';
+import { useState } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
@@ -18,9 +19,35 @@ import { useBooking, type PassengerType } from '@/app/lib/booking-context';
 export function BookingForm() {
   const router = useRouter();
   const { bookingState, setPassengerType } = useBooking();
+  
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    citizenship: '',
+    gender: '',
+    birthDay: '',
+    birthMonth: '',
+    birthYear: '',
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Здесь можно добавить валидацию и отправку данных
     router.push(routes.insuranceSelection);
   };
 
@@ -65,6 +92,8 @@ export function BookingForm() {
             </Label>
             <Input
               id="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
               placeholder="Например: Ivan"
               required
               className="h-8 sm:h-9 text-sm sm:text-base"
@@ -76,6 +105,8 @@ export function BookingForm() {
             </Label>
             <Input
               id="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
               placeholder="Например: Petrov"
               required
               className="h-8 sm:h-9 text-sm sm:text-base"
@@ -88,7 +119,7 @@ export function BookingForm() {
             <Label htmlFor="citizenship" className="text-sm sm:text-base text-[#022444]">
               Гражданство
             </Label>
-            <Select>
+            <Select value={formData.citizenship} onValueChange={(value) => handleSelectChange('citizenship', value)}>
               <SelectTrigger id="citizenship" className="h-8 sm:h-9 text-sm sm:text-base">
                 <SelectValue placeholder="Выбрать" />
               </SelectTrigger>
@@ -103,7 +134,7 @@ export function BookingForm() {
             <Label htmlFor="gender" className="text-sm sm:text-base text-[#022444]">
               Пол
             </Label>
-            <Select>
+            <Select value={formData.gender} onValueChange={(value) => handleSelectChange('gender', value)}>
               <SelectTrigger id="gender" className="h-8 sm:h-9 text-sm sm:text-base">
                 <SelectValue placeholder="Выбрать" />
               </SelectTrigger>
@@ -117,16 +148,25 @@ export function BookingForm() {
             <Label className="text-sm sm:text-base text-[#022444]">Дата рождения</Label>
             <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               <Input
+                id="birthDay"
+                value={formData.birthDay}
+                onChange={handleInputChange}
                 placeholder="ДД"
                 required
                 className="h-8 sm:h-9 text-sm sm:text-base text-center"
               />
               <Input
+                id="birthMonth"
+                value={formData.birthMonth}
+                onChange={handleInputChange}
                 placeholder="ММ"
                 required
                 className="h-8 sm:h-9 text-sm sm:text-base text-center"
               />
               <Input
+                id="birthYear"
+                value={formData.birthYear}
+                onChange={handleInputChange}
                 placeholder="ГГГГ"
                 required
                 className="h-8 sm:h-9 text-sm sm:text-base text-center"

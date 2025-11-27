@@ -20,13 +20,12 @@ export function UnifiedHeader() {
         <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 max-w-full">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2">
-              <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-white shrink-0 relative">
+              <div className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-white shrink-0">
                 <Image 
                   src="/logo.png" 
                   alt="LenaLink Logo" 
-                  width={40} 
-                  height={40} 
-                  className="w-full h-full object-contain p-1"
+                  fill
+                  className="object-contain p-1"
                   priority
                 />
               </div>
