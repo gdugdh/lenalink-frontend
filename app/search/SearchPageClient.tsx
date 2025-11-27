@@ -38,7 +38,7 @@ function SearchPageContent() {
       <div className="min-h-screen bg-[#FFFFFF] overflow-x-hidden">
         <UnifiedHeader />
 
-        <SearchBar fromCity={fromCity || 'Москва'} fromCode={fromCode || 'MOW'} toCity={toCity || 'Олекминск'} toCode={toCode || 'YKS'} />
+        <SearchBar fromCity={fromCity || 'Москва'} fromCode={fromCode || 'MOW'} toCity={toCity || 'Олекминск'} toCode={toCode || 'OLZ'} />
 
         <DatePriceBand />
 

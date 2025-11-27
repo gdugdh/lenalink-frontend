@@ -12,7 +12,7 @@ interface SearchBarProps {
   toCode?: string;
 }
 
-export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity = 'Олекминск', toCode = 'YKS' }: SearchBarProps) {
+export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity = 'Олекминск', toCode = 'OLZ' }: SearchBarProps) {
   const router = useRouter();
   const [isEditingFrom, setIsEditingFrom] = useState(false);
   const [isEditingTo, setIsEditingTo] = useState(false);

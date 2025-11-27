@@ -45,7 +45,7 @@ export const cities = [
 // Маппинг городов на коды аэропортов
 export const cityCodeMap: Record<string, string> = {
   'Москва': 'MOW',
-  'Олекминск': 'YKS',
+  'Олекминск': 'OLZ',
   'Санкт-Петербург': 'LED',
   'Новосибирск': 'OVB',
   'Екатеринбург': 'SVX',
