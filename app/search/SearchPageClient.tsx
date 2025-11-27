@@ -212,7 +212,7 @@ function SearchPageContent() {
 
         <SearchBar fromCity={fromCity || 'Москва'} fromCode={fromCode || 'MOW'} toCity={toCity || 'Олекминск'} toCode={toCode || 'OLZ'} />
 
-        <DatePriceBand />
+        <DatePriceBand currentDate={dateParam || new Date().toISOString().split('T')[0]} />
 
         {/* Main Content */}
         <div className="mx-auto container px-2 sm:px-4 py-4 sm:py-6 max-w-full overflow-x-hidden">
