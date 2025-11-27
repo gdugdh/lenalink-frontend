@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { cities, extractCityName, getCityCode } from '@/app/lib/cities';
+import { Calendar } from '@/app/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/app/components/ui/popover';
 
 interface SearchBarProps {
   fromCity?: string;
@@ -14,6 +16,7 @@ interface SearchBarProps {
 
 export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity = 'Олекминск', toCode = 'OLZ' }: SearchBarProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isEditingFrom, setIsEditingFrom] = useState(false);
   const [isEditingTo, setIsEditingTo] = useState(false);
   const [fromValue, setFromValue] = useState(fromCity);
@@ -24,10 +27,64 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
   const [showToSuggestions, setShowToSuggestions] = useState(false);
   const [fromSuggestionsPosition, setFromSuggestionsPosition] = useState({ top: 0, left: 0, width: 0 });
   const [toSuggestionsPosition, setToSuggestionsPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const fromInputRef = useRef<HTMLInputElement>(null);
   const toInputRef = useRef<HTMLInputElement>(null);
   const fromSuggestionsRef = useRef<HTMLDivElement>(null);
   const toSuggestionsRef = useRef<HTMLDivElement>(null);
+
+  // Функция для форматирования даты в строку YYYY-MM-DD (локальное время)
+  const formatDateToString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Функция для парсинга даты из строки YYYY-MM-DD (локальное время)
+  const parseDateFromString = (dateString: string): Date => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  // Получаем дату из URL или используем сегодняшнюю
+  const dateParam = searchParams.get('date') || '';
+  const selectedDate = dateParam ? parseDateFromString(dateParam) : new Date();
+  
+  // Форматируем дату для отображения
+  const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('ru-RU', { 
+      day: 'numeric', 
+      month: 'short', 
+      weekday: 'short' 
+    });
+  };
+
+  // Обработка выбора даты
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    
+    // Используем локальное форматирование вместо ISO, чтобы избежать проблем с часовыми поясами
+    const dateString = formatDateToString(date);
+    const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : '';
+    const currentTo = toValue ? cities.find(c => extractCityName(c).toLowerCase() === toValue.toLowerCase()) || `${toValue}, Россия` : '';
+    
+    router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(currentTo)}&date=${dateString}`);
+    setIsDatePickerOpen(false);
+  };
+
+  // Обработка нажатия на кнопку "Найти билеты"
+  const handleSearchClick = () => {
+    // Получаем полные названия городов
+    const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : fromCity;
+    const currentTo = toValue ? cities.find(c => extractCityName(c).toLowerCase() === toValue.toLowerCase()) || `${toValue}, Россия` : toCity;
+    
+    // Получаем дату из URL или используем выбранную дату
+    const dateString = dateParam || formatDateToString(selectedDate);
+    
+    // Обновляем URL, что автоматически запустит поиск на странице SearchPageClient
+    router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(currentTo)}&date=${dateString}`);
+  };
 
   // Обновляем значения при изменении пропсов
   useEffect(() => {
@@ -111,9 +168,10 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     setIsEditingFrom(false);
     fromInputRef.current?.blur();
     
-    // Обновляем URL с полным названием города
+    // Обновляем URL с полным названием города и сохраняем дату
     const currentTo = toValue ? cities.find(c => extractCityName(c).toLowerCase() === toValue.toLowerCase()) || `${toValue}, Россия` : '';
-    router.push(`/search?from=${encodeURIComponent(city)}&to=${encodeURIComponent(currentTo)}`);
+    const dateString = dateParam || selectedDate.toISOString().split('T')[0];
+    router.push(`/search?from=${encodeURIComponent(city)}&to=${encodeURIComponent(currentTo)}&date=${dateString}`);
   };
 
   // Выбор города из списка для "Куда"
@@ -125,9 +183,10 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     setIsEditingTo(false);
     toInputRef.current?.blur();
     
-    // Обновляем URL с полным названием города
+    // Обновляем URL с полным названием города и сохраняем дату
     const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : '';
-    router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(city)}`);
+    const dateString = dateParam || selectedDate.toISOString().split('T')[0];
+    router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(city)}&date=${dateString}`);
   };
 
   // Обработка клика на поле "Откуда"
@@ -361,16 +420,30 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                 </div>
               )}
             </div>
-            <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 shrink-0">
-              <div className="flex-1 min-w-0">
-                <div className="text-xs sm:text-sm font-medium text-[#022444]">
-                  2 дек, вт
+            <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+              <PopoverTrigger asChild>
+                <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 shrink-0 cursor-pointer hover:bg-gray-50 transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-[#022444]">
+                      {formatDate(selectedDate)}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <button className="ml-1 sm:ml-2 shrink-0">
-                <X className="h-3 w-3 sm:h-4 sm:w-4 text-[#7B91FF]" />
-              </button>
-            </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => handleDateSelect(date)}
+                  disabled={(date) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    return date < today;
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             <div className="hidden sm:flex items-center px-2 sm:px-4 py-2 sm:py-3 shrink-0">
               <div className="flex-1">
                 <div className="text-xs sm:text-sm font-medium text-[#022444]">
@@ -387,7 +460,10 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
               </div>
             </div>
           </div>
-          <button className="rounded-lg bg-[#7B91FF] px-4 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-white hover:bg-[#E16D32] w-full sm:w-auto">
+          <button 
+            onClick={handleSearchClick}
+            className="rounded-lg bg-[#7B91FF] px-4 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-white hover:bg-[#E16D32] w-full sm:w-auto transition-colors"
+          >
             Найти билеты
           </button>
         </div>
