@@ -91,9 +91,33 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
         setShowPassword(false);
       }
     } catch (error) {
+      // Переводим сообщения об ошибках на русский язык
+      let errorMessage = 'Неверный email или пароль';
+      
+      if (error instanceof Error) {
+        const errorText = error.message.toLowerCase();
+        
+        if (errorText.includes('invalid email') || errorText.includes('invalid password') || errorText.includes('неверный')) {
+          errorMessage = 'Неверный email или пароль';
+        } else if (errorText.includes('network') || errorText.includes('fetch')) {
+          errorMessage = 'Ошибка сети. Проверьте подключение к интернету';
+        } else if (errorText.includes('timeout')) {
+          errorMessage = 'Превышено время ожидания. Попробуйте позже';
+        } else if (errorText.includes('401') || errorText.includes('unauthorized')) {
+          errorMessage = 'Неверный email или пароль';
+        } else if (errorText.includes('403') || errorText.includes('forbidden')) {
+          errorMessage = 'Доступ запрещен';
+        } else if (errorText.includes('500') || errorText.includes('server')) {
+          errorMessage = 'Ошибка сервера. Попробуйте позже';
+        } else {
+          // Используем оригинальное сообщение, если оно на русском или если не можем определить тип ошибки
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: 'Ошибка входа',
-        description: error instanceof Error ? error.message : 'Неверный email или пароль',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

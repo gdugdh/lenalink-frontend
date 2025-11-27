@@ -232,22 +232,58 @@ class BackendApiClient {
 
       // Обработка ошибок
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          error: {
-            code: 'HTTP_ERROR',
-            message: `HTTP ${response.status}: ${response.statusText}`,
-          },
-        }));
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          // Если ответ не JSON, создаем объект ошибки
+          errorData = {
+            error: {
+              code: 'HTTP_ERROR',
+              message: `HTTP ${response.status}: ${response.statusText}`,
+            },
+          };
+        }
 
-        throw new Error(
-          errorData.error?.message || `HTTP error! status: ${response.status}`
-        );
+        // Извлекаем сообщение об ошибке
+        const errorMessage = errorData.error?.message || 
+                            errorData.message || 
+                            `HTTP error! status: ${response.status}`;
+
+        // Логируем ошибку только в режиме разработки
+        if (process.env.NODE_ENV === 'development') {
+          console.error('API request failed:', {
+            url: url,
+            endpoint: endpoint,
+            method: options.method || 'GET',
+            status: response.status,
+            statusText: response.statusText,
+            error: errorMessage,
+            errorData: errorData,
+          });
+        }
+
+        throw new Error(errorMessage);
       }
 
       return await response.json();
     } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
+      // Если это уже наша ошибка (обработанная выше), просто пробрасываем её
+      if (error instanceof Error && error.message !== 'Произошла ошибка при выполнении запроса') {
+        throw error;
+      }
+      
+      // Иначе это необработанная ошибка (сеть, парсинг и т.д.)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('API request failed (unhandled error):', {
+          url: url,
+          endpoint: endpoint,
+          method: options.method || 'GET',
+          error: error instanceof Error ? error.message : String(error),
+          errorObject: error,
+        });
+      }
+      throw new Error('Произошла ошибка при выполнении запроса');
     }
   }
 
