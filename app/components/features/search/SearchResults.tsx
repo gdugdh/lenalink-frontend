@@ -24,10 +24,22 @@ export interface RouteData {
 interface SearchResultsProps {
   routes?: RouteData[];
   onRouteClick?: (route: RouteData) => void;
+  loading?: boolean;
 }
 
-export function SearchResults({ routes = [], onRouteClick }: SearchResultsProps) {
-  // Если маршрутов нет, показываем сообщение
+export function SearchResults({ routes = [], onRouteClick, loading = false }: SearchResultsProps) {
+  // Показываем спиннер во время загрузки
+  if (loading) {
+    return (
+      <main className="flex-1 min-w-0 overflow-x-hidden">
+        <div className="flex items-center justify-center py-12">
+          <div className="h-12 w-12 border-4 border-[#7B91FF] border-t-transparent rounded-full animate-spin" />
+        </div>
+      </main>
+    );
+  }
+
+  // Если маршрутов нет, показываем сообщение (только когда не загружается)
   if (routes.length === 0) {
     return (
       <main className="flex-1 min-w-0 overflow-x-hidden">

@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, Suspense, useEffect } from 'react';
+import { useState, Suspense, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { PageLoader } from '@/app/components/shared/page-loader';
 import { UnifiedHeader } from '@/app/components/shared/unified-header';
 import { InsuranceModal } from '@/app/components/features/insurance/InsuranceModal';
 import { SearchBar } from '@/app/components/features/search/SearchBar';
 import { DatePriceBand } from '@/app/components/features/search/DatePriceBand';
-import { SearchFilters, SearchFiltersButton } from '@/app/components/features/search/SearchFilters';
+import { SearchFilters, SearchFiltersButton, type FilterState } from '@/app/components/features/search/SearchFilters';
 import { SearchResults, type RouteData } from '@/app/components/features/search/SearchResults';
 import { useRouter } from 'next/navigation';
 import { extractCityName, getCityCode } from '@/app/lib/cities';
@@ -71,7 +70,18 @@ function SearchPageContent() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<RouteData | null>(null);
   const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [allRoutes, setAllRoutes] = useState<RouteData[]>([]); // Все загруженные маршруты
   const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({
+    withBaggage: false,
+    transfers: [],
+    maxTransferDuration: 6,
+    convenientTransfers: false,
+    noRecheck: false,
+    noVisa: false,
+    noAirportChange: false,
+    noNightTransfers: false,
+  });
 
   // Получаем параметры из URL
   const fromParam = searchParams.get('from') || '';
@@ -134,7 +144,9 @@ function SearchPageContent() {
           transformBackendRouteToRouteData(route, index)
         );
         
-        setRoutes(transformedRoutes);
+        setAllRoutes(transformedRoutes);
+        // Применяем фильтры к загруженным маршрутам
+        applyFilters(transformedRoutes, filters);
       } catch (error) {
         console.error('Error loading routes:', error);
         toast({
@@ -151,6 +163,43 @@ function SearchPageContent() {
     loadRoutes();
   }, [fromCity, toCity, dateParam, toast]);
 
+  // Функция применения фильтров
+  const applyFilters = useCallback((routesToFilter: RouteData[], currentFilters: FilterState) => {
+    let filtered = [...routesToFilter];
+
+    // Фильтр по багажу (показываем priceDetails вместо price)
+    if (currentFilters.withBaggage) {
+      // В этом случае мы просто показываем маршруты с багажом
+      // В реальном приложении это может быть отдельное поле в данных
+    }
+
+    // Фильтр по количеству пересадок
+    if (currentFilters.transfers.length > 0) {
+      filtered = filtered.filter(route => {
+        // Извлекаем количество пересадок из строки "1 пересадка" или undefined
+        let transferCount = 0;
+        if (route.transfers) {
+          const match = route.transfers.match(/(\d+)/);
+          if (match) {
+            transferCount = parseInt(match[1]);
+          }
+        }
+        return currentFilters.transfers.includes(transferCount);
+      });
+    }
+
+    // Другие фильтры можно добавить позже, когда будут соответствующие данные
+
+    setRoutes(filtered);
+  }, []);
+
+  // Применяем фильтры при их изменении
+  useEffect(() => {
+    if (allRoutes.length > 0) {
+      applyFilters(allRoutes, filters);
+    }
+  }, [filters, allRoutes, applyFilters]);
+
   const handleRouteClick = (route: RouteData) => {
     setSelectedRoute(route);
     setIsModalOpen(true);
@@ -158,7 +207,6 @@ function SearchPageContent() {
 
   return (
     <>
-      <PageLoader />
       <div className="min-h-screen bg-[#FFFFFF] overflow-x-hidden">
         <UnifiedHeader />
 
@@ -173,16 +221,16 @@ function SearchPageContent() {
             <SearchFiltersButton onClick={() => setIsFiltersOpen(true)} />
 
             {/* Desktop Sidebar */}
-            <SearchFilters isMobile={false} />
+            <SearchFilters
+              isMobile={false}
+              routes={allRoutes}
+              filters={filters}
+              onFiltersChange={setFilters}
+              loading={loading}
+            />
 
             {/* Results */}
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="h-12 w-12 border-4 border-[#7B91FF] border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : (
-              <SearchResults routes={routes} onRouteClick={handleRouteClick} />
-            )}
+            <SearchResults routes={routes} onRouteClick={handleRouteClick} loading={loading} />
           </div>
         </div>
 
@@ -200,6 +248,10 @@ function SearchPageContent() {
           isMobile={true}
           isOpen={isFiltersOpen}
           onOpenChange={setIsFiltersOpen}
+          routes={allRoutes}
+          filters={filters}
+          onFiltersChange={setFilters}
+          loading={loading}
         />
       </div>
     </>

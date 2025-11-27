@@ -15,31 +15,31 @@ export function DatePriceBand() {
             <ChevronLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
           </button>
           <div className="flex gap-1 sm:gap-2 overflow-x-auto">
-            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center rounded-lg bg-[#7B91FF] px-2 sm:px-4 py-2">
-              <div className="text-sm sm:text-lg font-bold">20 884₽</div>
-              <div className="text-xs">2 дек</div>
+            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center justify-center rounded-lg bg-[#7B91FF] px-2 sm:px-4 py-2">
+              <div className="text-sm sm:text-lg font-bold text-center">20 884₽</div>
+              <div className="text-xs text-center">2 дек</div>
             </button>
-            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
-              <div className="text-xs sm:text-sm text-gray-400">30 ноя</div>
+            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center justify-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
+              <div className="text-xs sm:text-sm text-gray-400 text-center">30 ноя</div>
             </button>
-            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
-              <div className="text-xs sm:text-sm text-gray-400">1 дек</div>
+            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center justify-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
+              <div className="text-xs sm:text-sm text-gray-400 text-center">1 дек</div>
             </button>
-            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
-              <div className="text-sm sm:text-lg font-bold">21 251₽</div>
-              <div className="text-xs text-gray-400">3 дек</div>
+            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center justify-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
+              <div className="text-sm sm:text-lg font-bold text-center">21 251₽</div>
+              <div className="text-xs text-gray-400 text-center">3 дек</div>
             </button>
-            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
-              <div className="text-sm sm:text-lg font-bold">21 327₽</div>
-              <div className="text-xs text-gray-400">4 дек</div>
+            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center justify-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
+              <div className="text-sm sm:text-lg font-bold text-center">21 327₽</div>
+              <div className="text-xs text-gray-400 text-center">4 дек</div>
             </button>
-            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
-              <div className="text-sm sm:text-lg font-bold">21 866₽</div>
-              <div className="text-xs text-gray-400">5 дек</div>
+            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center justify-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
+              <div className="text-sm sm:text-lg font-bold text-center">21 866₽</div>
+              <div className="text-xs text-gray-400 text-center">5 дек</div>
             </button>
-            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
-              <div className="text-sm sm:text-lg font-bold">21 881₽</div>
-              <div className="text-xs text-gray-400">6 дек</div>
+            <button className="flex min-w-[80px] sm:min-w-[100px] flex-col items-center justify-center rounded-lg px-2 sm:px-4 py-2 hover:bg-white/10">
+              <div className="text-sm sm:text-lg font-bold text-center">21 881₽</div>
+              <div className="text-xs text-gray-400 text-center">6 дек</div>
             </button>
           </div>
           <button className="rounded-full p-2 hover:bg-white/10 shrink-0">
