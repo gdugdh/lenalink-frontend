@@ -6,7 +6,7 @@ import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import Link from 'next/link';
-import { cities, extractCityName } from '@/app/lib/cities';
+import { cities, extractCityName, getPopularCities } from '@/app/lib/cities';
 
 interface HomeSearchFormProps {
   from?: string;
@@ -27,8 +27,12 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
 
 
   // Фильтрация городов по введенному тексту, исключая уже выбранный город из другого поля
+  // Если запрос пустой, возвращает популярные города
   const filterCities = (query: string, excludeCity?: string): string[] => {
-    if (!query.trim()) return [];
+    if (!query.trim()) {
+      // Если поле пустое, показываем популярные города
+      return getPopularCities(5, excludeCity);
+    }
     const lowerQuery = query.toLowerCase();
     const excludeCityName = excludeCity ? extractCityName(excludeCity).toLowerCase() : '';
     
@@ -57,8 +61,8 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
     setFromValue(value);
     const suggestions = filterCities(value, toValue);
     setFromSuggestions(suggestions);
-    // Показываем меню, если есть ввод (даже если нет результатов)
-    setShowFromSuggestions(value.trim().length > 0);
+    // Показываем меню, если есть ввод или если поле пустое (для популярных городов)
+    setShowFromSuggestions(true);
   };
 
   // Обработка изменения поля "Куда"
@@ -67,8 +71,8 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
     setToValue(value);
     const suggestions = filterCities(value, fromValue);
     setToSuggestions(suggestions);
-    // Показываем меню, если есть ввод (даже если нет результатов)
-    setShowToSuggestions(value.trim().length > 0);
+    // Показываем меню, если есть ввод или если поле пустое (для популярных городов)
+    setShowToSuggestions(true);
   };
 
   // Обработка клавиатуры для поля "Откуда"
@@ -166,16 +170,14 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
                 onChange={handleFromChange}
                 onKeyDown={handleFromKeyDown}
                 onFocus={() => {
-                  if (fromValue.trim().length > 0) {
-                    const suggestions = filterCities(fromValue, toValue);
-                    setFromSuggestions(suggestions);
-                    setShowFromSuggestions(true);
-                  }
+                  const suggestions = filterCities(fromValue, toValue);
+                  setFromSuggestions(suggestions);
+                  setShowFromSuggestions(true);
                 }}
                 placeholder="Откуда"
                 className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
               />
-              {showFromSuggestions && fromValue.trim().length > 0 && (
+              {showFromSuggestions && (
                 <div
                   ref={fromSuggestionsRef}
                   className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
@@ -224,16 +226,14 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
                 onChange={handleToChange}
                 onKeyDown={handleToKeyDown}
                 onFocus={() => {
-                  if (toValue.trim().length > 0) {
-                    const suggestions = filterCities(toValue, fromValue);
-                    setToSuggestions(suggestions);
-                    setShowToSuggestions(true);
-                  }
+                  const suggestions = filterCities(toValue, fromValue);
+                  setToSuggestions(suggestions);
+                  setShowToSuggestions(true);
                 }}
                 placeholder="Куда"
                 className="border-gray-200 text-sm sm:text-base h-8 sm:h-9 px-2 sm:px-3"
               />
-              {showToSuggestions && toValue.trim().length > 0 && (
+              {showToSuggestions && (
                 <div
                   ref={toSuggestionsRef}
                   className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"

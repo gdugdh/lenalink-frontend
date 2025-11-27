@@ -112,7 +112,7 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     fromInputRef.current?.blur();
     
     // Обновляем URL с полным названием города
-    const currentTo = toCity ? cities.find(c => extractCityName(c).toLowerCase() === toCity.toLowerCase()) || `${toCity}, Россия` : '';
+    const currentTo = toValue ? cities.find(c => extractCityName(c).toLowerCase() === toValue.toLowerCase()) || `${toValue}, Россия` : '';
     router.push(`/search?from=${encodeURIComponent(city)}&to=${encodeURIComponent(currentTo)}`);
   };
 
@@ -126,9 +126,11 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     toInputRef.current?.blur();
     
     // Обновляем URL с полным названием города
-    const currentFrom = fromCity ? cities.find(c => extractCityName(c).toLowerCase() === fromCity.toLowerCase()) || `${fromCity}, Россия` : '';
+    const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : '';
     router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(city)}`);
   };
+<｜tool▁call▁begin｜>
+read_lints
 
   // Обработка клика на поле "Откуда"
   const handleFromClick = () => {

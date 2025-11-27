@@ -98,3 +98,16 @@ export const getCityCode = (cityName: string): string => {
   return cityCodeMap[cityName] || cityName.substring(0, 3).toUpperCase();
 };
 
+// Получение списка популярных городов (первые N городов)
+export const getPopularCities = (limit: number = 5, excludeCity?: string): string[] => {
+  const excludeCityName = excludeCity ? extractCityName(excludeCity).toLowerCase() : '';
+  
+  return cities
+    .filter(city => {
+      if (!excludeCityName) return true;
+      const cityName = extractCityName(city).toLowerCase();
+      return cityName !== excludeCityName;
+    })
+    .slice(0, limit);
+};
+
