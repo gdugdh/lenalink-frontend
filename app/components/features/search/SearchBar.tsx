@@ -232,9 +232,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
 
   return (
     <div className="border-b bg-white overflow-x-hidden">
-      <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 max-w-full">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <div className="flex flex-1 items-center gap-1 sm:gap-2 rounded-lg border border-gray-300 bg-white text-[#022444] overflow-x-auto scrollbar-hide">
+      <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 max-w-7xl">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 justify-center">
+          <div className="flex items-center gap-1 sm:gap-2 rounded-lg border border-gray-300 bg-white text-[#022444] overflow-x-auto scrollbar-hide w-full sm:w-auto">
             <div className="flex flex-1 min-w-[120px] items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative">
               {isEditingFrom ? (
                 <div className="flex-1 min-w-0 relative">
