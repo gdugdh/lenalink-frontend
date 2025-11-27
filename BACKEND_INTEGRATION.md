@@ -2,7 +2,7 @@
 
 ## Обзор
 
-Фронтенд интегрирован с Backend API LenaLink (http://localhost:8080/api/v1).
+Фронтенд интегрирован с Backend API LenaLink (https://lena.linkpc.net/api/v1).
 
 ## Что было сделано
 
@@ -40,10 +40,10 @@
 Создайте файл `.env.local` в корне проекта:
 
 ```env
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
+NEXT_PUBLIC_BACKEND_URL=https://lena.linkpc.net
 ```
 
-По умолчанию используется `http://localhost:8080`.
+По умолчанию используется `https://lena.linkpc.net`.
 
 ## Использование
 

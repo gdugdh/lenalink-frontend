@@ -1,9 +1,10 @@
 /**
  * Backend API Client для работы с LenaLink Backend API
- * Base URL: http://localhost:8080/api/v1
+ * Base URL: https://lena.linkpc.net
+ * API endpoints: /api/v1/* (routes, bookings, cities) и /api/* (auth)
  */
 
-const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://lena.linkpc.net';
 
 // Типы для API
 export interface BackendUser {
@@ -217,13 +218,9 @@ class BackendApiClient {
     const url = `${this.baseURL}${endpoint}`;
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
+      ...(this.token && { Authorization: `Bearer ${this.token}` }),
       ...options.headers,
     };
-
-    // Добавляем токен если есть
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
-    }
 
     const config: RequestInit = {
       ...options,
