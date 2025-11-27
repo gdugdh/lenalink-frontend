@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { DashboardClient } from './DashboardClient';
 import { requireRole } from '@/app/lib/auth';
 import type { UserRole } from '@/app/lib/mockUsers';
@@ -24,11 +25,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DashboardPage({ params }: Props) {
   const { role } = await params;
 
-  // Validate role parameter
+  // Validate role parameter independently of user authentication
+  // This ensures invalid roles show 404 regardless of auth status
   const validRoles: UserRole[] = ['user', 'admin', 'partner'];
   if (!validRoles.includes(role as UserRole)) {
-    // This will redirect to login if role is invalid
-    await requireRole('user');
+    notFound();
   }
 
   // Server-side role check - ensure user has access to this dashboard

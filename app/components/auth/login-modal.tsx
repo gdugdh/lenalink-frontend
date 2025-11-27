@@ -69,6 +69,18 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
         // Redirect to dashboard
         router.push(`/dashboard/${sessionData.user.role}`);
         router.refresh(); // Refresh to update header
+      } else {
+        // Handle case when session fetch fails after successful login
+        toast({
+          title: 'Ошибка получения сессии',
+          description: 'Не удалось получить информацию о сессии. Пожалуйста, попробуйте войти снова.',
+          variant: 'destructive',
+        });
+        // Close modal to allow user to retry
+        onOpenChange(false);
+        // Reset form
+        setEmail('');
+        setPassword('');
       }
     } catch (error) {
       toast({
