@@ -29,7 +29,7 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
           <X className="h-5 w-5 sm:h-6 sm:w-6 text-[#022444]" />
         </button>
 
-        <div className="flex flex-col md:flex-row w-full overflow-y-auto">
+        <div className="flex flex-col md:flex-row w-full overflow-y-auto md:overflow-hidden">
           <div className="flex-1 p-4 sm:p-6 md:p-8">
             <div className="mb-4 sm:mb-6">
               <h2 className="mb-2 text-xl sm:text-2xl font-bold text-[#022444]">
@@ -219,7 +219,7 @@ export function InsuranceModal({ isOpen, onCloseAction }: InsuranceModalProps) {
             </div>
           </div>
 
-          <div className="flex-1 bg-gradient-to-b from-[#7B91FF] to-[#7B91FF] p-4 sm:p-6 md:overflow-y-auto">
+          <div className="flex-1 bg-gradient-to-b from-[#7B91FF] to-[#7B91FF] p-4 sm:p-6 overflow-y-auto md:overflow-y-auto">
             <div className="mb-4 sm:mb-6 text-center sm:text-right sm:mr-10">
               <div className="text-sm text-white">
                 Цены на билеты от 41 256₽
