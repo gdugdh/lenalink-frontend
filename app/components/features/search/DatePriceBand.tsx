@@ -1,10 +1,17 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Calendar, ChevronLeftIcon, ChevronRight } from 'lucide-react';
+
+interface DatePriceData {
+  date: string; // Дата в формате YYYY-MM-DD
+  price: number | null; // Цена или null, если данных нет
+}
 
 interface DatePriceBandProps {
   currentDate?: string; // Дата в формате YYYY-MM-DD
+  prices?: DatePriceData[]; // Данные о ценах для дат (опционально)
 }
 
 interface DateItem {
@@ -13,10 +20,20 @@ interface DateItem {
   isSelected: boolean;
 }
 
-export function DatePriceBand({ currentDate }: DatePriceBandProps) {
+export function DatePriceBand({ currentDate, prices = [] }: DatePriceBandProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [dates, setDates] = useState<DateItem[]>([]);
   const [visibleRange, setVisibleRange] = useState({ start: -3, end: 10 }); // Показываем 3 дня назад и 10 дней вперед
+  const [selectedDate, setSelectedDate] = useState<string | null>(currentDate || null);
+
+  // Обновляем selectedDate при изменении currentDate
+  useEffect(() => {
+    if (currentDate) {
+      setSelectedDate(currentDate);
+    }
+  }, [currentDate]);
 
   // Функция для парсинга даты из строки YYYY-MM-DD
   const parseDateFromString = useCallback((dateString: string): Date => {
@@ -34,18 +51,28 @@ export function DatePriceBand({ currentDate }: DatePriceBandProps) {
     const scrollLeft = container?.scrollLeft || 0;
     const scrollWidth = container?.scrollWidth || 0;
     
+    // Создаем Map для быстрого поиска цен по датам
+    const pricesMap = new Map<string, number | null>();
+    prices.forEach(item => {
+      pricesMap.set(item.date, item.price);
+    });
+
     // Генерируем даты от start до end
     for (let i = visibleRange.start; i <= visibleRange.end; i++) {
       const date = new Date(baseDate);
       date.setDate(date.getDate() + i);
       
       // Определяем, является ли это выбранной датой
-      const isSelected = i === 0;
+      const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      const isSelected = selectedDate === dateString || (i === 0 && !selectedDate);
       
-      // Генерируем случайную цену для демонстрации (в реальном приложении это будет из API)
-      // Используем seed на основе даты для стабильности цен
-      const seed = date.getTime();
-      const price = isSelected ? 20884 : Math.floor(20000 + (seed % 5000));
+      // Ищем цену в переданных данных
+      let price: number | null = null;
+      if (pricesMap.has(dateString)) {
+        price = pricesMap.get(dateString) ?? null;
+      }
+      // Если prices не передан или для этой даты нет данных, price остается null
+      // Не генерируем случайные цены - показываем только дату
       
       newDates.push({
         date,
@@ -73,6 +100,7 @@ export function DatePriceBand({ currentDate }: DatePriceBandProps) {
   // Форматирование даты для отображения
   const formatDate = (date: Date): string => {
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+    // Результат будет в формате "13 нояб." (с точкой в конце)
   };
 
   // Форматирование цены
@@ -123,9 +151,21 @@ export function DatePriceBand({ currentDate }: DatePriceBandProps) {
 
   // Обработчик клика по дате
   const handleDateClick = (date: Date) => {
-    // В будущем здесь можно добавить навигацию на страницу поиска с новой датой
     const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    console.log('Selected date:', dateString);
+    setSelectedDate(dateString);
+    
+    // Навигация на страницу поиска с новой датой без перезагрузки страницы
+    const from = searchParams.get('from');
+    const to = searchParams.get('to');
+    
+    if (from && to) {
+      router.push(`/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${dateString}`);
+    } else {
+      // Если нет параметров поиска, просто обновляем дату в URL
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.set('date', dateString);
+      router.push(`/search?${newSearchParams.toString()}`);
+    }
   };
 
   return (
@@ -159,15 +199,15 @@ export function DatePriceBand({ currentDate }: DatePriceBandProps) {
               >
                 {dateItem.price !== null ? (
                   <>
-                    <div className="text-sm sm:text-lg font-bold text-center">
+                    <div className={`text-sm sm:text-lg font-bold text-center ${dateItem.isSelected ? 'text-white' : ''}`}>
                       {formatPrice(dateItem.price)}
                     </div>
-                    <div className={`text-xs text-center ${dateItem.isSelected ? '' : 'text-gray-400'}`}>
+                    <div className={`text-xs text-center ${dateItem.isSelected ? 'text-white' : 'text-gray-400'}`}>
                       {formatDate(dateItem.date)}
                     </div>
                   </>
                 ) : (
-                  <div className="text-xs sm:text-sm text-gray-400 text-center">
+                  <div className={`text-xs text-center ${dateItem.isSelected ? 'text-white' : 'text-gray-400'}`}>
                     {formatDate(dateItem.date)}
                   </div>
                 )}

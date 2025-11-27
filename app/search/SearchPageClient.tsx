@@ -11,7 +11,6 @@ import { SearchResults, type RouteData } from '@/app/components/features/search/
 import { useRouter } from 'next/navigation';
 import { extractCityName, getCityCode } from '@/app/lib/cities';
 import { backendApi, type Route as BackendRoute } from '@/app/lib/backend-api';
-import { useToast } from '@/app/hooks/use-toast';
 
 // Преобразуем формат бэкенда в формат фронтенда
 function transformBackendRouteToRouteData(route: BackendRoute, index: number): RouteData {
@@ -65,7 +64,6 @@ function transformBackendRouteToRouteData(route: BackendRoute, index: number): R
 function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<RouteData | null>(null);
@@ -121,22 +119,12 @@ function SearchPageContent() {
         if (!response) {
           console.error('API returned null or undefined response');
           setRoutes([]);
-          toast({
-            title: 'Ошибка загрузки маршрутов',
-            description: 'Сервер вернул неожиданный ответ',
-            variant: 'destructive',
-          });
           return;
         }
 
         if (!response.routes || !Array.isArray(response.routes)) {
           console.warn('API response missing routes array:', response);
           setRoutes([]);
-          toast({
-            title: 'Нет доступных маршрутов',
-            description: 'По вашему запросу маршруты не найдены',
-            variant: 'default',
-          });
           return;
         }
 
@@ -149,11 +137,6 @@ function SearchPageContent() {
         applyFilters(transformedRoutes, filters);
       } catch (error) {
         console.error('Error loading routes:', error);
-        toast({
-          title: 'Ошибка загрузки маршрутов',
-          description: error instanceof Error ? error.message : 'Не удалось загрузить маршруты',
-          variant: 'destructive',
-        });
         setRoutes([]);
       } finally {
         setLoading(false);
@@ -161,7 +144,7 @@ function SearchPageContent() {
     };
 
     loadRoutes();
-  }, [fromCity, toCity, dateParam, toast]);
+  }, [fromCity, toCity, dateParam]);
 
   // Функция применения фильтров
   const applyFilters = useCallback((routesToFilter: RouteData[], currentFilters: FilterState) => {

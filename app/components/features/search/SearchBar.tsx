@@ -28,6 +28,7 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
   const [fromSuggestionsPosition, setFromSuggestionsPosition] = useState({ top: 0, left: 0, width: 0 });
   const [toSuggestionsPosition, setToSuggestionsPosition] = useState({ top: 0, left: 0, width: 0 });
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isReturnDatePickerOpen, setIsReturnDatePickerOpen] = useState(false);
   const fromInputRef = useRef<HTMLInputElement>(null);
   const toInputRef = useRef<HTMLInputElement>(null);
   const fromSuggestionsRef = useRef<HTMLDivElement>(null);
@@ -49,7 +50,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
 
   // Получаем дату из URL или используем сегодняшнюю
   const dateParam = searchParams.get('date') || '';
+  const returnDateParam = searchParams.get('return_date') || '';
   const selectedDate = dateParam ? parseDateFromString(dateParam) : new Date();
+  const selectedReturnDate = returnDateParam ? parseDateFromString(returnDateParam) : null;
   
   // Форматируем дату для отображения
   const formatDate = (date: Date): string => {
@@ -69,8 +72,36 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : '';
     const currentTo = toValue ? cities.find(c => extractCityName(c).toLowerCase() === toValue.toLowerCase()) || `${toValue}, Россия` : '';
     
-    router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(currentTo)}&date=${dateString}`);
+    const returnDateString = returnDateParam || '';
+    const queryParams = new URLSearchParams();
+    queryParams.set('from', currentFrom);
+    queryParams.set('to', currentTo);
+    queryParams.set('date', dateString);
+    if (returnDateString) {
+      queryParams.set('return_date', returnDateString);
+    }
+    
+    router.push(`/search?${queryParams.toString()}`);
     setIsDatePickerOpen(false);
+  };
+
+  // Обработка выбора обратной даты
+  const handleReturnDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    
+    const dateString = formatDateToString(date);
+    const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : '';
+    const currentTo = toValue ? cities.find(c => extractCityName(c).toLowerCase() === toValue.toLowerCase()) || `${toValue}, Россия` : '';
+    
+    const departureDateString = dateParam || formatDateToString(selectedDate);
+    const queryParams = new URLSearchParams();
+    queryParams.set('from', currentFrom);
+    queryParams.set('to', currentTo);
+    queryParams.set('date', departureDateString);
+    queryParams.set('return_date', dateString);
+    
+    router.push(`/search?${queryParams.toString()}`);
+    setIsReturnDatePickerOpen(false);
   };
 
   // Обработка нажатия на кнопку "Найти билеты"
@@ -444,13 +475,33 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                 />
               </PopoverContent>
             </Popover>
-            <div className="hidden sm:flex items-center px-2 sm:px-4 py-2 sm:py-3 shrink-0">
-              <div className="flex-1">
-                <div className="text-xs sm:text-sm font-medium text-[#022444]">
-                  Обратно
+            <Popover open={isReturnDatePickerOpen} onOpenChange={setIsReturnDatePickerOpen}>
+              <PopoverTrigger asChild>
+                <div className="hidden sm:flex items-center px-2 sm:px-4 py-2 sm:py-3 shrink-0 cursor-pointer hover:bg-gray-50 transition-colors">
+                  <div className="flex-1">
+                    <div className="text-xs sm:text-sm font-medium text-[#022444]">
+                      {selectedReturnDate ? formatDate(selectedReturnDate) : 'Обратно'}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedReturnDate || undefined}
+                  onSelect={(date) => handleReturnDateSelect(date)}
+                  disabled={(date) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const minDate = new Date(selectedDate);
+                    minDate.setHours(0, 0, 0, 0);
+                    // Обратная дата должна быть не раньше сегодня и не раньше даты отправления
+                    return date < today || date < minDate;
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             <div className="flex items-center border-l px-2 sm:px-4 py-2 sm:py-3 shrink-0">
               <div className="flex-1 min-w-0">
                 <div className="text-xs sm:text-sm font-medium text-[#022444]">
