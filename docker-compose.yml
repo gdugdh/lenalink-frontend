@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      # Синхронизируем код проекта для hot reload
+      - .:/app
+      # Изолируем node_modules и .next для лучшей производительности
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_USE_MOCK_AUTH=true
+      - NEXT_PUBLIC_BACKEND_URL=https://lena.linkpc.net
+      - NODE_ENV=development
+    command: pnpm dev
+    stdin_open: true
+    tty: true
+
