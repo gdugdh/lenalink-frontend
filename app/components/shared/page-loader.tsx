@@ -5,11 +5,16 @@ import { Spinner } from "@/app/components/ui/spinner";
 
 export function PageLoader() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     // Simulate loading for 1-2 seconds
     const timer = setTimeout(() => {
-      setIsLoading(false);
+      setIsVisible(false);
+      // Даём время для fade-out анимации перед полным скрытием
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
     }, 130);
 
     return () => clearTimeout(timer);
@@ -18,11 +23,8 @@ export function PageLoader() {
   if (!isLoading) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
-      <div className="flex flex-col items-center gap-4">
-        <Spinner className="h-12 w-12 text-[#7B91FF]" />
-        <p className="text-lg font-medium text-[#022444]">Loading...</p>
-      </div>
+    <div className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <Spinner className="h-12 w-12 text-[#7B91FF]" />
     </div>
   );
 }
