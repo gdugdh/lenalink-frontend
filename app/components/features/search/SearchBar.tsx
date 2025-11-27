@@ -2,7 +2,14 @@
 
 import { ChevronDown, X } from 'lucide-react';
 
-export function SearchBar() {
+interface SearchBarProps {
+  fromCity?: string;
+  fromCode?: string;
+  toCity?: string;
+  toCode?: string;
+}
+
+export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity = 'Олекминск', toCode = 'YKS' }: SearchBarProps) {
   return (
     <div className="border-b bg-white overflow-x-hidden">
       <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 max-w-full">
@@ -11,9 +18,9 @@ export function SearchBar() {
             <div className="flex flex-1 min-w-[120px] items-center border-r px-2 sm:px-4 py-2 sm:py-3">
               <div className="flex-1 min-w-0">
                 <div className="text-xs sm:text-sm font-medium text-[#022444] truncate">
-                  Москва
+                  {fromCity}
                 </div>
-                <div className="text-xs text-[#022444]">MOW</div>
+                <div className="text-xs text-[#022444]">{fromCode}</div>
               </div>
               <button className="rounded-full p-1 hover:bg-gray-100 shrink-0">
                 <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-[#022444]" />
@@ -22,9 +29,9 @@ export function SearchBar() {
             <div className="flex flex-1 min-w-[120px] items-center border-r px-2 sm:px-4 py-2 sm:py-3">
               <div className="flex-1 min-w-0">
                 <div className="text-xs sm:text-sm font-medium text-[#022444] truncate">
-                  Олекминск
+                  {toCity}
                 </div>
-                <div className="text-xs text-[#022444]">YKS</div>
+                <div className="text-xs text-[#022444]">{toCode}</div>
               </div>
             </div>
             <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 shrink-0">
