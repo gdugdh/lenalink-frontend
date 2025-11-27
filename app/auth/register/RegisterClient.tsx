@@ -92,12 +92,29 @@ export function RegisterClient() {
     try {
       await register(email, password, name.trim(), role);
       
-      toast({
-        title: 'Регистрация успешна',
-        description: 'Вы успешно зарегистрированы и вошли в систему',
+      // Wait a moment for session state to update, then get role from API
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      
+      // Get session from API to get the correct role
+      const sessionResponse = await fetch('/api/auth/session', {
+        credentials: 'include',
       });
-
-      router.push(`/dashboard/${role}`);
+      
+      if (sessionResponse.ok) {
+        const sessionData = await sessionResponse.json();
+        toast({
+          title: 'Регистрация успешна',
+          description: 'Вы успешно зарегистрированы и вошли в систему',
+        });
+        router.push(`/dashboard/${sessionData.user.role}`);
+      } else {
+        // Fallback: use role from state, but this should rarely happen
+        toast({
+          title: 'Регистрация успешна',
+          description: 'Вы успешно зарегистрированы и вошли в систему',
+        });
+        router.push(`/dashboard/${role}`);
+      }
     } catch (error) {
       toast({
         title: 'Ошибка регистрации',
@@ -170,17 +187,6 @@ export function RegisterClient() {
                         <div className="font-semibold">Партнёр</div>
                         <div className="text-sm text-muted-foreground">
                           Предоставление транспортных услуг
-                        </div>
-                      </div>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                    <RadioGroupItem value="admin" id="role-admin" />
-                    <Label htmlFor="role-admin" className="font-normal cursor-pointer flex-1">
-                      <div>
-                        <div className="font-semibold">Администратор</div>
-                        <div className="text-sm text-muted-foreground">
-                          Управление системой и пользователями
                         </div>
                       </div>
                     </Label>

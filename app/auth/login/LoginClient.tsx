@@ -58,9 +58,31 @@ export function LoginClient() {
 
         router.push(redirectTo);
       } else {
-        // Fallback to selected role if session fetch fails
-        const redirectTo = searchParams.get('redirect') || `/dashboard/${role}`;
-        router.push(redirectTo);
+        // If session fetch fails, wait for AuthContext to update and retry
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const retryResponse = await fetch('/api/auth/session', {
+          credentials: 'include',
+        });
+        
+        if (retryResponse.ok) {
+          const sessionData = await retryResponse.json();
+          const redirectTo = searchParams.get('redirect') || `/dashboard/${sessionData.user.role}`;
+          
+          toast({
+            title: 'Успешный вход',
+            description: 'Вы успешно вошли в систему',
+          });
+          
+          router.push(redirectTo);
+        } else {
+          // Last resort: redirect to home page and let middleware handle it
+          toast({
+            title: 'Вход выполнен',
+            description: 'Вы успешно вошли в систему. Перенаправление...',
+          });
+          router.push('/');
+          router.refresh();
+        }
       }
     } catch (error) {
       toast({
