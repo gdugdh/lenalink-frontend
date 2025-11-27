@@ -8,7 +8,7 @@ import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { routes } from "@/app/lib/routes";
 import { useBooking, type SeatType } from "@/app/lib/booking-context";
-import { calculatePrice, getTariffName, getPassengerTypeLabel, getSeatName, getSeatPrice } from "@/app/lib/price-calculator";
+import { calculatePrice, getTariffName, getPassengerTypeLabel, getSeatName, getSeatPrice, extractPriceFromRoute } from "@/app/lib/price-calculator";
 
 export function SeatSelectionPageClient() {
   const router = useRouter();
@@ -217,13 +217,13 @@ export function SeatSelectionPageClient() {
                   onClick={() => router.back()}
                   className="text-[#022444]"
                 >
-                  Предыдущий рейс
+                  Назад
                 </Button>
                 <Button
                   onClick={handleContinue}
                   className="bg-[#7B91FF] hover:bg-[#E16D32]"
                 >
-                  Далее
+                  Продолжить
                 </Button>
               </div>
             </div>
@@ -234,10 +234,12 @@ export function SeatSelectionPageClient() {
                 <h3 className="mb-4 text-lg font-bold text-[#022444]">Итого</h3>
 
                 {(() => {
+                  const basePriceFromRoute = extractPriceFromRoute(bookingState.selectedRoute);
                   const priceBreakdown = calculatePrice(
                     bookingState.passengerType,
                     bookingState.tariff,
-                    bookingState.seatType
+                    bookingState.seatType,
+                    basePriceFromRoute
                   );
                   
                   return (

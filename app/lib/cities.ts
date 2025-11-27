@@ -1,3 +1,69 @@
+// Маппинг русских названий городов в английские slug'и для API
+const cityNameToSlug: Record<string, string> = {
+  'москва': 'moscow',
+  'санкт-петербург': 'saint-petersburg',
+  'новосибирск': 'novosibirsk',
+  'екатеринбург': 'ekaterinburg',
+  'казань': 'kazan',
+  'нижний новгород': 'nizhny-novgorod',
+  'челябинск': 'chelyabinsk',
+  'самара': 'samara',
+  'омск': 'omsk',
+  'ростов-на-дону': 'rostov-on-don',
+  'уфа': 'ufa',
+  'красноярск': 'krasnoyarsk',
+  'воронеж': 'voronezh',
+  'пермь': 'perm',
+  'волгоград': 'volgograd',
+  'краснодар': 'krasnodar',
+  'саратов': 'saratov',
+  'тюмень': 'tyumen',
+  'тольятти': 'tolyatti',
+  'якутск': 'yakutsk',
+  'иркутск': 'irkutsk',
+  'барнаул': 'barnaul',
+  'ульяновск': 'ulyanovsk',
+  'томск': 'tomsk',
+  'кемерово': 'kemerovo',
+  'новокузнецк': 'novokuznetsk',
+  'рязань': 'ryazan',
+  'астрахань': 'astrakhan',
+  'пенза': 'penza',
+  'липецк': 'lipetsk',
+  'тула': 'tula',
+  'киров': 'kirov',
+  'чебоксары': 'cheboksary',
+  'калининград': 'kaliningrad',
+  'курск': 'kursk',
+  'ставрополь': 'stavropol',
+  'сочи': 'sochi',
+  'улан-удэ': 'ulan-ude',
+  'магнитогорск': 'magnitogorsk',
+  'орел': 'orel',
+  'олекминск': 'olekminsk',
+  'махачкала': 'makhachkala',
+};
+
+// Функция для преобразования названия города в slug для API
+export function getCitySlug(cityName: string): string {
+  if (!cityName) return '';
+  
+  // Извлекаем только название города (без страны)
+  const name = extractCityName(cityName).toLowerCase().trim();
+  
+  // Ищем в маппинге
+  if (cityNameToSlug[name]) {
+    return cityNameToSlug[name];
+  }
+  
+  // Если не найдено, преобразуем в транслит (простая версия)
+  // Удаляем пробелы и дефисы, заменяем на дефисы
+  return name
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zа-яё0-9-]/g, '')
+    .toLowerCase();
+}
+
 // Список популярных городов для автокомплита
 export const cities = [
   'Москва, Россия',

@@ -1,4 +1,13 @@
 import type { PassengerType, TariffType, SeatType } from './booking-context';
+import type { RouteData } from '@/app/components/features/search/SearchResults';
+
+// Вспомогательная функция для извлечения цены из маршрута
+export function extractPriceFromRoute(route: RouteData | null | undefined): number | undefined {
+  if (!route?.price) return undefined;
+  const priceString = route.price.replace(/\s/g, '').replace(/₽/g, '').trim();
+  const price = parseInt(priceString);
+  return isNaN(price) ? undefined : price;
+}
 
 // Базовые цены для разных типов пассажиров
 const BASE_PRICES: Record<PassengerType, number> = {
@@ -33,9 +42,18 @@ export interface PriceBreakdown {
 export function calculatePrice(
   passengerType: PassengerType,
   tariff: TariffType,
-  seatType: SeatType
+  seatType: SeatType,
+  basePriceFromRoute?: number
 ): PriceBreakdown {
-  const basePrice = BASE_PRICES[passengerType];
+  // Используем цену из маршрута, если она предоставлена, иначе используем базовую цену по типу пассажира
+  const basePrice = basePriceFromRoute 
+    ? (passengerType === 'adult' 
+        ? basePriceFromRoute 
+        : passengerType === 'child' 
+          ? Math.round(basePriceFromRoute * 0.75)
+          : Math.round(basePriceFromRoute * 0.1))
+    : BASE_PRICES[passengerType];
+  
   const tariffFee = TARIFF_FEES[tariff];
   const seatFee = SEAT_FEES[seatType];
 

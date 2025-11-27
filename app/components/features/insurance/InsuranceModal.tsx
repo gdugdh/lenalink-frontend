@@ -40,7 +40,9 @@ export function InsuranceModal({ isOpen, onCloseAction, route }: InsuranceModalP
   const displayRoute = route || defaultRoute;
   
   // Extract price number for calculations
-  const priceNumber = parseInt(displayRoute.price.replace(/\s/g, '').replace('₽', '')) || 41256;
+  // Remove all spaces and currency symbol, then parse
+  const priceString = displayRoute.price.replace(/\s/g, '').replace(/₽/g, '').trim();
+  const priceNumber = parseInt(priceString) || 0;
 
   const handleSelectInsurance = () => {
     // Save selected route to context before navigating
@@ -399,7 +401,7 @@ export function InsuranceModal({ isOpen, onCloseAction, route }: InsuranceModalP
                 onClick={handleSelectInsurance}
                 className="mt-4 w-full rounded-lg bg-[#558DCA] py-2.5 text-sm font-semibold text-white hover:bg-[#4A7AB5]"
               >
-                Продолжить за 41 256₽
+                Продолжить за {priceNumber.toLocaleString('ru-RU')}₽
               </button>
             </div>
           </div>

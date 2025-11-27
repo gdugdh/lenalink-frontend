@@ -79,13 +79,23 @@ export interface Route {
 }
 
 export interface RoutesSearchResponse {
-  routes: Route[];
-  search_criteria: {
+  data?: {
+    routes: Route[];
+    search_criteria: {
+      from: string;
+      to: string;
+      departure_date: string;
+      passengers: number;
+    };
+  };
+  routes?: Route[];
+  search_criteria?: {
     from: string;
     to: string;
     departure_date: string;
     passengers: number;
   };
+  success?: boolean;
 }
 
 export interface RouteDetailsResponse extends Route {

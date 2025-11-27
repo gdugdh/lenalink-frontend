@@ -6,15 +6,17 @@ import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { routes } from "@/app/lib/routes";
 import { useBooking } from "@/app/lib/booking-context";
-import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName } from "@/app/lib/price-calculator";
+import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName, extractPriceFromRoute } from "@/app/lib/price-calculator";
 
 export function ConfirmationPageClient() {
   const router = useRouter();
   const { bookingState } = useBooking();
+  const basePriceFromRoute = extractPriceFromRoute(bookingState.selectedRoute);
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
-    bookingState.seatType
+    bookingState.seatType,
+    basePriceFromRoute
   );
 
   return (

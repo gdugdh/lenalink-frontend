@@ -7,7 +7,7 @@ import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
 import { routes } from "@/app/lib/routes";
 import { useBooking, type TariffType } from "@/app/lib/booking-context";
-import { calculatePrice, getTariffName, getPassengerTypeLabel } from "@/app/lib/price-calculator";
+import { calculatePrice, getTariffName, getPassengerTypeLabel, extractPriceFromRoute } from "@/app/lib/price-calculator";
 
 export function InsuranceSelectionPageClient() {
   const router = useRouter();
@@ -18,11 +18,21 @@ export function InsuranceSelectionPageClient() {
     router.push(routes.seatSelection);
   };
 
+  const basePriceFromRoute = extractPriceFromRoute(bookingState.selectedRoute);
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
-    bookingState.seatType
+    bookingState.seatType,
+    basePriceFromRoute
   );
+
+  // Рассчитываем цены для каждого тарифа для отображения
+  const tariffPrices = {
+    tariff1: calculatePrice(bookingState.passengerType, 'tariff1', bookingState.seatType, basePriceFromRoute).total,
+    tariff2: calculatePrice(bookingState.passengerType, 'tariff2', bookingState.seatType, basePriceFromRoute).total,
+    tariff3: calculatePrice(bookingState.passengerType, 'tariff3', bookingState.seatType, basePriceFromRoute).total,
+    tariff4: calculatePrice(bookingState.passengerType, 'tariff4', bookingState.seatType, basePriceFromRoute).total,
+  };
 
   return (
     <>
@@ -64,7 +74,7 @@ export function InsuranceSelectionPageClient() {
                     <div className="mb-2 text-4xl">💼</div>
                     <h3 className="mb-1 font-bold text-[#022444]">Тариф 1</h3>
                     <div className="text-2xl font-bold text-[#7B91FF]">
-                      41 256₽
+                      {tariffPrices.tariff1.toLocaleString('ru-RU')}₽
                     </div>
                   </div>
                   <div className="space-y-2 text-xs">
@@ -121,7 +131,7 @@ export function InsuranceSelectionPageClient() {
                     </div>
                     <h3 className="mb-1 font-bold text-[#022444]">Тариф 2</h3>
                     <div className="text-2xl font-bold text-[#7B91FF]">
-                      43 500₽
+                      {tariffPrices.tariff2.toLocaleString('ru-RU')}₽
                     </div>
                   </div>
                   <div className="space-y-2 text-xs">
@@ -169,7 +179,7 @@ export function InsuranceSelectionPageClient() {
                     <div className="mb-2 text-4xl">🎯</div>
                     <h3 className="mb-1 font-bold text-[#022444]">Тариф 3</h3>
                     <div className="text-2xl font-bold text-[#7B91FF]">
-                      45 500₽
+                      {tariffPrices.tariff3.toLocaleString('ru-RU')}₽
                     </div>
                   </div>
                   <div className="space-y-2 text-xs">
@@ -217,7 +227,7 @@ export function InsuranceSelectionPageClient() {
                     <div className="mb-2 text-4xl">🛡️</div>
                     <h3 className="mb-1 font-bold text-[#022444]">Тариф 4</h3>
                     <div className="text-2xl font-bold text-[#7B91FF]">
-                      47 500₽
+                      {tariffPrices.tariff4.toLocaleString('ru-RU')}₽
                     </div>
                   </div>
                   <div className="space-y-2 text-xs">
@@ -270,7 +280,7 @@ export function InsuranceSelectionPageClient() {
                   onClick={handleContinue}
                   className="bg-[#7B91FF] hover:bg-[#E16D32]"
                 >
-                  Выбрать «{getTariffName(selectedPlan)}»
+                  Продолжить
                 </Button>
               </div>
             </div>

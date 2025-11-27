@@ -45,7 +45,7 @@ const BookingContext = createContext<BookingContextType | undefined>(undefined);
 export function BookingProvider({ children }: { children: ReactNode }) {
   const [bookingState, setBookingState] = useState<BookingState>({
     passengerType: 'adult',
-    tariff: 'tariff2',
+    tariff: 'tariff1',
     seatType: 'random',
     selectedRoute: null,
     passengerData: null,

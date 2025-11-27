@@ -9,7 +9,7 @@ import { DatePriceBand } from '@/app/components/features/search/DatePriceBand';
 import { SearchFilters, SearchFiltersButton, type FilterState } from '@/app/components/features/search/SearchFilters';
 import { SearchResults, type RouteData } from '@/app/components/features/search/SearchResults';
 import { useRouter } from 'next/navigation';
-import { extractCityName, getCityCode } from '@/app/lib/cities';
+import { extractCityName, getCityCode, getCitySlug } from '@/app/lib/cities';
 import { backendApi, type Route as BackendRoute } from '@/app/lib/backend-api';
 
 // Преобразуем формат бэкенда в формат фронтенда
@@ -101,9 +101,9 @@ function SearchPageContent() {
 
       setLoading(true);
       try {
-        // Преобразуем названия городов в формат бэкенда (lowercase, без пробелов)
-        const fromSlug = fromCity.toLowerCase().replace(/\s+/g, '');
-        const toSlug = toCity.toLowerCase().replace(/\s+/g, '');
+        // Преобразуем названия городов в формат бэкенда (английские slug'и)
+        const fromSlug = getCitySlug(fromCity);
+        const toSlug = getCitySlug(toCity);
         
         // Используем дату из параметров или сегодняшнюю дату
         const departureDate = dateParam || new Date().toISOString().split('T')[0];
@@ -115,6 +115,11 @@ function SearchPageContent() {
           passengers: 1,
         });
 
+        // Детальное логирование для отладки
+        console.log('API response:', response);
+        console.log('Response type:', typeof response);
+        console.log('Response keys:', response ? Object.keys(response) : 'null');
+
         // Проверяем, что response и routes существуют
         if (!response) {
           console.error('API returned null or undefined response');
@@ -122,13 +127,38 @@ function SearchPageContent() {
           return;
         }
 
-        if (!response.routes || !Array.isArray(response.routes)) {
-          console.warn('API response missing routes array:', response);
+        // Проверяем разные возможные форматы ответа
+        let routes: BackendRoute[] = [];
+        
+        if (Array.isArray(response)) {
+          // Если ответ - это массив маршрутов напрямую
+          routes = response;
+          console.log('Response is array, routes count:', routes.length);
+        } else if (response.data && response.data.routes && Array.isArray(response.data.routes)) {
+          // Если ответ содержит поле data.routes (новый формат API)
+          routes = response.data.routes;
+          console.log('Response has data.routes field, routes count:', routes.length);
+        } else if (response.routes && Array.isArray(response.routes)) {
+          // Если ответ содержит поле routes напрямую (старый формат)
+          routes = response.routes;
+          console.log('Response has routes field, routes count:', routes.length);
+        } else if (response.data && Array.isArray(response.data)) {
+          // Если ответ содержит поле data как массив
+          routes = response.data;
+          console.log('Response has data field as array, routes count:', routes.length);
+        } else {
+          console.warn('API response missing routes array. Full response:', JSON.stringify(response, null, 2));
           setRoutes([]);
           return;
         }
 
-        const transformedRoutes = response.routes.map((route, index) =>
+        if (routes.length === 0) {
+          console.log('No routes found in response');
+          setRoutes([]);
+          return;
+        }
+
+        const transformedRoutes = routes.map((route, index) =>
           transformBackendRouteToRouteData(route, index)
         );
         

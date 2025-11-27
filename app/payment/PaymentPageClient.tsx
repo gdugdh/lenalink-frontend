@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { routes } from "@/app/lib/routes";
 import { useBooking } from "@/app/lib/booking-context";
-import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName } from "@/app/lib/price-calculator";
+import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName, extractPriceFromRoute } from "@/app/lib/price-calculator";
 import { backendApi } from "@/app/lib/backend-api";
 import { useAuth } from "@/app/context/AuthContext";
 import { useToast } from "@/app/hooks/use-toast";
@@ -20,10 +20,12 @@ export function PaymentPageClient() {
   const [selectedPayment, setSelectedPayment] = useState<string>("card");
   const [isCreatingBooking, setIsCreatingBooking] = useState(false);
   const { bookingState, setBookingId } = useBooking();
+  const basePriceFromRoute = extractPriceFromRoute(bookingState.selectedRoute);
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
-    bookingState.seatType
+    bookingState.seatType,
+    basePriceFromRoute
   );
 
   const handlePayment = async () => {
@@ -440,7 +442,7 @@ export function PaymentPageClient() {
                   disabled={isCreatingBooking}
                   className="bg-[#7B91FF] hover:bg-[#E16D32] px-8"
                 >
-                  {isCreatingBooking ? 'Создание бронирования...' : `Оплатить ${priceBreakdown.total.toLocaleString('ru-RU')}₽`}
+                  {isCreatingBooking ? 'Создание бронирования...' : 'Оплатить'}
                 </Button>
               </div>
             </div>

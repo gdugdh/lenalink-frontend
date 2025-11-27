@@ -56,9 +56,9 @@ export function SearchResults({ routes = [], onRouteClick, loading = false }: Se
   return (
     <main className="flex-1 min-w-0 overflow-x-hidden">
       <div className="space-y-3 sm:space-y-4 w-full">
-        {routes.map((route) => (
+        {routes.map((route, index) => (
           <RouteCard
-            key={route.id}
+            key={`${route.id}-${route.badge}-${index}`}
             badge={route.badge}
             price={route.price}
             priceDetails={route.priceDetails}
