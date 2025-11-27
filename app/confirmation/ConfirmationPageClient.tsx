@@ -330,6 +330,7 @@ export function ConfirmationPageClient() {
             >
               Вернуться на главную
             </button>
+            </div>
           </div>
         </div>
       </div>

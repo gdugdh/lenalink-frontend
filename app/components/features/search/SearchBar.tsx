@@ -129,8 +129,6 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : '';
     router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(city)}`);
   };
-<｜tool▁call▁begin｜>
-read_lints
 
   // Обработка клика на поле "Откуда"
   const handleFromClick = () => {
