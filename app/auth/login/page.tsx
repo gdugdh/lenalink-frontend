@@ -1,6 +1,15 @@
 import { redirect } from 'next/navigation';
+import { getSession } from '@/app/lib/auth';
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  // Check if user is already authenticated
+  const session = await getSession();
+  
+  // If authenticated, redirect to their dashboard
+  if (session?.user?.role) {
+    redirect(`/dashboard/${session.user.role}`);
+  }
+  
   // Redirect to home page with login modal parameter
   redirect('/?modal=login');
 }
