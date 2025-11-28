@@ -22,8 +22,8 @@ export interface Session {
 export interface AuthContextType {
   session: Session | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string, role: UserRole) => Promise<void>;
+  login: (email: string, password: string) => Promise<Session>;
+  register: (email: string, password: string, name: string, role: UserRole) => Promise<Session>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
   hasRole: (role: UserRole) => boolean;
