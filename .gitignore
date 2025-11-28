@@ -157,3 +157,15 @@ temp/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Cursor IDE
+.cursor/
+
+# Docker override files
+docker-compose.override.yml
+*.dockerfile
+.docker/
+
+# Plan files
+.plan.md
+*.plan.md

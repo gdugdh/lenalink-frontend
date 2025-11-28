@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Calendar, ChevronLeftIcon, ChevronRight } from 'lucide-react';
+import { DatePriceList } from './DatePriceList';
 
 interface DatePriceData {
   date: string; // Дата в формате YYYY-MM-DD
@@ -97,17 +98,6 @@ export function DatePriceBand({ currentDate, prices = [] }: DatePriceBandProps) 
     }
   }, [currentDate, visibleRange, parseDateFromString]);
 
-  // Форматирование даты для отображения
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
-    // Результат будет в формате "13 нояб." (с точкой в конце)
-  };
-
-  // Форматирование цены
-  const formatPrice = (price: number | null): string => {
-    if (price === null) return '';
-    return price.toLocaleString('ru-RU') + '₽';
-  };
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -165,37 +155,11 @@ export function DatePriceBand({ currentDate, prices = [] }: DatePriceBandProps) 
           >
             <ChevronLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
           </button>
-          <div
-            ref={scrollContainerRef}
-            className="flex gap-1 sm:gap-2 overflow-x-auto scrollbar-hide sm:overflow-x-visible sm:justify-center sm:flex-nowrap"
-          >
-            {dates.map((dateItem, index) => (
-              <button
-                key={`${dateItem.date.toISOString()}-${index}`}
-                onClick={() => handleDateClick(dateItem.date)}
-                className={`flex min-w-[80px] sm:min-w-[100px] flex-col items-center justify-center rounded-lg px-2 sm:px-4 py-2 transition-colors ${
-                  dateItem.isSelected
-                    ? 'bg-[#7B91FF]'
-                    : 'hover:bg-white/10'
-                }`}
-              >
-                {dateItem.price !== null ? (
-                  <>
-                    <div className={`text-sm sm:text-lg font-bold text-center ${dateItem.isSelected ? 'text-white' : ''}`}>
-                      {formatPrice(dateItem.price)}
-                    </div>
-                    <div className={`text-xs text-center ${dateItem.isSelected ? 'text-white' : 'text-gray-400'}`}>
-                      {formatDate(dateItem.date)}
-                    </div>
-                  </>
-                ) : (
-                  <div className={`text-xs text-center ${dateItem.isSelected ? 'text-white' : 'text-gray-400'}`}>
-                    {formatDate(dateItem.date)}
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
+          <DatePriceList
+            dates={dates}
+            onDateClick={handleDateClick}
+            scrollContainerRef={scrollContainerRef}
+          />
           <button
             onClick={scrollRight}
             className="sm:hidden rounded-full p-2 hover:bg-white/10 shrink-0 transition-colors"

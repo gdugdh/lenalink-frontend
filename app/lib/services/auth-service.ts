@@ -1,24 +1,24 @@
 /**
- * Сервис для работы с аутентификацией пользователей
- * Содержит логику входа, регистрации и обновления сессии
+ * Service for user authentication
+ * Contains login, registration and session refresh logic
  */
 
 import { backendApi, type BackendUser } from '../backend-api';
 import type { UserRole } from '../mockUsers';
 import type { Session } from '../types/auth.types';
 
-// Преобразуем BackendUser в наш формат Session
+// Transform BackendUser to our Session format
 export function backendUserToSession(backendUser: BackendUser, token: string): Session {
-  // По умолчанию роль 'user', так как бэкенд не возвращает роль
-  // В будущем можно добавить поле role в бэкенд или получать из токена
+  // Default role is 'user' since backend doesn't return role
+  // In the future, we can add role field to backend or get it from token
   return {
     user: {
       id: backendUser.id,
       email: backendUser.email,
-      role: 'user' as UserRole, // По умолчанию user
+      role: 'user' as UserRole, // Default user
       name: backendUser.name,
     },
-    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 дней
+    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
   };
 }
 
@@ -28,7 +28,7 @@ export async function refreshUserSession(token: string): Promise<Session | null>
       return null;
     }
 
-    // Если это моковый токен, проверяем сессию через API роут
+    // If this is a mock token, check session via API route
     if (token === 'mock-token') {
       try {
         const response = await fetch('/api/auth/session', {
@@ -37,7 +37,7 @@ export async function refreshUserSession(token: string): Promise<Session | null>
         
         if (response.ok) {
           const sessionData = await response.json();
-          // getSession() возвращает Session напрямую
+          // getSession() returns Session directly
           if (sessionData && sessionData.user) {
             const session: Session = {
               user: {
@@ -51,32 +51,32 @@ export async function refreshUserSession(token: string): Promise<Session | null>
             };
             return session;
           } else {
-            // Сессия истекла
+            // Session expired
             backendApi.setToken(null);
             return null;
           }
         } else {
-          // Сессия не найдена
+          // Session not found
           backendApi.setToken(null);
           return null;
         }
       } catch (error) {
-        // Ошибка при проверке сессии
+        // Error checking session
         backendApi.setToken(null);
         return null;
       }
     } else {
-      // Проверяем реальный токен, пытаясь получить список бронирований
-      // Если токен валиден, значит пользователь авторизован
+      // Check real token by trying to get bookings list
+      // If token is valid, user is authorized
       try {
         await backendApi.getMyBookings();
-        // Если запрос успешен, токен валиден
-        // Но нам нужно получить данные пользователя
-        // Пока возвращаем null, так как нет данных пользователя
-        // В будущем можно добавить эндпоинт /api/me для получения текущего пользователя
+        // If request succeeds, token is valid
+        // But we need to get user data
+        // For now return null since we don't have user data
+        // In the future, we can add /api/me endpoint to get current user
         return null;
       } catch (error) {
-        // Токен невалиден
+        // Token is invalid
         backendApi.setToken(null);
         return null;
       }
@@ -87,11 +87,11 @@ export async function refreshUserSession(token: string): Promise<Session | null>
 }
 
 export async function loginUser(email: string, password: string): Promise<Session> {
-  // Проверяем, нужно ли использовать моковый API
+  // Check if we need to use mock API
   const useMockAuth = process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true';
   
   if (useMockAuth) {
-    // Используем моковый API роут для тестирования
+    // Use mock API route for testing
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
@@ -103,12 +103,12 @@ export async function loginUser(email: string, password: string): Promise<Sessio
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Ошибка входа');
+      throw new Error(error.message || 'Login error');
     }
 
     const data = await response.json();
     
-    // Преобразуем мокового пользователя в формат Session
+    // Transform mock user to Session format
     const session: Session = {
       user: {
         id: data.session.user.id,
@@ -120,19 +120,19 @@ export async function loginUser(email: string, password: string): Promise<Sessio
       expiresAt: data.session.expiresAt,
     };
     
-    // Для моковых пользователей сохраняем специальный токен
+    // For mock users, save special token
     if (typeof window !== 'undefined') {
       localStorage.setItem('backend_token', 'mock-token');
     }
     
     return session;
   } else {
-    // Используем реальный API с fallback на моковый
+    // Use real API with fallback to mock
     try {
       const response = await backendApi.login({ email, password });
       return backendUserToSession(response.user, response.token);
     } catch (error) {
-      // Если реальный API не работает, пробуем моковый как fallback
+      // If real API doesn't work, try mock as fallback
       if (process.env.NODE_ENV === 'development') {
         console.warn('Real API failed, trying mock auth:', error);
       }
@@ -148,7 +148,7 @@ export async function loginUser(email: string, password: string): Promise<Sessio
 
         if (!mockResponse.ok) {
           const error = await mockResponse.json();
-          throw new Error(error.message || 'Ошибка входа');
+          throw new Error(error.message || 'Login error');
         }
 
         const data = await mockResponse.json();
@@ -170,7 +170,7 @@ export async function loginUser(email: string, password: string): Promise<Sessio
         
         return session;
       } catch (mockError) {
-        // Если и моковый не работает, пробрасываем исходную ошибку
+        // If mock also doesn't work, rethrow original error
         throw error;
       }
     }
@@ -183,11 +183,11 @@ export async function registerUser(
   name: string,
   role: UserRole
 ): Promise<Session> {
-  // Проверяем, нужно ли использовать моковый API
+  // Check if we need to use mock API
   const useMockAuth = process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true';
   
   if (useMockAuth) {
-    // Используем моковый API роут для тестирования
+    // Use mock API route for testing
     const response = await fetch('/api/auth/register', {
       method: 'POST',
       headers: {
@@ -199,7 +199,7 @@ export async function registerUser(
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Ошибка регистрации');
+      throw new Error(error.message || 'Registration error');
     }
 
     const data = await response.json();
@@ -221,13 +221,13 @@ export async function registerUser(
     
     return session;
   } else {
-    // Используем реальный API с fallback на моковый
+    // Use real API with fallback to mock
     try {
-      // Бэкенд не принимает role при регистрации, только name, email, password
+      // Backend doesn't accept role during registration, only name, email, password
       const response = await backendApi.register({ name, email, password });
       return backendUserToSession(response.user, response.token);
     } catch (error) {
-      // Если реальный API не работает, пробуем моковый как fallback
+      // If real API doesn't work, try mock as fallback
       if (process.env.NODE_ENV === 'development') {
         console.warn('Real API failed, trying mock auth:', error);
       }
@@ -243,7 +243,7 @@ export async function registerUser(
 
         if (!mockResponse.ok) {
           const error = await mockResponse.json();
-          throw new Error(error.message || 'Ошибка регистрации');
+          throw new Error(error.message || 'Registration error');
         }
 
         const data = await mockResponse.json();
@@ -265,7 +265,7 @@ export async function registerUser(
         
         return session;
       } catch (mockError) {
-        // Если и моковый не работает, пробрасываем исходную ошибку
+        // If mock also doesn't work, rethrow original error
         throw error;
       }
     }

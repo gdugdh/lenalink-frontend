@@ -1,5 +1,5 @@
 /**
- * Хук для создания бронирования
+ * Hook for creating bookings
  */
 
 import { useState, useCallback } from 'react';
@@ -21,12 +21,12 @@ export function useCreateBooking(selectedPayment: string, paymentMethodMap: Reco
   const [error, setError] = useState<Error | null>(null);
 
   const createBooking = useCallback(async () => {
-    // Проверяем что все данные есть
+    // Check that all data is present
     if (!bookingState.selectedRoute) {
-      const error = new Error('Маршрут не выбран');
+      const error = new Error('Route not selected');
       setError(error);
       toast({
-        title: 'Ошибка',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -34,10 +34,10 @@ export function useCreateBooking(selectedPayment: string, paymentMethodMap: Reco
     }
 
     if (!bookingState.passengerData) {
-      const error = new Error('Данные пассажира не заполнены');
+      const error = new Error('Passenger data not filled');
       setError(error);
       toast({
-        title: 'Ошибка',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -45,10 +45,10 @@ export function useCreateBooking(selectedPayment: string, paymentMethodMap: Reco
     }
 
     if (!session) {
-      const error = new Error('Необходимо войти в систему для создания бронирования');
+      const error = new Error('Login required to create booking');
       setError(error);
       toast({
-        title: 'Ошибка',
+        title: 'Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -65,29 +65,29 @@ export function useCreateBooking(selectedPayment: string, paymentMethodMap: Reco
       const bookingRequest = {
         route_id: bookingState.selectedRoute.id,
         passenger,
-        include_insurance: bookingState.tariff !== 'tariff1', // Включаем страховку если не базовый тариф
+        include_insurance: bookingState.tariff !== 'tariff1', // Include insurance if not base tariff
         payment_method: paymentMethodMap[selectedPayment] || 'card',
       };
 
       const booking = await backendApi.createBooking(bookingRequest);
       
-      // Сохраняем ID бронирования
+      // Save booking ID
       setBookingId(booking.id);
 
       toast({
-        title: 'Бронирование создано',
-        description: 'Ваше бронирование успешно создано',
+        title: 'Booking created',
+        description: 'Your booking has been successfully created',
       });
 
       router.push(routes.confirmation);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Не удалось создать бронирование');
+      const error = err instanceof Error ? err : new Error('Failed to create booking');
       setError(error);
       if (process.env.NODE_ENV === 'development') {
         console.error('Error creating booking:', err);
       }
       toast({
-        title: 'Ошибка создания бронирования',
+        title: 'Booking creation error',
         description: error.message,
         variant: 'destructive',
       });

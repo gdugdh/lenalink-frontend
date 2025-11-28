@@ -14,7 +14,9 @@ export async function GET() {
 
     return NextResponse.json(session);
   } catch (error) {
-    console.error('Session error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Session error:', error);
+    }
     return NextResponse.json(
       { message: 'Ошибка сервера' },
       { status: 500 }

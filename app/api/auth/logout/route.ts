@@ -6,7 +6,9 @@ export async function POST() {
     await clearSession();
     return NextResponse.json({ message: 'Выход выполнен успешно' });
   } catch (error) {
-    console.error('Logout error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Logout error:', error);
+    }
     return NextResponse.json(
       { message: 'Ошибка сервера' },
       { status: 500 }

@@ -1,5 +1,5 @@
-# Dependencies
-node_modules
+# Dependencies (устанавливаются в Docker, не копируются)
+node_modules/
 .pnp
 .pnp.js
 .yarn/cache
@@ -8,26 +8,27 @@ node_modules
 .yarn/install-state.gz
 .pnp.*
 
-# Testing
-coverage
-.nyc_output
+# Testing (не нужны в образе)
+coverage/
+.nyc_output/
 *.lcov
+**/__tests__/
+**/*.test.*
+**/*.spec.*
 
-# Next.js
-.next
-out
-build
-dist
-.vercel
+# Next.js build cache (пересоберется в Docker)
+.next/
+.next/cache
+out/
+build/
+dist/
 .turbo
 
-# Production
+# Debug и логи
 *.log
 *.pid
 *.seed
 *.pid.lock
-
-# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -35,26 +36,22 @@ pnpm-debug.log*
 .pnpm-debug.log*
 lerna-debug.log*
 
-# Local env files
+# Env files (используются через переменные окружения)
 .env
 .env*.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env.development
-.env.test
-.env.production
 
-# Vercel
-.vercel
+# Git (не нужен в образе)
+.git/
+.gitignore
+.gitattributes
 
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# IDEs and editors
-.idea
-.vscode
+# IDEs и редакторы
+.idea/
+.vscode/
+.cursor/
 *.swp
 *.swo
 *~
@@ -62,7 +59,7 @@ next-env.d.ts
 *.sublime-project
 *.sublime-workspace
 
-# OS
+# OS файлы
 .DS_Store
 .DS_Store?
 ._*
@@ -72,28 +69,51 @@ ehthumbs.db
 Thumbs.db
 Desktop.ini
 
-# Package managers
-.npm
+# Кэши
 .eslintcache
 .stylelintcache
-.prettierignore
-.yarn-integrity
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+.cache
+.parcel-cache
+.npm/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
 
-# Docker
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# Git
-.git
-.gitignore
-
-# README
+# Документация и конфиги, не нужные в образе
 README.md
+*.md
+!package.json
+.editorconfig
 
+# Временные файлы
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# Vercel (не нужен в Docker)
+.vercel
+
+# TypeScript build info (пересоберется)
+*.tsbuildinfo
+
+# Планы и заметки
+.plan.md
+*.plan.md
+.cursor/plans/
+
+# Docker override файлы
+docker-compose.override.yml
+.docker/
+
+# CI/CD файлы
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Другие сборки
+.nuxt
+storybook-static

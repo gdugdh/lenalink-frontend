@@ -4,9 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import { useToast } from '@/app/hooks/use-toast';
-import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -14,8 +11,9 @@ import {
   DialogTitle,
 } from '@/app/components/ui/dialog';
 import { Progress } from '@/app/components/ui/progress';
-import { RadioGroup, RadioGroupItem } from '@/app/components/ui/radio-group';
-import { ArrowLeft, ArrowRight, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { RegisterFormFields } from './RegisterFormFields';
+import { RoleSelector } from './RoleSelector';
+import { RegisterFormFooter } from './RegisterFormFooter';
 import type { UserRole } from '@/app/lib/mockUsers';
 
 interface RegisterModalProps {
@@ -209,161 +207,35 @@ export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterM
         
         {step === 'role' ? (
           <div className="space-y-6">
-            <div className="space-y-3">
-              <Label className="text-base">Выберите тип аккаунта</Label>
-              <RadioGroup value={role} onValueChange={(value) => setRole(value as UserRole)}>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                  <RadioGroupItem value="user" id="modal-role-user" />
-                  <Label htmlFor="modal-role-user" className="font-normal cursor-pointer flex-1">
-                    <div>
-                      <div className="font-semibold">Пользователь</div>
-                      <div className="text-sm text-muted-foreground">
-                        Покупка билетов и управление бронированиями
-                      </div>
-                    </div>
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                  <RadioGroupItem value="partner" id="modal-role-partner" />
-                  <Label htmlFor="modal-role-partner" className="font-normal cursor-pointer flex-1">
-                    <div>
-                      <div className="font-semibold">Партнёр</div>
-                      <div className="text-sm text-muted-foreground">
-                        Предоставление транспортных услуг
-                      </div>
-                    </div>
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <Button
-              onClick={handleRoleSelect}
-              className="w-full"
-              disabled={!role}
-            >
-              Продолжить
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            <RoleSelector selectedRole={role} onRoleChange={setRole} />
+            <RegisterFormFooter
+              step="role"
+              isSubmitting={false}
+              onContinue={handleRoleSelect}
+            />
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="modal-register-name">Имя</Label>
-              <Input
-                id="modal-register-name"
-                type="text"
-                placeholder="Иван Иванов"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                disabled={isSubmitting}
-                autoFocus
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="modal-register-email">Email</Label>
-              <Input
-                id="modal-register-email"
-                type="email"
-                placeholder="user@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="modal-register-password">Пароль</Label>
-              <div className="relative">
-                <Input
-                  id="modal-register-password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  minLength={6}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  disabled={isSubmitting}
-                  aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Минимум 6 символов
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="modal-register-confirm-password">Подтвердите пароль</Label>
-              <div className="relative">
-                <Input
-                  id="modal-register-confirm-password"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  minLength={6}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  disabled={isSubmitting}
-                  aria-label={showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setStep('role')}
-                disabled={isSubmitting}
-                className="flex-1"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Назад
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  'Регистрация...'
-                ) : (
-                  <>
-                    Зарегистрироваться
-                    <CheckCircle2 className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </Button>
-            </div>
+            <RegisterFormFields
+              formData={{ name, email, password, confirmPassword }}
+              showPassword={showPassword}
+              showConfirmPassword={showConfirmPassword}
+              isSubmitting={isSubmitting}
+              onChange={(field, value) => {
+                if (field === 'name') setName(value);
+                else if (field === 'email') setEmail(value);
+                else if (field === 'password') setPassword(value);
+                else if (field === 'confirmPassword') setConfirmPassword(value);
+              }}
+              onTogglePassword={() => setShowPassword(!showPassword)}
+              onToggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
+            />
+            <RegisterFormFooter
+              step="details"
+              isSubmitting={isSubmitting}
+              onBack={() => setStep('role')}
+              onSubmit={handleSubmit}
+            />
           </form>
         )}
 

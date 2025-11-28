@@ -63,7 +63,7 @@ function SearchPageContent() {
         <div className="mx-auto container px-2 sm:px-4 py-4 sm:py-6 max-w-full overflow-x-hidden">
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 max-w-[1200px] mx-auto">
             {/* Mobile Filter Button */}
-            <SearchFiltersButton onClick={() => setIsFiltersOpen(true)} />
+            <SearchFiltersButton onClickAction={() => setIsFiltersOpen(true)} />
 
             {/* Desktop Sidebar */}
             <SearchFilters

@@ -49,7 +49,9 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error('Register error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Register error:', error);
+    }
     return NextResponse.json(
       { message: 'Ошибка сервера' },
       { status: 500 }

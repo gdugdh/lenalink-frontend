@@ -1,5 +1,5 @@
 /**
- * Хук для загрузки и управления маршрутами
+ * Hook for loading and managing routes
  */
 
 import { useState, useEffect } from 'react';
@@ -26,11 +26,11 @@ export function useRoutes(fromCity: string, toCity: string, dateParam: string) {
       setLoading(true);
       setError(null);
       try {
-        // Преобразуем названия городов в формат бэкенда (английские slug'и)
+        // Convert city names to backend format (English slugs)
         const fromSlug = getCitySlug(fromCity);
         const toSlug = getCitySlug(toCity);
         
-        // Используем дату из параметров или сегодняшнюю дату
+        // Use date from parameters or today's date
         const departureDate = dateParam || new Date().toISOString().split('T')[0];
         
         const response = await backendApi.searchRoutes({
@@ -40,14 +40,14 @@ export function useRoutes(fromCity: string, toCity: string, dateParam: string) {
           passengers: 1,
         });
 
-        // Детальное логирование для отладки
+        // Detailed logging for debugging
         if (process.env.NODE_ENV === 'development') {
           console.log('API response:', response);
           console.log('Response type:', typeof response);
           console.log('Response keys:', response ? Object.keys(response) : 'null');
         }
 
-        // Проверяем, что response и routes существуют
+        // Check that response and routes exist
         if (!response) {
           if (process.env.NODE_ENV === 'development') {
             console.error('API returned null or undefined response');
@@ -57,29 +57,29 @@ export function useRoutes(fromCity: string, toCity: string, dateParam: string) {
           return;
         }
 
-        // Проверяем разные возможные форматы ответа
+        // Check different possible response formats
         let routes: BackendRoute[] = [];
         
         if (Array.isArray(response)) {
-          // Если ответ - это массив маршрутов напрямую
+          // If response is an array of routes directly
           routes = response;
           if (process.env.NODE_ENV === 'development') {
             console.log('Response is array, routes count:', routes.length);
           }
         } else if (response.data && response.data.routes && Array.isArray(response.data.routes)) {
-          // Если ответ содержит поле data.routes (новый формат API)
+          // If response contains data.routes field (new API format)
           routes = response.data.routes;
           if (process.env.NODE_ENV === 'development') {
             console.log('Response has data.routes field, routes count:', routes.length);
           }
         } else if (response.routes && Array.isArray(response.routes)) {
-          // Если ответ содержит поле routes напрямую (старый формат)
+          // If response contains routes field directly (old format)
           routes = response.routes;
           if (process.env.NODE_ENV === 'development') {
             console.log('Response has routes field, routes count:', routes.length);
           }
         } else if (response.data && Array.isArray(response.data)) {
-          // Если ответ содержит поле data как массив
+          // If response contains data field as array
           routes = response.data;
           if (process.env.NODE_ENV === 'development') {
             console.log('Response has data field as array, routes count:', routes.length);
@@ -107,12 +107,12 @@ export function useRoutes(fromCity: string, toCity: string, dateParam: string) {
         );
         
         setAllRoutes(transformedRoutes);
-        setRoutes(transformedRoutes); // Изначально показываем все маршруты
+        setRoutes(transformedRoutes); // Initially show all routes
       } catch (err) {
         if (process.env.NODE_ENV === 'development') {
           console.error('Error loading routes:', err);
         }
-        setError(err instanceof Error ? err : new Error('Ошибка загрузки маршрутов'));
+        setError(err instanceof Error ? err : new Error('Error loading routes'));
         setRoutes([]);
         setAllRoutes([]);
       } finally {

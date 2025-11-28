@@ -77,13 +77,13 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(() => ({
-    bookingState,
-    setPassengerType,
-    setTariff,
-    setSeatType,
-    setSelectedRoute,
-    setPassengerData,
-    setBookingId,
+        bookingState,
+        setPassengerType,
+        setTariff,
+        setSeatType,
+        setSelectedRoute,
+        setPassengerData,
+        setBookingId,
   }), [bookingState, setPassengerType, setTariff, setSeatType, setSelectedRoute, setPassengerData, setBookingId]);
 
   return (

@@ -23,7 +23,7 @@ export function PaymentPageClient() {
 
   // Управление способом оплаты
   const { selectedPayment, setSelectedPayment, paymentMethodMap } = usePaymentMethod();
-
+      
   // Создание бронирования
   const { createBooking, isCreatingBooking } = useCreateBooking(selectedPayment, paymentMethodMap);
 

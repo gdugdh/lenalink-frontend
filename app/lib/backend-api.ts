@@ -212,7 +212,7 @@ class BackendApiClient {
     this.routesApi = new RoutesApiService(baseURL);
     this.bookingsApi = new BookingsApiService(baseURL);
     this.citiesApi = new CitiesApiService(baseURL);
-  }
+    }
 
   // Управление токеном - синхронизируем между всеми сервисами
   setToken(token: string | null) {
@@ -224,7 +224,7 @@ class BackendApiClient {
 
   getToken(): string | null {
     return this.authApi.getToken();
-  }
+        }
 
   // Auth endpoints - делегируем AuthApiService
   async register(data: {
@@ -234,7 +234,7 @@ class BackendApiClient {
   }): Promise<BackendAuthResponse> {
     const response = await this.authApi.register(data);
     // Синхронизируем токен со всеми сервисами
-    this.setToken(response.token);
+      this.setToken(response.token);
     return response;
   }
 
@@ -244,7 +244,7 @@ class BackendApiClient {
   }): Promise<BackendAuthResponse> {
     const response = await this.authApi.login(data);
     // Синхронизируем токен со всеми сервисами
-    this.setToken(response.token);
+      this.setToken(response.token);
     return response;
   }
 

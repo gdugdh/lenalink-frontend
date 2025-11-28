@@ -28,12 +28,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const session = await refreshUserSession(currentToken);
       if (session) {
-        setSession(session);
+              setSession(session);
         setToken(currentToken === 'mock-token' ? 'mock-token' : currentToken);
       } else {
-        backendApi.setToken(null);
-        setSession(null);
-        setToken(null);
+          backendApi.setToken(null);
+          setSession(null);
+          setToken(null);
       }
     } catch (error) {
       setSession(null);
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(async (email: string, password: string, name: string, role: UserRole) => {
     const session = await registerUser(email, password, name, role);
-    setSession(session);
+        setSession(session);
     const token = backendApi.getToken();
     setToken(token);
   }, []);
@@ -82,14 +82,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [session]);
 
   const value = useMemo(() => ({
-    session,
-    loading,
-    login,
-    register,
-    logout,
-    refreshSession,
-    hasRole,
-    token,
+        session,
+        loading,
+        login,
+        register,
+        logout,
+        refreshSession,
+        hasRole,
+        token,
   }), [session, loading, login, register, logout, refreshSession, hasRole, token]);
 
   return (

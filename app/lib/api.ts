@@ -1,4 +1,4 @@
-// Базовый API клиент
+// Base API client
 class ApiClient {
   private baseURL: string;
 
@@ -25,7 +25,9 @@ class ApiClient {
 
       return await response.json();
     } catch (error) {
-      console.error('API request failed:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('API request failed:', error);
+      }
       throw error;
     }
   }
@@ -55,10 +57,10 @@ class ApiClient {
   }
 }
 
-// Инициализация API клиента
+// Initialize API client
 const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api');
 
-// Специфичные API методы для поиска маршрутов
+// Specific API methods for route search
 export const searchApi = {
   searchRoutes: (params: {
     from: string;
@@ -69,7 +71,7 @@ export const searchApi = {
   getRouteDetails: (routeId: string) => apiClient.get(`/search/routes/${routeId}`),
 };
 
-// API методы для бронирования
+// API methods for booking
 export const bookingApi = {
   createBooking: (data: {
     routeId: string;
@@ -80,7 +82,7 @@ export const bookingApi = {
     apiClient.put(`/booking/${bookingId}`, data),
 };
 
-// API методы для страховки
+// API methods for insurance
 export const insuranceApi = {
   getInsurancePlans: (bookingId: string) => 
     apiClient.get(`/insurance/plans?bookingId=${bookingId}`),
@@ -88,7 +90,7 @@ export const insuranceApi = {
     apiClient.post('/insurance/select', { bookingId, planId }),
 };
 
-// API методы для выбора места
+// API methods for seat selection
 export const seatApi = {
   getAvailableSeats: (segmentId: string) =>
     apiClient.get(`/seats/available?segmentId=${segmentId}`),
@@ -96,7 +98,7 @@ export const seatApi = {
     apiClient.post('/seats/select', { segmentId, seatId }),
 };
 
-// API методы для оплаты
+// API methods for payment
 export const paymentApi = {
   createPayment: (bookingId: string, paymentMethod: string) =>
     apiClient.post('/payment/create', { bookingId, paymentMethod }),
@@ -104,7 +106,7 @@ export const paymentApi = {
     apiClient.post(`/payment/${paymentId}/confirm`, {}),
 };
 
-// API методы для подтверждения
+// API methods for confirmation
 export const confirmationApi = {
   getConfirmation: (bookingId: string) =>
     apiClient.get(`/confirmation/${bookingId}`),

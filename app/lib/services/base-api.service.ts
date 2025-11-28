@@ -1,6 +1,6 @@
 /**
- * Базовый класс для всех API сервисов
- * Содержит общую логику для выполнения HTTP запросов
+ * Base class for all API services
+ * Contains common logic for making HTTP requests
  */
 
 export class BaseApiService {
@@ -9,7 +9,7 @@ export class BaseApiService {
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
-    // Загружаем токен из localStorage при инициализации
+    // Load token from localStorage on initialization
     if (typeof window !== 'undefined') {
       this.token = localStorage.getItem('backend_token');
     }
@@ -51,16 +51,16 @@ export class BaseApiService {
       try {
         response = await fetch(url, config);
       } catch (fetchError) {
-        // Обработка сетевых ошибок (CORS, недоступный сервер и т.д.)
-        let errorMessage = 'Неизвестная ошибка сети';
+        // Handle network errors (CORS, unavailable server, etc.)
+        let errorMessage = 'Unknown network error';
         
         if (fetchError instanceof Error) {
           errorMessage = fetchError.message;
         } else if (typeof fetchError === 'string') {
           errorMessage = fetchError;
         } else if (fetchError && typeof fetchError === 'object') {
-          // Пытаемся извлечь сообщение из объекта ошибки
-          errorMessage = (fetchError as any).message || (fetchError as any).toString() || 'Ошибка сети';
+          // Try to extract message from error object
+          errorMessage = (fetchError as any).message || (fetchError as any).toString() || 'Network error';
         }
         
         if (process.env.NODE_ENV === 'development') {
@@ -74,23 +74,23 @@ export class BaseApiService {
           });
         }
 
-        // Определяем тип ошибки и выбрасываем понятное сообщение
+        // Determine error type and throw a clear message
         if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError') || errorMessage === 'Failed to fetch') {
-          throw new Error('Не удалось подключиться к серверу. Проверьте подключение к интернету или попробуйте позже.');
+          throw new Error('Failed to connect to server. Check your internet connection or try again later.');
         } else if (errorMessage.includes('CORS')) {
-          throw new Error('Ошибка CORS. Сервер не разрешает запросы с этого домена.');
+          throw new Error('CORS error. Server does not allow requests from this domain.');
         } else {
-          throw new Error(`Ошибка сети: ${errorMessage}`);
+          throw new Error(`Network error: ${errorMessage}`);
         }
       }
 
-      // Обработка ошибок HTTP
+      // Handle HTTP errors
       if (!response.ok) {
         let errorData;
         try {
           errorData = await response.json();
         } catch {
-          // Если ответ не JSON, создаем объект ошибки
+          // If response is not JSON, create error object
           errorData = {
             error: {
               code: 'HTTP_ERROR',
@@ -99,12 +99,12 @@ export class BaseApiService {
           };
         }
 
-        // Извлекаем сообщение об ошибке
+        // Extract error message
         const errorMessage = errorData.error?.message || 
                             errorData.message || 
                             `HTTP error! status: ${response.status}`;
 
-        // Логируем ошибку только в режиме разработки
+        // Log error only in development mode
         if (process.env.NODE_ENV === 'development') {
           console.error('API request failed:', {
             url: url,
@@ -120,11 +120,11 @@ export class BaseApiService {
         throw new Error(errorMessage);
       }
 
-      // Парсинг JSON ответа
+      // Parse JSON response
       try {
         return await response.json();
       } catch (jsonError) {
-        // Ошибка парсинга JSON
+        // JSON parsing error
         if (process.env.NODE_ENV === 'development') {
           console.error('JSON parse error:', {
             url: url,
@@ -134,30 +134,30 @@ export class BaseApiService {
             error: jsonError instanceof Error ? jsonError.message : String(jsonError),
           });
         }
-        throw new Error('Сервер вернул некорректный ответ. Попробуйте позже.');
+        throw new Error('Server returned invalid response. Please try again later.');
       }
     } catch (error) {
-      // Если это уже наша обработанная ошибка, просто пробрасываем её
+      // If this is already our processed error, just rethrow it
       if (error instanceof Error) {
-        // Проверяем, не является ли это уже обработанной ошибкой
+        // Check if this is already a processed error
         const processedErrors = [
-          'Не удалось подключиться к серверу',
-          'Ошибка CORS',
-          'Ошибка сети',
-          'Сервер вернул некорректный ответ',
+          'Failed to connect to server',
+          'CORS error',
+          'Network error',
+          'Server returned invalid response',
         ];
         
         if (processedErrors.some(msg => error.message.includes(msg))) {
           throw error;
         }
         
-        // Если это ошибка из обработки HTTP, тоже пробрасываем
+        // If this is an error from HTTP handling, also rethrow
         if (error.message.includes('HTTP error') || error.message.length > 0) {
           throw error;
         }
       }
       
-      // Иначе это необработанная ошибка
+      // Otherwise this is an unhandled error
       if (process.env.NODE_ENV === 'development') {
         console.error('API request failed (unhandled error):', {
           url: url,
@@ -167,7 +167,7 @@ export class BaseApiService {
           errorObject: error,
         });
       }
-      throw new Error('Произошла ошибка при выполнении запроса');
+      throw new Error('An error occurred while executing the request');
     }
   }
 }

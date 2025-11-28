@@ -1,43 +1,43 @@
 /**
- * Утилиты для преобразования данных маршрутов
+ * Utilities for transforming route data
  */
 
 import type { Route as BackendRoute, RouteSegment } from './backend-api';
 import type { RouteData } from '../components/features/search/SearchResults';
 
-// Форматирование времени маршрута
+// Format route time
 export function formatRouteTime(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 }
 
-// Форматирование даты маршрута
+// Format route date
 export function formatRouteDate(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: 'short' });
 }
 
-// Извлечение кодов маршрута из сегментов
+// Extract route codes from segments
 export function extractRouteCodes(segments: RouteSegment[]): string[] {
   return segments.map(seg => {
-    // Извлекаем код из ID или используем первые буквы города
+    // Extract code from ID or use first letters of city
     return seg.from.id.split('_')[0].toUpperCase() || seg.from.city.substring(0, 3).toUpperCase();
   });
 }
 
-// Преобразуем формат бэкенда в формат фронтенда
+// Transform backend format to frontend format
 export function transformBackendRouteToRouteData(route: BackendRoute, index: number): RouteData {
   const firstSegment = route.segments[0];
   const lastSegment = route.segments[route.segments.length - 1];
   
-  // Определяем badge в зависимости от типа маршрута
+  // Determine badge based on route type
   const badgeMap: Record<string, string> = {
     optimal: 'Оптимальный',
     fastest: 'Самый быстрый',
     cheapest: 'Самый дешёвый',
   };
   
-  // Формируем коды маршрута
+  // Form route codes
   const routeCodes = extractRouteCodes(route.segments);
   
   return {
