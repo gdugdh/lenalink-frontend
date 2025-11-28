@@ -12,8 +12,21 @@ import { calculatePrice, getTariffName, getPassengerTypeLabel, getSeatName, getS
 
 export function SeatSelectionPageClient() {
   const router = useRouter();
-  const { bookingState, setSeatType } = useBooking();
-  const selectedOutbound = bookingState.seatType;
+  const { bookingState, setSeatSelections } = useBooking();
+
+  // Получаем текущий выбор места для первого сегмента (segment_index = 0)
+  const currentSelection = bookingState.seatSelections?.find(s => s.segment_index === 0);
+  const selectedOutbound = currentSelection?.seat_type || 'random';
+
+  // Обработчик изменения выбора места
+  const handleSeatChange = (seatType: SeatType) => {
+    // Обновляем выбор места для segment_index = 0
+    const newSelections = bookingState.seatSelections?.filter(s => s.segment_index !== 0) || [];
+    if (seatType !== 'random') {
+      newSelections.push({ segment_index: 0, seat_type: seatType });
+    }
+    setSeatSelections(newSelections);
+  };
 
   const handleContinue = () => {
     router.push(routes.payment);
@@ -89,7 +102,7 @@ export function SeatSelectionPageClient() {
                         name="outbound"
                         value="random"
                         checked={selectedOutbound === "random"}
-                        onChange={(e) => setSeatType(e.target.value as SeatType)}
+                        onChange={(e) => handleSeatChange(e.target.value as SeatType)}
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
@@ -122,7 +135,7 @@ export function SeatSelectionPageClient() {
                         name="outbound"
                         value="window"
                         checked={selectedOutbound === "window"}
-                        onChange={(e) => setSeatType(e.target.value as SeatType)}
+                        onChange={(e) => handleSeatChange(e.target.value as SeatType)}
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
@@ -155,7 +168,7 @@ export function SeatSelectionPageClient() {
                         name="outbound"
                         value="aisle"
                         checked={selectedOutbound === "aisle"}
-                        onChange={(e) => setSeatType(e.target.value as SeatType)}
+                        onChange={(e) => handleSeatChange(e.target.value as SeatType)}
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
@@ -178,7 +191,7 @@ export function SeatSelectionPageClient() {
                     {/* Extra legroom */}
                     <label
                       className={`cursor-pointer rounded-lg border-2 p-4 text-center transition-all ${
-                        selectedOutbound === "legroom"
+                        selectedOutbound === "extra_legroom"
                           ? "border-[#7B91FF] bg-orange-50"
                           : "border-gray-200 hover:border-gray-300"
                       }`}
@@ -186,9 +199,9 @@ export function SeatSelectionPageClient() {
                       <input
                         type="radio"
                         name="outbound"
-                        value="legroom"
-                        checked={selectedOutbound === "legroom"}
-                        onChange={(e) => setSeatType(e.target.value as SeatType)}
+                        value="extra_legroom"
+                        checked={selectedOutbound === "extra_legroom"}
+                        onChange={(e) => handleSeatChange(e.target.value as SeatType)}
                         className="sr-only"
                       />
                       <div className="mb-2 flex justify-center">
@@ -201,10 +214,10 @@ export function SeatSelectionPageClient() {
                         />
                       </div>
                       <div className="mb-1 text-sm font-medium text-[#022444]">
-                        {getSeatName("legroom")}
+                        {getSeatName("extra_legroom")}
                       </div>
                       <div className="text-sm font-bold text-[#7B91FF]">
-                        {getSeatPrice("legroom").toLocaleString('ru-RU')}₽
+                        {getSeatPrice("extra_legroom").toLocaleString('ru-RU')}₽
                       </div>
                     </label>
                   </div>
@@ -238,7 +251,8 @@ export function SeatSelectionPageClient() {
                   const priceBreakdown = calculatePrice(
                     bookingState.passengerType,
                     bookingState.tariff,
-                    bookingState.seatType,
+                    bookingState.seatSelections || [],
+                    bookingState.includeInsurance || false,
                     basePriceFromRoute
                   );
                   
@@ -259,13 +273,21 @@ export function SeatSelectionPageClient() {
                             </span>
                           </div>
                         )}
-                        {priceBreakdown.seatFee > 0 && (
+                        {priceBreakdown.totalSeatFees > 0 && (
                           <div className="flex justify-between text-sm">
                             <span className="text-[#022444]">
-                              1x место
+                              {bookingState.seatSelections?.length || 0}x место
                             </span>
                             <span className="font-medium text-[#022444]">
-                              {priceBreakdown.seatFee.toLocaleString('ru-RU')}₽
+                              {priceBreakdown.totalSeatFees.toLocaleString('ru-RU')}₽
+                            </span>
+                          </div>
+                        )}
+                        {priceBreakdown.insuranceFee > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-[#022444]">1x страховка</span>
+                            <span className="font-medium text-[#022444]">
+                              {priceBreakdown.insuranceFee.toLocaleString('ru-RU')}₽
                             </span>
                           </div>
                         )}

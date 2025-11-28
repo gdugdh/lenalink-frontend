@@ -19,10 +19,22 @@ export function formatRouteDate(dateString: string): string {
 
 // Extract route codes from segments
 export function extractRouteCodes(segments: RouteSegment[]): string[] {
-  return segments.map(seg => {
-    // Extract code from ID or use first letters of city
-    return seg.from.id.split('_')[0].toUpperCase() || seg.from.city.substring(0, 3).toUpperCase();
+  if (segments.length === 0) return [];
+
+  const codes: string[] = [];
+
+  // Добавляем коды из всех сегментов (from каждого сегмента)
+  segments.forEach(seg => {
+    const code = seg.from.id.split('_')[0].toUpperCase() || seg.from.city.substring(0, 3).toUpperCase();
+    codes.push(code);
   });
+
+  // Добавляем конечную точку (to последнего сегмента)
+  const lastSegment = segments[segments.length - 1];
+  const lastCode = lastSegment.to.id.split('_')[0].toUpperCase() || lastSegment.to.city.substring(0, 3).toUpperCase();
+  codes.push(lastCode);
+
+  return codes;
 }
 
 // Transform backend format to frontend format

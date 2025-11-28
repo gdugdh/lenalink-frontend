@@ -42,60 +42,41 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
-      
-      // Wait a moment for session state to update, then get role from API
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      
-      // Get session from API to get the correct role
-      const sessionResponse = await fetch('/api/auth/session', {
-        credentials: 'include',
-      });
-      
-      if (sessionResponse.ok) {
-        const sessionData = await sessionResponse.json();
-        
-        toast({
-          title: 'Успешный вход',
-          description: 'Вы успешно вошли в систему',
-        });
+      const session = await login(email, password);
 
-        // Close modal
-        onOpenChange(false);
-        
-        // Reset form
-        setEmail('');
-        setPassword('');
-        setShowPassword(false);
-        
-        // Get redirect parameter or default to dashboard
-        const redirectTo = searchParams.get('redirect') || `/dashboard/${sessionData.user.role}`;
-        router.push(redirectTo);
-        router.refresh(); // Refresh to update header
-      } else {
-        // Handle case when session fetch fails after successful login
-        toast({
-          title: 'Ошибка получения сессии',
-          description: 'Не удалось получить информацию о сессии. Пожалуйста, попробуйте войти снова.',
-          variant: 'destructive',
-        });
-        // Close modal to allow user to retry
-        onOpenChange(false);
-        // Reset form
-        setEmail('');
-        setPassword('');
-        setShowPassword(false);
-      }
+      toast({
+        title: 'Успешный вход',
+        description: 'Вы успешно вошли в систему',
+      });
+
+      // Close modal
+      onOpenChange(false);
+
+      // Reset form
+      setEmail('');
+      setPassword('');
+      setShowPassword(false);
+
+      // Get redirect parameter or default to dashboard
+      const redirectTo = searchParams.get('redirect') || `/dashboard/${session.user.role}`;
+      router.push(redirectTo);
+      router.refresh(); // Refresh to update header
     } catch (error) {
+      // Log error for debugging
+      console.error('Login error:', error);
+
       // Переводим сообщения об ошибках на русский язык
-      let errorMessage = 'Неверный email или пароль';
-      
+      let errorMessage = 'Произошла ошибка при входе. Попробуйте снова.';
+
       if (error instanceof Error) {
         const errorText = error.message.toLowerCase();
-        
+
+        // Log original error message
+        console.error('Error message:', error.message);
+
         if (errorText.includes('invalid email') || errorText.includes('invalid password') || errorText.includes('неверный')) {
           errorMessage = 'Неверный email или пароль';
-        } else if (errorText.includes('network') || errorText.includes('fetch')) {
+        } else if (errorText.includes('network') || errorText.includes('fetch') || errorText.includes('failed to fetch')) {
           errorMessage = 'Ошибка сети. Проверьте подключение к интернету';
         } else if (errorText.includes('timeout')) {
           errorMessage = 'Превышено время ожидания. Попробуйте позже';
@@ -105,12 +86,19 @@ export function LoginModal({ open, onOpenChange, onSwitchToRegister }: LoginModa
           errorMessage = 'Доступ запрещен';
         } else if (errorText.includes('500') || errorText.includes('server')) {
           errorMessage = 'Ошибка сервера. Попробуйте позже';
-        } else {
-          // Используем оригинальное сообщение, если оно на русском или если не можем определить тип ошибки
+        } else if (error.message && error.message.trim().length > 0) {
+          // Используем оригинальное сообщение, если оно не пустое
           errorMessage = error.message;
         }
+      } else if (typeof error === 'string' && error.trim().length > 0) {
+        errorMessage = error;
       }
-      
+
+      // Ensure error message is not empty
+      if (!errorMessage || errorMessage.trim().length === 0) {
+        errorMessage = 'Произошла неизвестная ошибка. Пожалуйста, попробуйте позже.';
+      }
+
       toast({
         title: 'Ошибка входа',
         description: errorMessage,
