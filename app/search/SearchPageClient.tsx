@@ -1,64 +1,91 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { PageLoader } from '@/app/components/shared/page-loader';
 import { UnifiedHeader } from '@/app/components/shared/unified-header';
 import { InsuranceModal } from '@/app/components/features/insurance/InsuranceModal';
 import { SearchBar } from '@/app/components/features/search/SearchBar';
 import { DatePriceBand } from '@/app/components/features/search/DatePriceBand';
-import { SearchFilters, SearchFiltersButton } from '@/app/components/features/search/SearchFilters';
-import { SearchResults } from '@/app/components/features/search/SearchResults';
-import { routes } from '@/app/lib/routes';
-import { useRouter } from 'next/navigation';
+import { SearchFilters, SearchFiltersButton, type FilterState } from '@/app/components/features/search/SearchFilters';
+import { SearchResults, type RouteData } from '@/app/components/features/search/SearchResults';
 import { extractCityName, getCityCode } from '@/app/lib/cities';
+import { useRoutes } from '@/app/hooks/use-routes';
+import { useRouteFilters } from '@/app/hooks/use-route-filters';
 
 function SearchPageContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState<RouteData | null>(null);
 
   // Получаем параметры из URL
   const fromParam = searchParams.get('from') || '';
   const toParam = searchParams.get('to') || '';
+  const dateParam = searchParams.get('date') || '';
 
   const fromCity = extractCityName(fromParam);
   const toCity = extractCityName(toParam);
   const fromCode = getCityCode(fromCity);
   const toCode = getCityCode(toCity);
 
-  const handleRouteClick = (routeId: string) => {
-    setIsModalOpen(true);
+  // Загружаем маршруты
+  const { allRoutes, loading } = useRoutes(fromCity, toCity, dateParam);
+
+  // Фильтруем маршруты
+  const initialFilters: FilterState = {
+    withBaggage: false,
+    transfers: [],
+    maxTransferDuration: 6,
+    convenientTransfers: false,
+    noRecheck: false,
+    noVisa: false,
+    noAirportChange: false,
+    noNightTransfers: false,
   };
+
+  const { filters, setFilters, filteredRoutes } = useRouteFilters(allRoutes, initialFilters);
+
+  const handleRouteClick = useCallback((route: RouteData) => {
+    setSelectedRoute(route);
+    setIsModalOpen(true);
+  }, []);
 
   return (
     <>
-      <PageLoader />
       <div className="min-h-screen bg-[#FFFFFF] overflow-x-hidden">
         <UnifiedHeader />
 
         <SearchBar fromCity={fromCity || 'Москва'} fromCode={fromCode || 'MOW'} toCity={toCity || 'Олекминск'} toCode={toCode || 'OLZ'} />
 
-        <DatePriceBand />
+        <DatePriceBand currentDate={dateParam || new Date().toISOString().split('T')[0]} />
 
         {/* Main Content */}
         <div className="mx-auto container px-2 sm:px-4 py-4 sm:py-6 max-w-full overflow-x-hidden">
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 max-w-[1200px] mx-auto">
             {/* Mobile Filter Button */}
-            <SearchFiltersButton onClick={() => setIsFiltersOpen(true)} />
+            <SearchFiltersButton onClickAction={() => setIsFiltersOpen(true)} />
 
             {/* Desktop Sidebar */}
-            <SearchFilters isMobile={false} />
+            <SearchFilters
+              isMobile={false}
+              routes={allRoutes}
+              filters={filters}
+              onFiltersChange={setFilters}
+              loading={loading}
+            />
 
             {/* Results */}
-            <SearchResults onRouteClick={handleRouteClick} />
+            <SearchResults routes={filteredRoutes} onRouteClick={handleRouteClick} loading={loading} />
           </div>
         </div>
 
         <InsuranceModal
           isOpen={isModalOpen}
-          onCloseAction={() => setIsModalOpen(false)}
+          onCloseAction={() => {
+            setIsModalOpen(false);
+            setSelectedRoute(null);
+          }}
+          route={selectedRoute}
         />
 
         {/* Mobile Filters Sheet */}
@@ -66,6 +93,10 @@ function SearchPageContent() {
           isMobile={true}
           isOpen={isFiltersOpen}
           onOpenChange={setIsFiltersOpen}
+          routes={allRoutes}
+          filters={filters}
+          onFiltersChange={setFilters}
+          loading={loading}
         />
       </div>
     </>

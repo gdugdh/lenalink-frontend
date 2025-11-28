@@ -1,0 +1,119 @@
+# Dependencies (устанавливаются в Docker, не копируются)
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Testing (не нужны в образе)
+coverage/
+.nyc_output/
+*.lcov
+**/__tests__/
+**/*.test.*
+**/*.spec.*
+
+# Next.js build cache (пересоберется в Docker)
+.next/
+.next/cache
+out/
+build/
+dist/
+.turbo
+
+# Debug и логи
+*.log
+*.pid
+*.seed
+*.pid.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# Env files (используются через переменные окружения)
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Git (не нужен в образе)
+.git/
+.gitignore
+.gitattributes
+
+# IDEs и редакторы
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# OS файлы
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Кэши
+.eslintcache
+.stylelintcache
+.cache
+.parcel-cache
+.npm/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Документация и конфиги, не нужные в образе
+README.md
+*.md
+!package.json
+.editorconfig
+
+# Временные файлы
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# Vercel (не нужен в Docker)
+.vercel
+
+# TypeScript build info (пересоберется)
+*.tsbuildinfo
+
+# Планы и заметки
+.plan.md
+*.plan.md
+.cursor/plans/
+
+# Docker override файлы
+docker-compose.override.yml
+.docker/
+
+# CI/CD файлы
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Другие сборки
+.nuxt
+storybook-static

@@ -1,9 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { cities, extractCityName, getCityCode } from '@/app/lib/cities';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { cities, extractCityName } from '@/app/lib/cities';
+import { formatDateToString, parseDateFromString } from '@/app/lib/utils/date-utils';
+import { CityInputField } from './CityInputField';
+import { DatePickerField } from './DatePickerField';
+import { ReturnDatePickerField } from './ReturnDatePickerField';
+import { PassengerInfoField } from './PassengerInfoField';
+import { SearchButton } from './SearchButton';
 
 interface SearchBarProps {
   fromCity?: string;
@@ -14,382 +19,188 @@ interface SearchBarProps {
 
 export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity = 'Олекминск', toCode = 'OLZ' }: SearchBarProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isEditingFrom, setIsEditingFrom] = useState(false);
   const [isEditingTo, setIsEditingTo] = useState(false);
   const [fromValue, setFromValue] = useState(fromCity);
   const [toValue, setToValue] = useState(toCity);
-  const [fromSuggestions, setFromSuggestions] = useState<string[]>([]);
-  const [toSuggestions, setToSuggestions] = useState<string[]>([]);
-  const [showFromSuggestions, setShowFromSuggestions] = useState(false);
-  const [showToSuggestions, setShowToSuggestions] = useState(false);
-  const [fromSuggestionsPosition, setFromSuggestionsPosition] = useState({ top: 0, left: 0, width: 0 });
-  const [toSuggestionsPosition, setToSuggestionsPosition] = useState({ top: 0, left: 0, width: 0 });
-  const fromInputRef = useRef<HTMLInputElement>(null);
-  const toInputRef = useRef<HTMLInputElement>(null);
-  const fromSuggestionsRef = useRef<HTMLDivElement>(null);
-  const toSuggestionsRef = useRef<HTMLDivElement>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isReturnDatePickerOpen, setIsReturnDatePickerOpen] = useState(false);
 
-  // Обновляем значения при изменении пропсов
+  // Get date from URL or use today's date
+  const dateParam = searchParams.get('date') || '';
+  const returnDateParam = searchParams.get('return_date') || '';
+  const selectedDate = dateParam ? parseDateFromString(dateParam) : new Date();
+  const selectedReturnDate = returnDateParam ? parseDateFromString(returnDateParam) : null;
+
+  // Helper to get full city name
+  const getFullCityName = useCallback((value: string, fallback: string): string => {
+    return value ? cities.find(c => extractCityName(c).toLowerCase() === value.toLowerCase()) || `${value}, Россия` : fallback;
+  }, []);
+
+  // Handle date selection
+  const handleDateSelect = useCallback((date: Date | undefined) => {
+    if (!date) return;
+    
+    const dateString = formatDateToString(date);
+    const currentFrom = getFullCityName(fromValue, '');
+    const currentTo = getFullCityName(toValue, '');
+    
+    const returnDateString = returnDateParam || '';
+    const queryParams = new URLSearchParams();
+    queryParams.set('from', currentFrom);
+    queryParams.set('to', currentTo);
+    queryParams.set('date', dateString);
+    if (returnDateString) {
+      queryParams.set('return_date', returnDateString);
+    }
+    
+    router.push(`/search?${queryParams.toString()}`);
+    setIsDatePickerOpen(false);
+  }, [fromValue, toValue, returnDateParam, router, getFullCityName]);
+
+  // Handle return date selection
+  const handleReturnDateSelect = useCallback((date: Date | undefined) => {
+    if (!date) return;
+    
+    const dateString = formatDateToString(date);
+    const currentFrom = getFullCityName(fromValue, '');
+    const currentTo = getFullCityName(toValue, '');
+    
+    const departureDateString = dateParam || formatDateToString(selectedDate);
+    const queryParams = new URLSearchParams();
+    queryParams.set('from', currentFrom);
+    queryParams.set('to', currentTo);
+    queryParams.set('date', departureDateString);
+    queryParams.set('return_date', dateString);
+    
+    router.push(`/search?${queryParams.toString()}`);
+    setIsReturnDatePickerOpen(false);
+  }, [fromValue, toValue, dateParam, selectedDate, router, getFullCityName]);
+
+  // Handle return date removal
+  const handleRemoveReturnDate = useCallback(() => {
+    const currentFrom = getFullCityName(fromValue, '');
+    const currentTo = getFullCityName(toValue, '');
+    
+    const departureDateString = dateParam || formatDateToString(selectedDate);
+    const queryParams = new URLSearchParams();
+    queryParams.set('from', currentFrom);
+    queryParams.set('to', currentTo);
+    queryParams.set('date', departureDateString);
+    
+    router.push(`/search?${queryParams.toString()}`);
+    setIsReturnDatePickerOpen(false);
+  }, [fromValue, toValue, dateParam, selectedDate, router, getFullCityName]);
+
+  // Handle search button click
+  const handleSearchClick = useCallback(() => {
+    const currentFrom = getFullCityName(fromValue, fromCity);
+    const currentTo = getFullCityName(toValue, toCity);
+    const dateString = dateParam || formatDateToString(selectedDate);
+    
+    router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(currentTo)}&date=${dateString}`);
+  }, [fromValue, toValue, fromCity, toCity, dateParam, selectedDate, router, getFullCityName]);
+
+  // Update values when props change
   useEffect(() => {
     setFromValue(fromCity);
     setToValue(toCity);
   }, [fromCity, toCity]);
 
-  // Фильтрация городов по введенному тексту, исключая уже выбранный город из другого поля
-  const filterCities = (query: string, excludeCity?: string): string[] => {
-    if (!query.trim()) return [];
-    const lowerQuery = query.toLowerCase();
-    const excludeCityName = excludeCity ? extractCityName(excludeCity).toLowerCase() : '';
-    
-    return cities
-      .filter(city => {
-        const cityLower = city.toLowerCase();
-        const cityName = extractCityName(city).toLowerCase();
-        // Исключаем город, если он уже выбран в другом поле
-        if (excludeCityName && cityName === excludeCityName) {
-          return false;
-        }
-        return cityLower.includes(lowerQuery);
-      })
-      .slice(0, 5); // Показываем максимум 5 результатов
-  };
-
-  // Обновление позиции выпадающего меню для "Откуда"
-  const updateFromSuggestionsPosition = () => {
-    if (fromInputRef.current) {
-      const rect = fromInputRef.current.getBoundingClientRect();
-      setFromSuggestionsPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
-  };
-
-  // Обработка изменения поля "Откуда"
-  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setFromValue(value);
-    const suggestions = filterCities(value, toValue);
-    setFromSuggestions(suggestions);
-    setShowFromSuggestions(value.trim().length > 0);
-    if (value.trim().length > 0) {
-      setTimeout(updateFromSuggestionsPosition, 0);
-    }
-  };
-
-  // Обновление позиции выпадающего меню для "Куда"
-  const updateToSuggestionsPosition = () => {
-    if (toInputRef.current) {
-      const rect = toInputRef.current.getBoundingClientRect();
-      setToSuggestionsPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
-  };
-
-  // Обработка изменения поля "Куда"
-  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setToValue(value);
-    const suggestions = filterCities(value, fromValue);
-    setToSuggestions(suggestions);
-    setShowToSuggestions(value.trim().length > 0);
-    if (value.trim().length > 0) {
-      setTimeout(updateToSuggestionsPosition, 0);
-    }
-  };
-
-  // Выбор города из списка для "Откуда"
-  const handleFromSelect = (city: string) => {
+  // Handle city selection for "From"
+  const handleFromSelect = useCallback((city: string) => {
     const cityName = extractCityName(city);
     setFromValue(cityName);
-    setFromSuggestions([]);
-    setShowFromSuggestions(false);
     setIsEditingFrom(false);
-    fromInputRef.current?.blur();
     
-    // Обновляем URL с полным названием города
-    const currentTo = toValue ? cities.find(c => extractCityName(c).toLowerCase() === toValue.toLowerCase()) || `${toValue}, Россия` : '';
-    router.push(`/search?from=${encodeURIComponent(city)}&to=${encodeURIComponent(currentTo)}`);
-  };
+    const currentTo = getFullCityName(toValue, '');
+    const dateString = dateParam || formatDateToString(selectedDate);
+    router.push(`/search?from=${encodeURIComponent(city)}&to=${encodeURIComponent(currentTo)}&date=${dateString}`);
+  }, [toValue, dateParam, selectedDate, router, getFullCityName]);
 
-  // Выбор города из списка для "Куда"
-  const handleToSelect = (city: string) => {
+  // Handle city selection for "To"
+  const handleToSelect = useCallback((city: string) => {
     const cityName = extractCityName(city);
     setToValue(cityName);
-    setToSuggestions([]);
-    setShowToSuggestions(false);
     setIsEditingTo(false);
-    toInputRef.current?.blur();
     
-    // Обновляем URL с полным названием города
-    const currentFrom = fromValue ? cities.find(c => extractCityName(c).toLowerCase() === fromValue.toLowerCase()) || `${fromValue}, Россия` : '';
-    router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(city)}`);
-  };
+    const currentFrom = getFullCityName(fromValue, '');
+    const dateString = dateParam || formatDateToString(selectedDate);
+    router.push(`/search?from=${encodeURIComponent(currentFrom)}&to=${encodeURIComponent(city)}&date=${dateString}`);
+  }, [fromValue, dateParam, selectedDate, router, getFullCityName]);
 
-  // Обработка клика на поле "Откуда"
-  const handleFromClick = () => {
-    setIsEditingFrom(true);
+  // Handle blur for "From" field
+  const handleFromBlur = useCallback(() => {
     setTimeout(() => {
-      fromInputRef.current?.focus();
-      fromInputRef.current?.select();
-    }, 0);
-  };
-
-  // Обработка клика на поле "Куда"
-  const handleToClick = () => {
-    setIsEditingTo(true);
-    setTimeout(() => {
-      toInputRef.current?.focus();
-      toInputRef.current?.select();
-    }, 0);
-  };
-
-  // Обработка потери фокуса для "Откуда"
-  const handleFromBlur = () => {
-    // Не закрываем сразу, чтобы можно было кликнуть на предложение
-    setTimeout(() => {
-      if (!fromSuggestionsRef.current?.contains(document.activeElement)) {
-        setIsEditingFrom(false);
-        setShowFromSuggestions(false);
-        // Если значение не валидно, возвращаем исходное
-        const isValid = cities.some(city => extractCityName(city).toLowerCase() === fromValue.toLowerCase());
-        if (!isValid && fromValue !== fromCity) {
-          setFromValue(fromCity);
-        }
+      setIsEditingFrom(false);
+      const isValid = cities.some(city => extractCityName(city).toLowerCase() === fromValue.toLowerCase());
+      if (!isValid && fromValue !== fromCity) {
+        setFromValue(fromCity);
       }
     }, 200);
-  };
+  }, [fromValue, fromCity]);
 
-  // Обработка потери фокуса для "Куда"
-  const handleToBlur = () => {
-    // Не закрываем сразу, чтобы можно было кликнуть на предложение
+  // Handle blur for "To" field
+  const handleToBlur = useCallback(() => {
     setTimeout(() => {
-      if (!toSuggestionsRef.current?.contains(document.activeElement)) {
-        setIsEditingTo(false);
-        setShowToSuggestions(false);
-        // Если значение не валидно, возвращаем исходное
-        const isValid = cities.some(city => extractCityName(city).toLowerCase() === toValue.toLowerCase());
-        if (!isValid && toValue !== toCity) {
-          setToValue(toCity);
-        }
+      setIsEditingTo(false);
+      const isValid = cities.some(city => extractCityName(city).toLowerCase() === toValue.toLowerCase());
+      if (!isValid && toValue !== toCity) {
+        setToValue(toCity);
       }
     }, 200);
-  };
-
-  // Обновление позиций при скролле или изменении размера окна
-  useEffect(() => {
-    const updatePositions = () => {
-      if (showFromSuggestions && fromInputRef.current) {
-        updateFromSuggestionsPosition();
-      }
-      if (showToSuggestions && toInputRef.current) {
-        updateToSuggestionsPosition();
-      }
-    };
-
-    window.addEventListener('scroll', updatePositions, true);
-    window.addEventListener('resize', updatePositions);
-    
-    return () => {
-      window.removeEventListener('scroll', updatePositions, true);
-      window.removeEventListener('resize', updatePositions);
-    };
-  }, [showFromSuggestions, showToSuggestions]);
-
-  // Закрытие выпадающих меню при клике вне их
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        fromSuggestionsRef.current &&
-        !fromSuggestionsRef.current.contains(event.target as Node) &&
-        fromInputRef.current &&
-        !fromInputRef.current.contains(event.target as Node)
-      ) {
-        setShowFromSuggestions(false);
-      }
-      if (
-        toSuggestionsRef.current &&
-        !toSuggestionsRef.current.contains(event.target as Node) &&
-        toInputRef.current &&
-        !toInputRef.current.contains(event.target as Node)
-      ) {
-        setShowToSuggestions(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const currentFromCode = isEditingFrom ? getCityCode(fromValue) : fromCode;
-  const currentToCode = isEditingTo ? getCityCode(toValue) : toCode;
+  }, [toValue, toCity]);
 
   return (
     <div className="border-b bg-white overflow-x-hidden">
       <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 max-w-7xl">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 justify-center">
-          <div className="flex items-center gap-1 sm:gap-2 rounded-lg border border-gray-300 bg-white text-[#022444] overflow-x-auto scrollbar-hide w-full sm:w-auto">
-            <div className="flex flex-1 min-w-[120px] items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative">
-              {isEditingFrom ? (
-                <div className="flex-1 min-w-0 relative">
-                  <input
-                    ref={fromInputRef}
-                    type="text"
-                    value={fromValue}
-                    onChange={handleFromChange}
-                    onBlur={handleFromBlur}
-                    onFocus={() => {
-                      if (fromValue.trim().length > 0) {
-                        const suggestions = filterCities(fromValue, toValue);
-                        setFromSuggestions(suggestions);
-                        setShowFromSuggestions(true);
-                        setTimeout(updateFromSuggestionsPosition, 0);
-                      }
-                    }}
-                    className="w-full text-xs sm:text-sm font-medium text-[#022444] bg-transparent border-none outline-none"
-                    placeholder="Откуда"
-                  />
-                  <div className="text-xs text-[#022444]">{currentFromCode}</div>
-                  {showFromSuggestions && fromValue.trim().length > 0 && (
-                    <div
-                      ref={fromSuggestionsRef}
-                      className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
-                      style={{
-                        top: `${fromSuggestionsPosition.top}px`,
-                        left: `${fromSuggestionsPosition.left}px`,
-                        width: `${fromSuggestionsPosition.width}px`,
-                      }}
-                    >
-                      {fromSuggestions.length > 0 ? (
-                        fromSuggestions.map((city, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => handleFromSelect(city)}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
-                          >
-                            {city}
-                          </button>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                          Мы ничего не нашли
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className="flex-1 min-w-0" onClick={handleFromClick}>
-                    <div className="text-xs sm:text-sm font-medium text-[#022444] truncate cursor-pointer">
-                      {fromCity}
-                    </div>
-                    <div className="text-xs text-[#022444]">{fromCode}</div>
-                  </div>
-                  <button 
-                    onClick={handleFromClick}
-                    className="rounded-full p-1 hover:bg-gray-100 shrink-0"
-                  >
-                    <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-[#022444]" />
-                  </button>
-                </>
-              )}
+          <div className="flex items-center gap-0 sm:gap-2 rounded-lg border border-gray-300 bg-white text-[#022444] overflow-x-auto scrollbar-hide w-full sm:w-auto shrink-0" style={{ height: '48px' }}>
+            <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative shrink-0" style={{ height: '48px', width: '120px', minWidth: '120px', maxWidth: '120px' }}>
+              <CityInputField
+                value={fromValue}
+                code={fromCode}
+                placeholder="Откуда"
+                excludeCity={toValue}
+                isEditing={isEditingFrom}
+                onEdit={() => setIsEditingFrom(true)}
+                onChange={setFromValue}
+                onSelect={handleFromSelect}
+                onBlur={handleFromBlur}
+              />
             </div>
-            <div className="flex flex-1 min-w-[120px] items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative">
-              {isEditingTo ? (
-                <div className="flex-1 min-w-0 relative">
-                  <input
-                    ref={toInputRef}
-                    type="text"
-                    value={toValue}
-                    onChange={handleToChange}
-                    onBlur={handleToBlur}
-                    onFocus={() => {
-                      if (toValue.trim().length > 0) {
-                        const suggestions = filterCities(toValue, fromValue);
-                        setToSuggestions(suggestions);
-                        setShowToSuggestions(true);
-                        setTimeout(updateToSuggestionsPosition, 0);
-                      }
-                    }}
-                    className="w-full text-xs sm:text-sm font-medium text-[#022444] bg-transparent border-none outline-none"
-                    placeholder="Куда"
-                  />
-                  <div className="text-xs text-[#022444]">{currentToCode}</div>
-                  {showToSuggestions && toValue.trim().length > 0 && (
-                    <div
-                      ref={toSuggestionsRef}
-                      className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto"
-                      style={{
-                        top: `${toSuggestionsPosition.top}px`,
-                        left: `${toSuggestionsPosition.left}px`,
-                        width: `${toSuggestionsPosition.width}px`,
-                      }}
-                    >
-                      {toSuggestions.length > 0 ? (
-                        toSuggestions.map((city, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => handleToSelect(city)}
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors first:rounded-t-lg last:rounded-b-lg"
-                          >
-                            {city}
-                          </button>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                          Мы ничего не нашли
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="flex-1 min-w-0" onClick={handleToClick}>
-                  <div className="text-xs sm:text-sm font-medium text-[#022444] truncate cursor-pointer">
-                    {toCity}
-                  </div>
-                  <div className="text-xs text-[#022444]">{toCode}</div>
-                </div>
-              )}
+            <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative shrink-0" style={{ height: '48px', width: '120px', minWidth: '120px', maxWidth: '120px' }}>
+              <CityInputField
+                value={toValue}
+                code={toCode}
+                placeholder="Куда"
+                excludeCity={fromValue}
+                isEditing={isEditingTo}
+                onEdit={() => setIsEditingTo(true)}
+                onChange={setToValue}
+                onSelect={handleToSelect}
+                onBlur={handleToBlur}
+              />
             </div>
-            <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 shrink-0">
-              <div className="flex-1 min-w-0">
-                <div className="text-xs sm:text-sm font-medium text-[#022444]">
-                  2 дек, вт
-                </div>
-              </div>
-              <button className="ml-1 sm:ml-2 shrink-0">
-                <X className="h-3 w-3 sm:h-4 sm:w-4 text-[#7B91FF]" />
-              </button>
-            </div>
-            <div className="hidden sm:flex items-center px-2 sm:px-4 py-2 sm:py-3 shrink-0">
-              <div className="flex-1">
-                <div className="text-xs sm:text-sm font-medium text-[#022444]">
-                  Обратно
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center border-l px-2 sm:px-4 py-2 sm:py-3 shrink-0">
-              <div className="flex-1 min-w-0">
-                <div className="text-xs sm:text-sm font-medium text-[#022444]">
-                  1 пассажир
-                </div>
-                <div className="text-xs text-[#022444] hidden sm:block">Эконом</div>
-              </div>
-            </div>
+            <DatePickerField
+              selectedDate={selectedDate}
+              onSelect={handleDateSelect}
+              isOpen={isDatePickerOpen}
+              onOpenChange={setIsDatePickerOpen}
+            />
+            <ReturnDatePickerField
+              selectedDate={selectedDate}
+              returnDate={selectedReturnDate}
+              onSelect={handleReturnDateSelect}
+              onRemove={handleRemoveReturnDate}
+              minDate={selectedDate}
+              isOpen={isReturnDatePickerOpen}
+              onOpenChange={setIsReturnDatePickerOpen}
+            />
+            <PassengerInfoField passengerCount={1} tariff="Эконом" />
           </div>
-          <button className="rounded-lg bg-[#7B91FF] px-4 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-white hover:bg-[#E16D32] w-full sm:w-auto">
-            Найти билеты
-          </button>
+          <SearchButton onClick={handleSearchClick} />
         </div>
       </div>
     </div>

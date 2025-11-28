@@ -1,14 +1,19 @@
 'use client';
 
 import { useBooking } from '@/app/lib/booking-context';
-import { calculatePrice, getPassengerTypeLabel } from '@/app/lib/price-calculator';
+import { calculatePrice, getPassengerTypeLabel, extractPriceFromRoute } from '@/app/lib/price-calculator';
 
 export function PriceSummary() {
   const { bookingState } = useBooking();
+  
+  // Извлекаем базовую цену из выбранного маршрута
+  const basePriceFromRoute = extractPriceFromRoute(bookingState.selectedRoute);
+  
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
-    bookingState.seatType
+    bookingState.seatType,
+    basePriceFromRoute
   );
 
   return (

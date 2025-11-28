@@ -5,24 +5,27 @@ import { Button } from "@/app/components/ui/button";
 import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { routes } from "@/app/lib/routes";
 import { useBooking } from "@/app/lib/booking-context";
-import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName } from "@/app/lib/price-calculator";
+import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName, extractPriceFromRoute } from "@/app/lib/price-calculator";
+import { usePaymentMethod } from "@/app/hooks/use-payment-method";
+import { useCreateBooking } from "@/app/hooks/use-create-booking";
 
 export function PaymentPageClient() {
   const router = useRouter();
-  const [selectedPayment, setSelectedPayment] = useState<string>("card");
   const { bookingState } = useBooking();
+  const basePriceFromRoute = extractPriceFromRoute(bookingState.selectedRoute);
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
-    bookingState.seatType
+    bookingState.seatType,
+    basePriceFromRoute
   );
 
-  const handlePayment = () => {
-    router.push(routes.confirmation);
-  };
+  // Управление способом оплаты
+  const { selectedPayment, setSelectedPayment, paymentMethodMap } = usePaymentMethod();
+      
+  // Создание бронирования
+  const { createBooking, isCreatingBooking } = useCreateBooking(selectedPayment, paymentMethodMap);
 
   return (
     <>
@@ -352,10 +355,11 @@ export function PaymentPageClient() {
                   Назад
                 </Button>
                 <Button
-                  onClick={handlePayment}
+                  onClick={createBooking}
+                  disabled={isCreatingBooking}
                   className="bg-[#7B91FF] hover:bg-[#E16D32] px-8"
                 >
-                  Оплатить {priceBreakdown.total.toLocaleString('ru-RU')}₽
+                  {isCreatingBooking ? 'Создание бронирования...' : 'Оплатить'}
                 </Button>
               </div>
             </div>

@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { BookingProvider } from "./lib/booking-context";
+import { AuthProvider } from "./context/AuthContext";
 import { GlobalLoader } from "./components/shared/global-loader";
+import { Toaster } from "./components/ui/toaster";
 import "./globals.css";
 
-const geist = Geist({ subsets: ["latin"] });
+const geist = Geist({ 
+  subsets: ["latin"],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: "lena link",
@@ -37,9 +42,12 @@ export default function RootLayout({
     <html lang="ru" className={`${geist.className} overflow-x-hidden`}>
       <body className={`${geist.className} antialiased overflow-x-hidden`} suppressHydrationWarning>
         <GlobalLoader />
-        <BookingProvider>
-          {children}
-        </BookingProvider>
+        <AuthProvider>
+          <BookingProvider>
+            {children}
+          </BookingProvider>
+        </AuthProvider>
+        <Toaster />
         <Analytics />
       </body>
     </html>

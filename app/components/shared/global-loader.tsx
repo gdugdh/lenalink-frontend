@@ -1,21 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Spinner } from "@/app/components/ui/spinner";
 
 export function GlobalLoader() {
   const [isLoading, setIsLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
 
+  const minLoadTime = useMemo(() => 500, []);
+  const fadeOutTime = useMemo(() => 300, []);
+
   useEffect(() => {
     // Показываем загрузку минимум немного для плавности
-    const minLoadTime = setTimeout(() => {
+    const minLoadTimeout = setTimeout(() => {
       setIsVisible(false);
       // Даём время для fade-out анимации перед полным скрытием
       setTimeout(() => {
         setIsLoading(false);
-      }, 300);
-    }, 500);
+      }, fadeOutTime);
+    }, minLoadTime);
 
     // Также скрываем загрузку когда страница полностью загружена
     const handleLoad = () => {
@@ -24,7 +27,7 @@ export function GlobalLoader() {
         // Даём время для fade-out анимации перед полным скрытием
         setTimeout(() => {
           setIsLoading(false);
-        }, 300);
+        }, fadeOutTime);
       }, 200);
     };
 
@@ -35,10 +38,10 @@ export function GlobalLoader() {
     }
 
     return () => {
-      clearTimeout(minLoadTime);
+      clearTimeout(minLoadTimeout);
       window.removeEventListener("load", handleLoad);
     };
-  }, []);
+  }, [minLoadTime, fadeOutTime]);
 
   if (!isLoading) return null;
 

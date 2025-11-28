@@ -1,140 +1,29 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { MapContainer } from './MapContainer';
 
 export function MapView() {
-  const mapRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!isMounted) return;
+  const markers = [
+    { position: [55.7558, 37.6173] as [number, number], label: 'Москва' },
+    { position: [62.0355, 129.6755] as [number, number], label: 'Якутск' },
+    { position: [60.4076, 120.4279] as [number, number], label: 'Олекминск' },
+  ];
 
-    // Check if script already exists
-    if (document.querySelector('script[src*="api-maps.yandex.ru"]')) {
-      // Script already loaded, just initialize map
-      if (
-        mapRef.current &&
-        typeof window !== 'undefined' &&
-        (window as any).ymaps
-      ) {
-        (window as any).ymaps.ready(() => {
-          const map = new (window as any).ymaps.Map(mapRef.current, {
-            center: [60.0, 105.0],
-            zoom: 4,
-            controls: ['zoomControl'],
-          });
-
-          const routeLine = new (window as any).ymaps.Polyline(
-            [
-              [55.7558, 37.6173], // Moscow
-              [62.0355, 129.6755], // Yakutsk
-              [60.4076, 120.4279], // Olekminsk
-            ],
-            {},
-            {
-              strokeColor: '#7B91FF',
-              strokeWidth: 4,
-              strokeStyle: 'solid',
-            },
-          );
-
-          map.geoObjects.add(routeLine);
-
-          const moscowPlacemark = new (window as any).ymaps.Placemark(
-            [55.7558, 37.6173],
-            {
-              balloonContent: 'Москва',
-            },
-          );
-          map.geoObjects.add(moscowPlacemark);
-
-          const yakutskPlacemark = new (window as any).ymaps.Placemark(
-            [62.0355, 129.6755],
-            {
-              balloonContent: 'Якутск',
-            },
-          );
-          map.geoObjects.add(yakutskPlacemark);
-
-          const olekminskPlacemark = new (window as any).ymaps.Placemark(
-            [60.4076, 120.4279],
-            {
-              balloonContent: 'Олекминск',
-            },
-          );
-          map.geoObjects.add(olekminskPlacemark);
-        });
-      }
-      return;
-    }
-
-    const script = document.createElement('script');
-    const apiKey = process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY;
-    script.src = apiKey
-      ? `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${apiKey}`
-      : 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
-    script.async = true;
-    script.onload = () => {
-      if (
-        mapRef.current &&
-        typeof window !== 'undefined' &&
-        (window as any).ymaps
-      ) {
-        (window as any).ymaps.ready(() => {
-          const map = new (window as any).ymaps.Map(mapRef.current, {
-            center: [60.0, 105.0],
-            zoom: 4,
-            controls: ['zoomControl'],
-          });
-
-          const routeLine = new (window as any).ymaps.Polyline(
-            [
-              [55.7558, 37.6173], // Moscow
-              [62.0355, 129.6755], // Yakutsk
-              [60.4076, 120.4279], // Olekminsk
-            ],
-            {},
-            {
-              strokeColor: '#7B91FF',
-              strokeWidth: 4,
-              strokeStyle: 'solid',
-            },
-          );
-
-          map.geoObjects.add(routeLine);
-
-          const moscowPlacemark = new (window as any).ymaps.Placemark(
-            [55.7558, 37.6173],
-            {
-              balloonContent: 'Москва',
-            },
-          );
-          map.geoObjects.add(moscowPlacemark);
-
-          const yakutskPlacemark = new (window as any).ymaps.Placemark(
-            [62.0355, 129.6755],
-            {
-              balloonContent: 'Якутск',
-            },
-          );
-          map.geoObjects.add(yakutskPlacemark);
-
-          const olekminskPlacemark = new (window as any).ymaps.Placemark(
-            [60.4076, 120.4279],
-            {
-              balloonContent: 'Олекминск',
-            },
-          );
-          map.geoObjects.add(olekminskPlacemark);
-        });
-      }
-    };
-    document.head.appendChild(script);
-  }, [isMounted]);
+  const routeLine = {
+    points: [
+      [55.7558, 37.6173],
+      [62.0355, 129.6755],
+      [60.4076, 120.4279],
+    ] as Array<[number, number]>,
+    color: '#7B91FF',
+  };
 
   return (
     <div className="rounded-lg border bg-white p-2 sm:p-3 md:p-4">
@@ -142,10 +31,12 @@ export function MapView() {
         КАРТА
       </h3>
       {isMounted ? (
-        <div
-          ref={mapRef}
-          className="h-[200px] sm:h-[250px] md:h-[300px] w-full rounded-lg bg-gray-100"
-        ></div>
+        <MapContainer
+          center={[60.0, 105.0]}
+          zoom={4}
+          markers={markers}
+          routeLine={routeLine}
+        />
       ) : (
         <div className="h-[200px] sm:h-[250px] md:h-[300px] w-full rounded-lg bg-gray-100 flex items-center justify-center">
           <div className="text-xs sm:text-sm text-[#022444]">Загрузка карты...</div>
