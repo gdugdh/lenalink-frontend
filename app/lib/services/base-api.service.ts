@@ -64,14 +64,23 @@ export class BaseApiService {
         }
         
         if (process.env.NODE_ENV === 'development') {
-          console.error('Network error (fetch failed):', {
-            url: url,
-            endpoint: endpoint,
-            method: options.method || 'GET',
-            error: errorMessage,
-            errorType: fetchError instanceof Error ? fetchError.constructor.name : typeof fetchError,
-            errorString: String(fetchError),
-          });
+          // Only log network errors if they're not just "server unavailable"
+          // This reduces console noise during development when backend is not running
+          if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+            console.warn('⚠️ Backend server is not available:', {
+              url: url,
+              endpoint: endpoint,
+              hint: 'Make sure backend server is running or set NEXT_PUBLIC_BACKEND_URL environment variable',
+            });
+          } else {
+            console.error('Network error (fetch failed):', {
+              url: url,
+              endpoint: endpoint,
+              method: options.method || 'GET',
+              error: errorMessage,
+              errorType: fetchError instanceof Error ? fetchError.constructor.name : typeof fetchError,
+            });
+          }
         }
 
         // Determine error type and throw a clear message

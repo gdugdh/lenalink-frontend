@@ -109,10 +109,39 @@ export function useRoutes(fromCity: string, toCity: string, dateParam: string) {
         setAllRoutes(transformedRoutes);
         setRoutes(transformedRoutes); // Initially show all routes
       } catch (err) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Error loading routes:', err);
+        // Handle network errors gracefully
+        let errorMessage = 'Не удалось загрузить маршруты';
+        
+        if (err instanceof Error) {
+          // Check if it's a network/server connection error
+          if (
+            err.message.includes('Failed to connect') ||
+            err.message.includes('Failed to fetch') ||
+            err.message.includes('NetworkError') ||
+            err.message.includes('fetch failed')
+          ) {
+            errorMessage = 'Сервер недоступен. Проверьте подключение к интернету или попробуйте позже.';
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('Backend server is not available. This is expected if backend is not running.', {
+                error: err.message,
+                url: 'Check BACKEND_BASE_URL in backend-api.ts'
+              });
+            }
+          } else {
+            errorMessage = err.message || 'Ошибка при загрузке маршрутов';
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Error loading routes:', err);
+            }
+          }
+        } else {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Unknown error loading routes:', err);
+          }
         }
-        setError(err instanceof Error ? err : new Error('Error loading routes'));
+        
+        setError(new Error(errorMessage));
         setRoutes([]);
         setAllRoutes([]);
       } finally {
