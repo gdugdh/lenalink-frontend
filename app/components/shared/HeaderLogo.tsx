@@ -10,9 +10,9 @@ interface HeaderLogoProps {
 export function HeaderLogo({ href = '/' }: HeaderLogoProps) {
   return (
     <Link href={href} className="flex items-center gap-1.5 sm:gap-2">
-      <div className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-white shrink-0">
+      <div className="relative h-8 w-8 sm:h-10 sm:w-10 shrink-0">
         <Image 
-          src="/logo.png" 
+          src="/logo.svg" 
           alt="LenaLink Logo" 
           fill
           className="object-contain p-1"

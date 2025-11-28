@@ -31,7 +31,7 @@ export function DashboardHeader({ session, onLogout }: DashboardHeaderProps) {
           <Link href="/" className="flex items-center gap-3">
             <div className="relative h-8 w-8 sm:h-10 sm:w-10 shrink-0 flex items-center justify-center">
               <Image 
-                src="/logo.png" 
+                src="/logo.svg" 
                 alt="LenaLink Logo" 
                 width={32} 
                 height={32} 

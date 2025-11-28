@@ -310,7 +310,7 @@ export function PaymentPageClient() {
                   disabled={isCreatingBooking}
                   className="bg-[#7B91FF] hover:bg-[#E16D32] px-8"
                 >
-                  {isCreatingBooking ? 'Создание бронирования...' : 'Оплатить'}
+                  {isCreatingBooking ? 'Оплата...' : 'Оплатить'}
                 </Button>
               </div>
             </div>

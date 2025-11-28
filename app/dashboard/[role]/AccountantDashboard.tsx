@@ -100,7 +100,7 @@ export function AccountantDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calculator className="h-5 w-5" />
-              Баланс компании
+              Выделенный бюджет на командировку
             </CardTitle>
             <CardDescription className="text-white/80">
               Текущий остаток корпоративного депозита

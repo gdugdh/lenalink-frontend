@@ -5,17 +5,12 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from './use-toast';
-import { backendApi } from '../lib/backend-api';
 import { useBooking } from '../lib/booking-context';
-import { useAuth } from '../context/AuthContext';
-import { transformPassengerDataToApiFormat } from '../lib/booking-transforms';
 import { routes } from '../lib/routes';
-import type { PaymentMethod } from './use-payment-method';
 
-export function useCreateBooking(selectedPayment: string, paymentMethodMap: Record<string, 'card' | 'yookassa' | 'cloudpay' | 'sberpay'>) {
+export function useCreateBooking(selectedPayment?: string, paymentMethodMap?: Record<string, 'card' | 'yookassa' | 'cloudpay' | 'sberpay'>) {
   const router = useRouter();
   const { toast } = useToast();
-  const { session } = useAuth();
   const { bookingState, setBookingId } = useBooking();
   const [isCreatingBooking, setIsCreatingBooking] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -23,36 +18,24 @@ export function useCreateBooking(selectedPayment: string, paymentMethodMap: Reco
   const createBooking = useCallback(async () => {
     // Check that all data is present
     if (!bookingState.selectedRoute) {
-      const error = new Error('Route not selected');
+      const error = new Error('Маршрут не выбран');
       setError(error);
       toast({
-        title: 'Error',
-        description: error.message,
+        title: 'Ошибка',
+        description: 'Маршрут не выбран',
         variant: 'destructive',
       });
       return;
     }
 
     if (!bookingState.passengerData) {
-      const error = new Error('Passenger data not filled');
+      const error = new Error('Данные пассажира не заполнены');
       setError(error);
       toast({
-        title: 'Error',
-        description: error.message,
+        title: 'Ошибка',
+        description: 'Данные пассажира не заполнены',
         variant: 'destructive',
       });
-      return;
-    }
-
-    if (!session) {
-      const error = new Error('Login required to create booking');
-      setError(error);
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-      router.push('/?modal=login');
       return;
     }
 
@@ -60,45 +43,37 @@ export function useCreateBooking(selectedPayment: string, paymentMethodMap: Reco
     setError(null);
 
     try {
-      const passenger = transformPassengerDataToApiFormat(bookingState.passengerData, session);
+      // Mock payment processing - simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      const bookingRequest = {
-        route_id: bookingState.selectedRoute.id,
-        passenger,
-        tariff: bookingState.tariff,
-        seat_selections: bookingState.seatSelections,
-        include_insurance: bookingState.includeInsurance,
-        payment_method: paymentMethodMap[selectedPayment] || 'card',
-      };
-
-      console.log('Creating booking with request:', bookingRequest);
-
-      const booking = await backendApi.createBooking(bookingRequest);
+      // Generate mock booking ID
+      const mockBookingId = `BK-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       
       // Save booking ID
-      setBookingId(booking.id);
+      setBookingId(mockBookingId);
 
       toast({
-        title: 'Booking created',
-        description: 'Your booking has been successfully created',
+        title: 'Оплата успешна',
+        description: 'Ваше бронирование было успешно создано',
       });
 
+      // Redirect to confirmation page with booking details
       router.push(routes.confirmation);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to create booking');
+      const error = err instanceof Error ? err : new Error('Ошибка при создании бронирования');
       setError(error);
       if (process.env.NODE_ENV === 'development') {
         console.error('Error creating booking:', err);
       }
       toast({
-        title: 'Booking creation error',
+        title: 'Ошибка оплаты',
         description: error.message,
         variant: 'destructive',
       });
     } finally {
       setIsCreatingBooking(false);
     }
-  }, [bookingState, session, selectedPayment, paymentMethodMap, router, toast, setBookingId]);
+  }, [bookingState, selectedPayment, paymentMethodMap, router, toast, setBookingId]);
 
   return {
     createBooking,

@@ -20,6 +20,30 @@ export function ConfirmationPageClient() {
     basePriceFromRoute
   );
 
+  // Generate or use booking ID
+  const bookingId = bookingState.bookingId || 'MOW2OLZ2024';
+  
+  // Copy booking ID to clipboard
+  const handleCopyBookingId = async () => {
+    try {
+      await navigator.clipboard.writeText(bookingId);
+      // You could add a toast notification here
+    } catch (err) {
+      console.error('Failed to copy booking ID:', err);
+    }
+  };
+
+  // Get passenger name from booking state or use default
+  const passengerName = bookingState.passengerData
+    ? `${bookingState.passengerData.firstName || ''} ${bookingState.passengerData.lastName || ''}`.trim() || 'Иван Петров'
+    : 'Иван Петров';
+  
+  const passengerCitizenship = bookingState.passengerData?.citizenship || 'Россия';
+  
+  const passengerBirthDate = bookingState.passengerData
+    ? `${String(bookingState.passengerData.birthDay || '15').padStart(2, '0')}.${String(bookingState.passengerData.birthMonth || '03').padStart(2, '0')}.${bookingState.passengerData.birthYear || '1990'}`
+    : '15.03.1990';
+
   return (
     <>
       <PageLoader />
@@ -52,10 +76,13 @@ export function ConfirmationPageClient() {
                 <div>
                   <div className="text-sm text-[#022444]">Код бронирования</div>
                   <div className="text-2xl font-bold text-[#022444]">
-                    MOW2OLZ2024
+                    {bookingId}
                   </div>
                 </div>
-                <button className="rounded-lg bg-[#7B91FF] px-4 py-2 text-sm font-semibold text-white hover:bg-[#E16D32]">
+                <button 
+                  onClick={handleCopyBookingId}
+                  className="rounded-lg bg-[#7B91FF] px-4 py-2 text-sm font-semibold text-white hover:bg-[#E16D32] transition-colors"
+                >
                   Скопировать
                 </button>
               </div>
@@ -233,16 +260,16 @@ export function ConfirmationPageClient() {
                 <div className="flex justify-between">
                   <span className="text-[#022444]">Имя:</span>
                   <span className="font-medium text-[#022444]">
-                    Иван Петров
+                    {passengerName}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#022444]">Гражданство:</span>
-                  <span className="font-medium text-[#022444]">Россия</span>
+                  <span className="font-medium text-[#022444]">{passengerCitizenship}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#022444]">Дата рождения:</span>
-                  <span className="font-medium text-[#022444]">15.03.1990</span>
+                  <span className="font-medium text-[#022444]">{passengerBirthDate}</span>
                 </div>
               </div>
             </div>
