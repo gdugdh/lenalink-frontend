@@ -12,7 +12,7 @@ import { BookingsApiService } from "./services/bookings-api.service";
 import { CitiesApiService } from "./services/cities-api.service";
 
 const BACKEND_BASE_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"; // 'https://lena.linkpc.net';
+  process.env.NEXT_PUBLIC_BACKEND_URL || "https://lena.linkpc.net"; // 'https://lena.linkpc.net';
 
 // Типы для API
 export interface BackendUser {
