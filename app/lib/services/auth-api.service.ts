@@ -11,7 +11,7 @@ export class AuthApiService extends BaseApiService {
     email: string;
     password: string;
   }): Promise<BackendAuthResponse> {
-    const response = await this.request<BackendAuthResponse>('/api/register', {
+    const response = await this.request<BackendAuthResponse>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
