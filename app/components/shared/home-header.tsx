@@ -73,9 +73,9 @@ export function HomeHeader() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-[#022444] relative">
+            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center relative">
               <Image 
-                src="/logo.png" 
+                src="/logo.svg" 
                 alt="LenaLink Logo" 
                 width={32} 
                 height={32} 

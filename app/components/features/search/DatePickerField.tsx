@@ -35,11 +35,6 @@ export function DatePickerField({
           mode="single"
           selected={selectedDate}
           onSelect={onSelect}
-          disabled={(date) => {
-            const today = minDate || new Date();
-            today.setHours(0, 0, 0, 0);
-            return date < today;
-          }}
           initialFocus
         />
       </PopoverContent>
