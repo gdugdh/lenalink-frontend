@@ -2,7 +2,9 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.fast
+      args:
+        DOCKER_BUILDKIT: 1
     container_name: hack-the-ice-frontend
     restart: unless-stopped
     ports:
