@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import { UserDashboard } from './UserDashboard';
 import { AdminDashboard } from './AdminDashboard';
-import { PartnerDashboard } from './PartnerDashboard';
+import { EmployeeDashboard } from './EmployeeDashboard';
+import { AccountantDashboard } from './AccountantDashboard';
 import type { UserRole } from '@/app/lib/mockUsers';
 
 export function DashboardClient() {
@@ -30,7 +31,7 @@ export function DashboardClient() {
       }
 
       // Invalid role, redirect to home with login modal
-      if (!['user', 'admin', 'partner'].includes(session.user.role)) {
+      if (!['user', 'employee', 'accountant', 'admin'].includes(session.user.role)) {
         router.push('/?modal=login');
       }
     }
@@ -61,10 +62,12 @@ export function DashboardClient() {
   switch (session.user.role) {
     case 'user':
       return <UserDashboard />;
+    case 'employee':
+      return <EmployeeDashboard />;
+    case 'accountant':
+      return <AccountantDashboard />;
     case 'admin':
       return <AdminDashboard />;
-    case 'partner':
-      return <PartnerDashboard />;
     default:
       // Show loading state while redirecting
       return (

@@ -13,11 +13,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Only allow 'user' and 'partner' roles for registration
-    // 'admin' role should be assigned manually by existing admins
-    if (!['user', 'partner'].includes(role)) {
+    // Only allow 'user' and 'employee' roles for registration
+    // 'admin' and 'accountant' roles should be assigned manually by existing admins
+    if (!['user', 'employee'].includes(role)) {
       return NextResponse.json(
-        { message: 'Недопустимая роль. Доступны только роли: пользователь, партнёр' },
+        { message: 'Недопустимая роль. Доступны только роли: пользователь, сотрудник' },
         { status: 400 }
       );
     }
@@ -33,6 +33,9 @@ export async function POST(request: NextRequest) {
           role: user.role,
           name: user.name,
           balance: user.balance,
+          companyId: user.companyId,
+          companyName: user.companyName,
+          companyBalance: user.companyBalance,
         },
         expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
       };

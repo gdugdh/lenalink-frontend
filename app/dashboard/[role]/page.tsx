@@ -12,8 +12,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { role } = await params;
   const roleNames: Record<string, string> = {
     user: 'Пользователь',
+    employee: 'Сотрудник',
+    accountant: 'Бухгалтер',
     admin: 'Администратор',
-    partner: 'Партнёр',
   };
 
   return {
@@ -27,7 +28,7 @@ export default async function DashboardPage({ params }: Props) {
 
   // Validate role parameter independently of user authentication
   // This ensures invalid roles show 404 regardless of auth status
-  const validRoles: UserRole[] = ['user', 'admin', 'partner'];
+  const validRoles: UserRole[] = ['user', 'employee', 'accountant', 'admin'];
   if (!validRoles.includes(role as UserRole)) {
     notFound();
   }

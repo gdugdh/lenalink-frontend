@@ -31,6 +31,9 @@ export async function POST(request: NextRequest) {
         role: user.role,
         name: user.name,
         balance: user.balance,
+        companyId: user.companyId,
+        companyName: user.companyName,
+        companyBalance: user.companyBalance,
       },
       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     };

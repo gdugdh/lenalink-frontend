@@ -54,8 +54,9 @@ export function AdminDashboard() {
 
   const recentUsers = [
     { id: 1, name: 'Иван Иванов', email: 'user@example.com', role: 'user', status: 'active' },
-    { id: 2, name: 'Партнёр Компания', email: 'partner@example.com', role: 'partner', status: 'active' },
-    { id: 3, name: 'Новый пользователь', email: 'new@example.com', role: 'user', status: 'pending' },
+    { id: 2, name: 'Сотрудник Компании', email: 'employee@example.com', role: 'employee', status: 'active' },
+    { id: 3, name: 'Бухгалтер Компании', email: 'accountant@example.com', role: 'accountant', status: 'active' },
+    { id: 4, name: 'Новый пользователь', email: 'new@example.com', role: 'user', status: 'pending' },
   ];
 
   return (

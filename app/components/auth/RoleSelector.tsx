@@ -26,12 +26,12 @@ export function RoleSelector({ selectedRole, onRoleChange }: RoleSelectorProps) 
           </Label>
         </div>
         <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
-          <RadioGroupItem value="partner" id="modal-role-partner" />
-          <Label htmlFor="modal-role-partner" className="font-normal cursor-pointer flex-1">
+          <RadioGroupItem value="employee" id="modal-role-employee" />
+          <Label htmlFor="modal-role-employee" className="font-normal cursor-pointer flex-1">
             <div>
-              <div className="font-semibold">Партнёр</div>
+              <div className="font-semibold">Сотрудник</div>
               <div className="text-sm text-muted-foreground">
-                Предоставление транспортных услуг
+                Покупка билетов за счет корпоративного депозита, командировки
               </div>
             </div>
           </Label>

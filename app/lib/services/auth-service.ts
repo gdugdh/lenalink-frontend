@@ -46,6 +46,9 @@ export async function refreshUserSession(token: string): Promise<Session | null>
                 role: sessionData.user.role,
                 name: sessionData.user.name,
                 balance: sessionData.user.balance,
+                companyId: sessionData.user.companyId,
+                companyName: sessionData.user.companyName,
+                companyBalance: sessionData.user.companyBalance,
               },
               expiresAt: sessionData.expiresAt,
             };
@@ -116,6 +119,9 @@ export async function loginUser(email: string, password: string): Promise<Sessio
         role: data.session.user.role,
         name: data.session.user.name,
         balance: data.session.user.balance,
+        companyId: data.session.user.companyId,
+        companyName: data.session.user.companyName,
+        companyBalance: data.session.user.companyBalance,
       },
       expiresAt: data.session.expiresAt,
     };
@@ -211,6 +217,9 @@ export async function registerUser(
         role: data.session.user.role,
         name: data.session.user.name,
         balance: data.session.user.balance,
+        companyId: data.session.user.companyId,
+        companyName: data.session.user.companyName,
+        companyBalance: data.session.user.companyBalance,
       },
       expiresAt: data.session.expiresAt,
     };

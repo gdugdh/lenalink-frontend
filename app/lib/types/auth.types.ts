@@ -11,7 +11,10 @@ export interface Session {
     email: string;
     role: UserRole;
     name: string;
-    balance?: number;
+    balance?: number; // For user role
+    companyId?: string; // For employee and accountant roles
+    companyName?: string; // For employee and accountant roles
+    companyBalance?: number; // For accountant role
   };
   expiresAt: number;
 }

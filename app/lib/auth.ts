@@ -65,6 +65,7 @@ export async function registerMock(
     name,
     role,
     ...(role === 'user' && { balance: 0 }),
+    ...(role === 'employee' && { companyId: undefined, companyName: undefined }),
   };
 
   // In a real app, save to database
@@ -88,6 +89,9 @@ export async function createSession(user: MockUser): Promise<void> {
       role: user.role,
       name: user.name,
       balance: user.balance,
+      companyId: user.companyId,
+      companyName: user.companyName,
+      companyBalance: user.companyBalance,
     },
     expiresAt,
   };
