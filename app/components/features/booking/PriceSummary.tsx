@@ -12,7 +12,8 @@ export function PriceSummary() {
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
-    bookingState.seatType,
+    bookingState.seatSelections || [],
+    bookingState.includeInsurance || false,
     basePriceFromRoute
   );
 
@@ -37,11 +38,19 @@ export function PriceSummary() {
             </span>
           </div>
         )}
-        {priceBreakdown.seatFee > 0 && (
+        {priceBreakdown.totalSeatFees > 0 && (
           <div className="flex justify-between text-xs sm:text-sm">
-            <span className="text-[#022444]">1x место</span>
+            <span className="text-[#022444]">{bookingState.seatSelections?.length || 0}x место</span>
             <span className="font-medium text-[#022444]">
-              {priceBreakdown.seatFee.toLocaleString('ru-RU')}₽
+              {priceBreakdown.totalSeatFees.toLocaleString('ru-RU')}₽
+            </span>
+          </div>
+        )}
+        {priceBreakdown.insuranceFee > 0 && (
+          <div className="flex justify-between text-xs sm:text-sm">
+            <span className="text-[#022444]">1x страховка</span>
+            <span className="font-medium text-[#022444]">
+              {priceBreakdown.insuranceFee.toLocaleString('ru-RU')}₽
             </span>
           </div>
         )}

@@ -18,6 +18,7 @@ interface MapContainerProps {
 export function MapContainer({ center, zoom, markers, routeLine }: MapContainerProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const mapInstanceRef = useRef<any>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -26,6 +27,15 @@ export function MapContainer({ center, zoom, markers, routeLine }: MapContainerP
   useEffect(() => {
     if (!isMounted) return;
 
+    console.log('MapContainer: Initializing with', {
+      center,
+      zoom,
+      markers,
+      routeLine,
+      markersCount: markers.length,
+      routePointsCount: routeLine?.points.length,
+    });
+
     const initializeMap = () => {
       if (
         mapRef.current &&
@@ -33,13 +43,24 @@ export function MapContainer({ center, zoom, markers, routeLine }: MapContainerP
         (window as any).ymaps
       ) {
         (window as any).ymaps.ready(() => {
+          // Очищаем предыдущую карту если она есть
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.destroy();
+            mapInstanceRef.current = null;
+          }
+
           const map = new (window as any).ymaps.Map(mapRef.current, {
             center,
             zoom,
             controls: ['zoomControl'],
           });
 
-          if (routeLine) {
+          mapInstanceRef.current = map;
+
+          console.log('MapContainer: Map created', map);
+
+          if (routeLine && routeLine.points.length > 0) {
+            console.log('MapContainer: Adding route line', routeLine.points);
             const polyline = new (window as any).ymaps.Polyline(
               routeLine.points,
               {},
@@ -52,7 +73,8 @@ export function MapContainer({ center, zoom, markers, routeLine }: MapContainerP
             map.geoObjects.add(polyline);
           }
 
-          markers.forEach((marker) => {
+          markers.forEach((marker, index) => {
+            console.log(`MapContainer: Adding marker ${index}`, marker);
             const placemark = new (window as any).ymaps.Placemark(
               marker.position,
               {
@@ -61,6 +83,8 @@ export function MapContainer({ center, zoom, markers, routeLine }: MapContainerP
             );
             map.geoObjects.add(placemark);
           });
+
+          console.log('MapContainer: All objects added');
         });
       }
     };
@@ -78,6 +102,14 @@ export function MapContainer({ center, zoom, markers, routeLine }: MapContainerP
     script.async = true;
     script.onload = initializeMap;
     document.head.appendChild(script);
+
+    // Cleanup on unmount
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.destroy();
+        mapInstanceRef.current = null;
+      }
+    };
   }, [isMounted, center, zoom, markers, routeLine]);
 
   return (

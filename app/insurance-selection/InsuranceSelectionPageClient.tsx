@@ -22,16 +22,17 @@ export function InsuranceSelectionPageClient() {
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
-    bookingState.seatType,
+    bookingState.seatSelections || [],
+    bookingState.includeInsurance || false,
     basePriceFromRoute
   );
 
   // Рассчитываем цены для каждого тарифа для отображения
   const tariffPrices = {
-    tariff1: calculatePrice(bookingState.passengerType, 'tariff1', bookingState.seatType, basePriceFromRoute).total,
-    tariff2: calculatePrice(bookingState.passengerType, 'tariff2', bookingState.seatType, basePriceFromRoute).total,
-    tariff3: calculatePrice(bookingState.passengerType, 'tariff3', bookingState.seatType, basePriceFromRoute).total,
-    tariff4: calculatePrice(bookingState.passengerType, 'tariff4', bookingState.seatType, basePriceFromRoute).total,
+    tarif1: calculatePrice(bookingState.passengerType, 'tarif1', bookingState.seatSelections || [], false, basePriceFromRoute).total,
+    tarif2: calculatePrice(bookingState.passengerType, 'tarif2', bookingState.seatSelections || [], false, basePriceFromRoute).total,
+    tarif3: calculatePrice(bookingState.passengerType, 'tarif3', bookingState.seatSelections || [], false, basePriceFromRoute).total,
+    tarif4: calculatePrice(bookingState.passengerType, 'tarif4', bookingState.seatSelections || [], false, basePriceFromRoute).total,
   };
 
   return (
@@ -57,7 +58,7 @@ export function InsuranceSelectionPageClient() {
                 {/* Tariff 1 */}
                 <label
                   className={`cursor-pointer rounded-lg border-2 p-6 transition-all ${
-                    selectedPlan === "tariff1"
+                    selectedPlan === "tarif1"
                       ? "border-[#7B91FF] bg-orange-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
@@ -65,8 +66,8 @@ export function InsuranceSelectionPageClient() {
                   <input
                     type="radio"
                     name="plan"
-                    value="tariff1"
-                    checked={selectedPlan === "tariff1"}
+                    value="tarif1"
+                    checked={selectedPlan === "tarif1"}
                     onChange={(e) => setTariff(e.target.value as TariffType)}
                     className="sr-only"
                   />
@@ -74,7 +75,7 @@ export function InsuranceSelectionPageClient() {
                     <div className="mb-2 text-4xl">💼</div>
                     <h3 className="mb-1 font-bold text-[#022444]">Тариф 1</h3>
                     <div className="text-2xl font-bold text-[#7B91FF]">
-                      {tariffPrices.tariff1.toLocaleString('ru-RU')}₽
+                      {tariffPrices.tarif1.toLocaleString('ru-RU')}₽
                     </div>
                   </div>
                   <div className="space-y-2 text-xs">
@@ -106,7 +107,7 @@ export function InsuranceSelectionPageClient() {
                 {/* Tariff 2 */}
                 <label
                   className={`cursor-pointer rounded-lg border-2 p-6 transition-all ${
-                    selectedPlan === "tariff2"
+                    selectedPlan === "tarif2"
                       ? "border-[#7B91FF] bg-orange-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
@@ -114,8 +115,8 @@ export function InsuranceSelectionPageClient() {
                   <input
                     type="radio"
                     name="plan"
-                    value="tariff2"
-                    checked={selectedPlan === "tariff2"}
+                    value="tarif2"
+                    checked={selectedPlan === "tarif2"}
                     onChange={(e) => setTariff(e.target.value as TariffType)}
                     className="sr-only"
                   />
@@ -131,7 +132,7 @@ export function InsuranceSelectionPageClient() {
                     </div>
                     <h3 className="mb-1 font-bold text-[#022444]">Тариф 2</h3>
                     <div className="text-2xl font-bold text-[#7B91FF]">
-                      {tariffPrices.tariff2.toLocaleString('ru-RU')}₽
+                      {tariffPrices.tarif2.toLocaleString('ru-RU')}₽
                     </div>
                   </div>
                   <div className="space-y-2 text-xs">
@@ -162,7 +163,7 @@ export function InsuranceSelectionPageClient() {
                 {/* Tariff 3 */}
                 <label
                   className={`cursor-pointer rounded-lg border-2 p-6 transition-all ${
-                    selectedPlan === "tariff3"
+                    selectedPlan === "tarif3"
                       ? "border-[#7B91FF] bg-orange-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
@@ -170,8 +171,8 @@ export function InsuranceSelectionPageClient() {
                   <input
                     type="radio"
                     name="plan"
-                    value="tariff3"
-                    checked={selectedPlan === "tariff3"}
+                    value="tarif3"
+                    checked={selectedPlan === "tarif3"}
                     onChange={(e) => setTariff(e.target.value as TariffType)}
                     className="sr-only"
                   />
@@ -179,7 +180,7 @@ export function InsuranceSelectionPageClient() {
                     <div className="mb-2 text-4xl">🎯</div>
                     <h3 className="mb-1 font-bold text-[#022444]">Тариф 3</h3>
                     <div className="text-2xl font-bold text-[#7B91FF]">
-                      {tariffPrices.tariff3.toLocaleString('ru-RU')}₽
+                      {tariffPrices.tarif3.toLocaleString('ru-RU')}₽
                     </div>
                   </div>
                   <div className="space-y-2 text-xs">
@@ -210,7 +211,7 @@ export function InsuranceSelectionPageClient() {
                 {/* Tariff 4 */}
                 <label
                   className={`cursor-pointer rounded-lg border-2 p-6 transition-all ${
-                    selectedPlan === "tariff4"
+                    selectedPlan === "tarif4"
                       ? "border-[#7B91FF] bg-orange-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
@@ -218,8 +219,8 @@ export function InsuranceSelectionPageClient() {
                   <input
                     type="radio"
                     name="plan"
-                    value="tariff4"
-                    checked={selectedPlan === "tariff4"}
+                    value="tarif4"
+                    checked={selectedPlan === "tarif4"}
                     onChange={(e) => setTariff(e.target.value as TariffType)}
                     className="sr-only"
                   />
@@ -227,7 +228,7 @@ export function InsuranceSelectionPageClient() {
                     <div className="mb-2 text-4xl">🛡️</div>
                     <h3 className="mb-1 font-bold text-[#022444]">Тариф 4</h3>
                     <div className="text-2xl font-bold text-[#7B91FF]">
-                      {tariffPrices.tariff4.toLocaleString('ru-RU')}₽
+                      {tariffPrices.tarif4.toLocaleString('ru-RU')}₽
                     </div>
                   </div>
                   <div className="space-y-2 text-xs">

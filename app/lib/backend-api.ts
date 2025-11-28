@@ -2,16 +2,17 @@
  * Backend API Client для работы с LenaLink Backend API
  * Base URL: https://lena.linkpc.net
  * API endpoints: /api/v1/* (routes, bookings, cities) и /api/* (auth)
- * 
+ *
  * Этот файл теперь является фасадом, который объединяет все API сервисы
  */
 
-import { AuthApiService } from './services/auth-api.service';
-import { RoutesApiService } from './services/routes-api.service';
-import { BookingsApiService } from './services/bookings-api.service';
-import { CitiesApiService } from './services/cities-api.service';
+import { AuthApiService } from "./services/auth-api.service";
+import { RoutesApiService } from "./services/routes-api.service";
+import { BookingsApiService } from "./services/bookings-api.service";
+import { CitiesApiService } from "./services/cities-api.service";
 
-const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://lena.linkpc.net';
+const BACKEND_BASE_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"; // 'https://lena.linkpc.net';
 
 // Типы для API
 export interface BackendUser {
@@ -35,7 +36,7 @@ export interface City {
 
 export interface RouteSegment {
   id: string;
-  transport_type: 'air' | 'rail' | 'bus' | 'river' | 'taxi' | 'walk';
+  transport_type: "air" | "rail" | "bus" | "river" | "taxi" | "walk";
   provider: string;
   from: {
     id: string;
@@ -62,18 +63,18 @@ export interface RouteSegment {
 
 export interface Route {
   id: string;
-  type: 'optimal' | 'fastest' | 'cheapest';
+  type: "optimal" | "fastest" | "cheapest";
   segments: RouteSegment[];
   total_price: number;
   total_distance: number;
   total_duration: string;
   reliability_score: number;
   geojson?: {
-    type: 'FeatureCollection';
+    type: "FeatureCollection";
     features: Array<{
-      type: 'Feature';
+      type: "Feature";
       geometry: {
-        type: 'LineString';
+        type: "LineString";
         coordinates: number[][];
       };
       properties: {
@@ -144,7 +145,7 @@ export interface BookingRequest {
   route_id: string;
   passenger: Passenger;
   include_insurance?: boolean;
-  payment_method: 'card' | 'yookassa' | 'cloudpay' | 'sberpay';
+  payment_method: "card" | "yookassa" | "cloudpay" | "sberpay";
 }
 
 export interface BookingSegment {
@@ -173,7 +174,14 @@ export interface BookingSegment {
 export interface Booking {
   id: string;
   route_id: string;
-  status: 'pending' | 'pending_payment' | 'in_progress' | 'completed' | 'failed' | 'cancelled' | 'refunded';
+  status:
+    | "pending"
+    | "pending_payment"
+    | "in_progress"
+    | "completed"
+    | "failed"
+    | "cancelled"
+    | "refunded";
   passenger: {
     first_name: string;
     last_name: string;
@@ -212,7 +220,7 @@ class BackendApiClient {
     this.routesApi = new RoutesApiService(baseURL);
     this.bookingsApi = new BookingsApiService(baseURL);
     this.citiesApi = new CitiesApiService(baseURL);
-    }
+  }
 
   // Управление токеном - синхронизируем между всеми сервисами
   setToken(token: string | null) {
@@ -224,7 +232,7 @@ class BackendApiClient {
 
   getToken(): string | null {
     return this.authApi.getToken();
-        }
+  }
 
   // Auth endpoints - делегируем AuthApiService
   async register(data: {
@@ -234,7 +242,7 @@ class BackendApiClient {
   }): Promise<BackendAuthResponse> {
     const response = await this.authApi.register(data);
     // Синхронизируем токен со всеми сервисами
-      this.setToken(response.token);
+    this.setToken(response.token);
     return response;
   }
 
@@ -244,7 +252,7 @@ class BackendApiClient {
   }): Promise<BackendAuthResponse> {
     const response = await this.authApi.login(data);
     // Синхронизируем токен со всеми сервисами
-      this.setToken(response.token);
+    this.setToken(response.token);
     return response;
   }
 
@@ -296,14 +304,10 @@ class BackendApiClient {
     return this.bookingsApi.getAllBookings(params);
   }
 
-  async cancelBooking(
-    bookingId: string,
-    reason: string
-  ): Promise<Booking> {
+  async cancelBooking(bookingId: string, reason: string): Promise<Booking> {
     return this.bookingsApi.cancelBooking(bookingId, reason);
   }
 }
 
 // Экспортируем singleton instance
 export const backendApi = new BackendApiClient(BACKEND_BASE_URL);
-
