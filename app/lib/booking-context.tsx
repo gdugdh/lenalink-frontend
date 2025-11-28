@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import type { RouteData } from '@/app/components/features/search/SearchResults';
 
 export type PassengerType = 'adult' | 'child' | 'infant';
@@ -52,42 +52,42 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     bookingId: null,
   });
 
-  const setPassengerType = (type: PassengerType) => {
+  const setPassengerType = useCallback((type: PassengerType) => {
     setBookingState((prev) => ({ ...prev, passengerType: type }));
-  };
+  }, []);
 
-  const setTariff = (tariff: TariffType) => {
+  const setTariff = useCallback((tariff: TariffType) => {
     setBookingState((prev) => ({ ...prev, tariff }));
-  };
+  }, []);
 
-  const setSeatType = (seat: SeatType) => {
+  const setSeatType = useCallback((seat: SeatType) => {
     setBookingState((prev) => ({ ...prev, seatType: seat }));
-  };
+  }, []);
 
-  const setSelectedRoute = (route: RouteData | null) => {
+  const setSelectedRoute = useCallback((route: RouteData | null) => {
     setBookingState((prev) => ({ ...prev, selectedRoute: route }));
-  };
+  }, []);
 
-  const setPassengerData = (data: PassengerData | null) => {
+  const setPassengerData = useCallback((data: PassengerData | null) => {
     setBookingState((prev) => ({ ...prev, passengerData: data }));
-  };
+  }, []);
 
-  const setBookingId = (id: string | null) => {
+  const setBookingId = useCallback((id: string | null) => {
     setBookingState((prev) => ({ ...prev, bookingId: id }));
-  };
+  }, []);
+
+  const value = useMemo(() => ({
+    bookingState,
+    setPassengerType,
+    setTariff,
+    setSeatType,
+    setSelectedRoute,
+    setPassengerData,
+    setBookingId,
+  }), [bookingState, setPassengerType, setTariff, setSeatType, setSelectedRoute, setPassengerData, setBookingId]);
 
   return (
-    <BookingContext.Provider
-      value={{
-        bookingState,
-        setPassengerType,
-        setTariff,
-        setSeatType,
-        setSelectedRoute,
-        setPassengerData,
-        setBookingId,
-      }}
-    >
+    <BookingContext.Provider value={value}>
       {children}
     </BookingContext.Provider>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Heart, Share2, Clock, Plane } from 'lucide-react';
 
 interface RouteCardProps {
@@ -21,7 +22,7 @@ interface RouteCardProps {
   showClock?: boolean;
 }
 
-export function RouteCard({
+export const RouteCard = React.memo(function RouteCard({
   badge,
   price,
   priceDetails,
@@ -142,5 +143,5 @@ export function RouteCard({
       </div>
     </div>
   );
-}
+});
 

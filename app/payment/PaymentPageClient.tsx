@@ -5,21 +5,14 @@ import { Button } from "@/app/components/ui/button";
 import { UnifiedHeader } from "@/app/components/shared/unified-header";
 import { PageLoader } from "@/app/components/shared/page-loader";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { routes } from "@/app/lib/routes";
 import { useBooking } from "@/app/lib/booking-context";
 import { calculatePrice, getPassengerTypeLabel, getTariffName, getSeatName, extractPriceFromRoute } from "@/app/lib/price-calculator";
-import { backendApi } from "@/app/lib/backend-api";
-import { useAuth } from "@/app/context/AuthContext";
-import { useToast } from "@/app/hooks/use-toast";
+import { usePaymentMethod } from "@/app/hooks/use-payment-method";
+import { useCreateBooking } from "@/app/hooks/use-create-booking";
 
 export function PaymentPageClient() {
   const router = useRouter();
-  const { toast } = useToast();
-  const { session } = useAuth();
-  const [selectedPayment, setSelectedPayment] = useState<string>("card");
-  const [isCreatingBooking, setIsCreatingBooking] = useState(false);
-  const { bookingState, setBookingId } = useBooking();
+  const { bookingState } = useBooking();
   const basePriceFromRoute = extractPriceFromRoute(bookingState.selectedRoute);
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
@@ -28,87 +21,11 @@ export function PaymentPageClient() {
     basePriceFromRoute
   );
 
-  const handlePayment = async () => {
-    // Проверяем что все данные есть
-    if (!bookingState.selectedRoute) {
-      toast({
-        title: 'Ошибка',
-        description: 'Маршрут не выбран',
-        variant: 'destructive',
-      });
-      return;
-    }
+  // Управление способом оплаты
+  const { selectedPayment, setSelectedPayment, paymentMethodMap } = usePaymentMethod();
 
-    if (!bookingState.passengerData) {
-      toast({
-        title: 'Ошибка',
-        description: 'Данные пассажира не заполнены',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (!session) {
-      toast({
-        title: 'Ошибка',
-        description: 'Необходимо войти в систему для создания бронирования',
-        variant: 'destructive',
-      });
-      router.push('/?modal=login');
-      return;
-    }
-
-    setIsCreatingBooking(true);
-
-    try {
-      // Преобразуем данные пассажира в формат API
-      const birthDate = `${bookingState.passengerData.birthYear}-${bookingState.passengerData.birthMonth.padStart(2, '0')}-${bookingState.passengerData.birthDay.padStart(2, '0')}`;
-      
-      // Преобразуем payment_method
-      const paymentMethodMap: Record<string, 'card' | 'yookassa' | 'cloudpay' | 'sberpay'> = {
-        card: 'card',
-        yookassa: 'yookassa',
-        cloudpay: 'cloudpay',
-        sberpay: 'sberpay',
-      };
-
-      const bookingRequest = {
-        route_id: bookingState.selectedRoute.id,
-        passenger: {
-          first_name: bookingState.passengerData.firstName,
-          last_name: bookingState.passengerData.lastName,
-          middle_name: bookingState.passengerData.middleName || '',
-          date_of_birth: birthDate,
-          passport_number: bookingState.passengerData.passportNumber || '0000 000000', // Заглушка, если не указан
-          email: bookingState.passengerData.email || session.user.email,
-          phone: bookingState.passengerData.phone || '+79000000000', // Заглушка, если не указан
-        },
-        include_insurance: bookingState.tariff !== 'tariff1', // Включаем страховку если не базовый тариф
-        payment_method: paymentMethodMap[selectedPayment] || 'card',
-      };
-
-      const booking = await backendApi.createBooking(bookingRequest);
-      
-      // Сохраняем ID бронирования
-      setBookingId(booking.id);
-
-      toast({
-        title: 'Бронирование создано',
-        description: 'Ваше бронирование успешно создано',
-      });
-
-      router.push(routes.confirmation);
-    } catch (error) {
-      console.error('Error creating booking:', error);
-      toast({
-        title: 'Ошибка создания бронирования',
-        description: error instanceof Error ? error.message : 'Не удалось создать бронирование',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsCreatingBooking(false);
-    }
-  };
+  // Создание бронирования
+  const { createBooking, isCreatingBooking } = useCreateBooking(selectedPayment, paymentMethodMap);
 
   return (
     <>
@@ -438,7 +355,7 @@ export function PaymentPageClient() {
                   Назад
                 </Button>
                 <Button
-                  onClick={handlePayment}
+                  onClick={createBooking}
                   disabled={isCreatingBooking}
                   className="bg-[#7B91FF] hover:bg-[#E16D32] px-8"
                 >

@@ -7,7 +7,10 @@ import { GlobalLoader } from "./components/shared/global-loader";
 import { Toaster } from "./components/ui/toaster";
 import "./globals.css";
 
-const geist = Geist({ subsets: ["latin"] });
+const geist = Geist({ 
+  subsets: ["latin"],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: "lena link",

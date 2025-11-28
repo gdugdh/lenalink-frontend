@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Search, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import Link from 'next/link';
-import { cities, extractCityName, getPopularCities } from '@/app/lib/cities';
+import { extractCityName } from '@/app/lib/cities';
+import { useCitySearch } from '@/app/hooks/use-city-search';
 
 interface HomeSearchFormProps {
   from?: string;
@@ -16,8 +17,6 @@ interface HomeSearchFormProps {
 export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
   const [fromValue, setFromValue] = useState(from);
   const [toValue, setToValue] = useState(to);
-  const [fromSuggestions, setFromSuggestions] = useState<string[]>([]);
-  const [toSuggestions, setToSuggestions] = useState<string[]>([]);
   const [showFromSuggestions, setShowFromSuggestions] = useState(false);
   const [showToSuggestions, setShowToSuggestions] = useState(false);
   const fromInputRef = useRef<HTMLInputElement>(null);
@@ -25,101 +24,74 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
   const fromSuggestionsRef = useRef<HTMLDivElement>(null);
   const toSuggestionsRef = useRef<HTMLDivElement>(null);
 
-
-  // Фильтрация городов по введенному тексту, исключая уже выбранный город из другого поля
-  // Если запрос пустой, возвращает популярные города
-  const filterCities = (query: string, excludeCity?: string): string[] => {
-    if (!query.trim()) {
-      // Если поле пустое, показываем популярные города
-      return getPopularCities(5, excludeCity);
-    }
-    const lowerQuery = query.toLowerCase();
-    const excludeCityName = excludeCity ? extractCityName(excludeCity).toLowerCase() : '';
-    
-    return cities
-      .filter(city => {
-        const cityLower = city.toLowerCase();
-        const cityName = extractCityName(city).toLowerCase();
-        // Исключаем город, если он уже выбран в другом поле
-        if (excludeCityName && cityName === excludeCityName) {
-          return false;
-        }
-        return cityLower.includes(lowerQuery);
-      })
-      .slice(0, 5); // Показываем максимум 5 результатов
-  };
-
-  // Проверка, является ли значение валидным городом из списка
-  const isValidCity = (value: string): boolean => {
-    if (!value.trim()) return false;
-    return cities.some(city => city.toLowerCase() === value.toLowerCase());
-  };
+  // Используем хуки для поиска городов
+  const fromSearch = useCitySearch(fromValue, toValue);
+  const toSearch = useCitySearch(toValue, fromValue);
+  
+  const fromSuggestions = fromSearch.suggestions;
+  const toSuggestions = toSearch.suggestions;
 
   // Обработка изменения поля "Откуда"
-  const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFromChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFromValue(value);
-    const suggestions = filterCities(value, toValue);
-    setFromSuggestions(suggestions);
     // Показываем меню, если есть ввод или если поле пустое (для популярных городов)
     setShowFromSuggestions(true);
-  };
+  }, []);
 
   // Обработка изменения поля "Куда"
-  const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleToChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setToValue(value);
-    const suggestions = filterCities(value, fromValue);
-    setToSuggestions(suggestions);
     // Показываем меню, если есть ввод или если поле пустое (для популярных городов)
     setShowToSuggestions(true);
-  };
+  }, []);
 
   // Обработка клавиатуры для поля "Откуда"
-  const handleFromKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleFromKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
       setShowFromSuggestions(false);
-    } else if (e.key === 'ArrowDown' && fromSuggestions.length > 0) {
+    } else if (e.key === 'ArrowDown' && fromSearch.suggestions.length > 0) {
       e.preventDefault();
       setShowFromSuggestions(true);
     }
-  };
+  }, [fromSearch.suggestions]);
 
   // Обработка клавиатуры для поля "Куда"
-  const handleToKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleToKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
       setShowToSuggestions(false);
-    } else if (e.key === 'ArrowDown' && toSuggestions.length > 0) {
+    } else if (e.key === 'ArrowDown' && toSearch.suggestions.length > 0) {
       e.preventDefault();
       setShowToSuggestions(true);
     }
-  };
+  }, [toSearch.suggestions]);
 
   // Выбор города из списка для "Откуда"
-  const handleFromSelect = (city: string) => {
+  const handleFromSelect = useCallback((city: string) => {
     setFromValue(city);
-    setFromSuggestions([]);
     setShowFromSuggestions(false);
     fromInputRef.current?.blur();
-  };
+  }, []);
 
   // Выбор города из списка для "Куда"
-  const handleToSelect = (city: string) => {
+  const handleToSelect = useCallback((city: string) => {
     setToValue(city);
-    setToSuggestions([]);
     setShowToSuggestions(false);
     toInputRef.current?.blur();
-  };
+  }, []);
 
   // Обмен местами значений
-  const handleSwap = () => {
-    const temp = fromValue;
-    setFromValue(toValue);
-    setToValue(temp);
+  const handleSwap = useCallback(() => {
+    setFromValue((prevFrom) => {
+      const currentTo = toValue;
+      setToValue(prevFrom);
+      return currentTo;
+    });
     // Закрываем выпадающие меню при обмене
     setShowFromSuggestions(false);
     setShowToSuggestions(false);
-  };
+  }, [toValue]);
 
   // Закрытие выпадающих меню при клике вне их
   useEffect(() => {
@@ -149,10 +121,10 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
   }, []);
 
   // Проверка валидности формы
-  const isFormValid = isValidCity(fromValue) && isValidCity(toValue);
+  const isFormValid = useMemo(() => fromSearch.isValid && toSearch.isValid, [fromSearch.isValid, toSearch.isValid]);
 
   // Формирование URL для поиска
-  const searchUrl = `/search?from=${encodeURIComponent(fromValue)}&to=${encodeURIComponent(toValue)}`;
+  const searchUrl = useMemo(() => `/search?from=${encodeURIComponent(fromValue)}&to=${encodeURIComponent(toValue)}`, [fromValue, toValue]);
 
   return (
     <div className="w-full max-w-md">
@@ -170,8 +142,6 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
                 onChange={handleFromChange}
                 onKeyDown={handleFromKeyDown}
                 onFocus={() => {
-                  const suggestions = filterCities(fromValue, toValue);
-                  setFromSuggestions(suggestions);
                   setShowFromSuggestions(true);
                 }}
                 placeholder="Откуда"
@@ -226,8 +196,6 @@ export function HomeSearchForm({ from = '', to = '' }: HomeSearchFormProps) {
                 onChange={handleToChange}
                 onKeyDown={handleToKeyDown}
                 onFocus={() => {
-                  const suggestions = filterCities(toValue, fromValue);
-                  setToSuggestions(suggestions);
                   setShowToSuggestions(true);
                 }}
                 placeholder="Куда"

@@ -16,6 +16,7 @@ import { routes } from '@/app/lib/routes';
 import { useRouter } from 'next/navigation';
 import { useBooking, type PassengerType, type PassengerData } from '@/app/lib/booking-context';
 import { useAuth } from '@/app/context/AuthContext';
+import { validatePassengerData } from '@/app/lib/validation/passenger-validation';
 
 export function BookingForm() {
   const router = useRouter();
@@ -80,8 +81,9 @@ export function BookingForm() {
     e.preventDefault();
     
     // Валидация
-    if (!formData.firstName || !formData.lastName || !formData.citizenship || !formData.gender || 
-        !formData.birthDay || !formData.birthMonth || !formData.birthYear) {
+    const validation = validatePassengerData(formData);
+    if (!validation.isValid) {
+      // Можно показать ошибки пользователю
       return;
     }
     

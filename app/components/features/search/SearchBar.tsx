@@ -340,10 +340,10 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
     <div className="border-b bg-white overflow-x-hidden">
       <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 max-w-7xl">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 justify-center">
-          <div className="flex items-center gap-1 sm:gap-2 rounded-lg border border-gray-300 bg-white text-[#022444] overflow-x-auto scrollbar-hide w-full sm:w-auto">
-            <div className="flex flex-1 min-w-[120px] items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative">
+          <div className="flex items-center gap-0 sm:gap-2 rounded-lg border border-gray-300 bg-white text-[#022444] overflow-x-auto scrollbar-hide w-full sm:w-auto shrink-0" style={{ height: '48px' }}>
+            <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative shrink-0" style={{ height: '48px', width: '120px', minWidth: '120px', maxWidth: '120px' }}>
               {isEditingFrom ? (
-                <div className="flex-1 min-w-0 relative">
+                <div className="flex-1 min-w-0 relative flex flex-col justify-center h-full w-full">
                   <input
                     ref={fromInputRef}
                     type="text"
@@ -358,8 +358,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                         setTimeout(updateFromSuggestionsPosition, 0);
                       }
                     }}
-                    className="w-full text-xs sm:text-sm font-medium text-[#022444] bg-transparent border-none outline-none"
+                    className="w-full text-xs sm:text-sm font-medium text-[#022444] bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none p-0 m-0"
                     placeholder="Откуда"
+                    style={{ boxSizing: 'border-box' }}
                   />
                   <div className="text-xs text-[#022444]">{currentFromCode}</div>
                   {showFromSuggestions && fromValue.trim().length > 0 && (
@@ -369,7 +370,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                       style={{
                         top: `${fromSuggestionsPosition.top}px`,
                         left: `${fromSuggestionsPosition.left}px`,
-                        width: `${fromSuggestionsPosition.width}px`,
+                        width: '120px',
+                        minWidth: '120px',
+                        maxWidth: '120px',
                       }}
                     >
                       {fromSuggestions.length > 0 ? (
@@ -401,16 +404,17 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                   </div>
                   <button 
                     onClick={handleFromClick}
-                    className="rounded-full p-1 hover:bg-gray-100 shrink-0"
+                    className="rounded-full p-1 hover:bg-gray-100 shrink-0 focus:outline-none focus:ring-0 focus:scale-100 active:scale-100 transition-none"
+                    style={{ boxSizing: 'border-box' }}
                   >
                     <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-[#022444]" />
                   </button>
                 </>
               )}
             </div>
-            <div className="flex flex-1 min-w-[120px] items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative">
+            <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 relative shrink-0" style={{ height: '48px', width: '120px', minWidth: '120px', maxWidth: '120px' }}>
               {isEditingTo ? (
-                <div className="flex-1 min-w-0 relative">
+                <div className="flex-1 min-w-0 relative flex flex-col justify-center h-full w-full">
                   <input
                     ref={toInputRef}
                     type="text"
@@ -425,8 +429,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                         setTimeout(updateToSuggestionsPosition, 0);
                       }
                     }}
-                    className="w-full text-xs sm:text-sm font-medium text-[#022444] bg-transparent border-none outline-none"
+                    className="w-full text-xs sm:text-sm font-medium text-[#022444] bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-none p-0 m-0"
                     placeholder="Куда"
+                    style={{ boxSizing: 'border-box' }}
                   />
                   <div className="text-xs text-[#022444]">{currentToCode}</div>
                   {showToSuggestions && toValue.trim().length > 0 && (
@@ -436,7 +441,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                       style={{
                         top: `${toSuggestionsPosition.top}px`,
                         left: `${toSuggestionsPosition.left}px`,
-                        width: `${toSuggestionsPosition.width}px`,
+                        width: '120px',
+                        minWidth: '120px',
+                        maxWidth: '120px',
                       }}
                     >
                       {toSuggestions.length > 0 ? (
@@ -469,9 +476,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
             </div>
             <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
               <PopoverTrigger asChild>
-                <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 shrink-0 cursor-pointer hover:bg-gray-50 transition-colors">
+                <div className="flex items-center border-r px-2 sm:px-4 py-2 sm:py-3 shrink-0 cursor-pointer hover:bg-gray-50 transition-colors focus:outline-none focus:ring-0" style={{ height: '48px', minWidth: '90px', width: 'auto', flexShrink: 0 }}>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs sm:text-sm font-medium text-[#022444]">
+                    <div className="text-xs sm:text-sm font-medium text-[#022444] whitespace-nowrap truncate">
                       {formatDate(selectedDate)}
                     </div>
                   </div>
@@ -493,9 +500,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
             </Popover>
             <Popover open={isReturnDatePickerOpen} onOpenChange={setIsReturnDatePickerOpen}>
               <PopoverTrigger asChild>
-                <div className="hidden sm:flex items-center px-2 sm:px-4 py-2 sm:py-3 shrink-0 cursor-pointer hover:bg-gray-50 transition-colors">
-                  <div className="flex-1">
-                    <div className="text-xs sm:text-sm font-medium text-[#022444]">
+                <div className="flex items-center px-2 sm:px-4 py-2 sm:py-3 shrink-0 cursor-pointer hover:bg-gray-50 transition-colors focus:outline-none focus:ring-0" style={{ height: '48px', minWidth: '90px', width: 'auto', flexShrink: 0 }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-medium text-[#022444] whitespace-nowrap truncate">
                       {selectedReturnDate ? formatDate(selectedReturnDate) : 'Обратно'}
                     </div>
                   </div>
@@ -528,9 +535,9 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
                 )}
               </PopoverContent>
             </Popover>
-            <div className="flex items-center border-l px-2 sm:px-4 py-2 sm:py-3 shrink-0">
+            <div className="flex items-center border-l px-2 sm:px-4 py-2 sm:py-3 shrink-0" style={{ height: '48px', minWidth: '90px', width: 'auto', flexShrink: 0 }}>
               <div className="flex-1 min-w-0">
-                <div className="text-xs sm:text-sm font-medium text-[#022444]">
+                <div className="text-xs sm:text-sm font-medium text-[#022444] whitespace-nowrap truncate">
                   1 пассажир
                 </div>
                 <div className="text-xs text-[#022444] hidden sm:block">Эконом</div>
@@ -539,7 +546,8 @@ export function SearchBar({ fromCity = 'Москва', fromCode = 'MOW', toCity 
           </div>
           <button 
             onClick={handleSearchClick}
-            className="rounded-lg bg-[#7B91FF] px-4 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-white hover:bg-[#E16D32] w-full sm:w-auto transition-colors"
+            className="rounded-lg bg-[#7B91FF] px-4 sm:px-8 text-sm sm:text-base font-medium text-white hover:bg-[#E16D32] w-full sm:w-auto transition-colors focus:outline-none focus:ring-0 focus:scale-100 active:scale-100 shrink-0"
+            style={{ boxSizing: 'border-box', height: '48px' }}
           >
             Найти билеты
           </button>

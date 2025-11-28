@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { RouteCard } from './RouteCard';
 
 export interface RouteData {
@@ -27,7 +28,7 @@ interface SearchResultsProps {
   loading?: boolean;
 }
 
-export function SearchResults({ routes = [], onRouteClick, loading = false }: SearchResultsProps) {
+export const SearchResults = React.memo(function SearchResults({ routes = [], onRouteClick, loading = false }: SearchResultsProps) {
   // Показываем спиннер во время загрузки
   if (loading) {
     return (
@@ -80,5 +81,5 @@ export function SearchResults({ routes = [], onRouteClick, loading = false }: Se
       </div>
     </main>
   );
-}
+});
 

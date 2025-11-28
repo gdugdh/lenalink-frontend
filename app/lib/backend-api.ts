@@ -2,7 +2,14 @@
  * Backend API Client для работы с LenaLink Backend API
  * Base URL: https://lena.linkpc.net
  * API endpoints: /api/v1/* (routes, bookings, cities) и /api/* (auth)
+ * 
+ * Этот файл теперь является фасадом, который объединяет все API сервисы
  */
+
+import { AuthApiService } from './services/auth-api.service';
+import { RoutesApiService } from './services/routes-api.service';
+import { BookingsApiService } from './services/bookings-api.service';
+import { CitiesApiService } from './services/cities-api.service';
 
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://lena.linkpc.net';
 
@@ -195,187 +202,39 @@ export interface Booking {
 }
 
 class BackendApiClient {
-  private baseURL: string;
-  private token: string | null = null;
+  private authApi: AuthApiService;
+  private routesApi: RoutesApiService;
+  private bookingsApi: BookingsApiService;
+  private citiesApi: CitiesApiService;
 
   constructor(baseURL: string) {
-    this.baseURL = baseURL;
-    // Загружаем токен из localStorage при инициализации
-    if (typeof window !== 'undefined') {
-      this.token = localStorage.getItem('backend_token');
-    }
+    this.authApi = new AuthApiService(baseURL);
+    this.routesApi = new RoutesApiService(baseURL);
+    this.bookingsApi = new BookingsApiService(baseURL);
+    this.citiesApi = new CitiesApiService(baseURL);
   }
 
+  // Управление токеном - синхронизируем между всеми сервисами
   setToken(token: string | null) {
-    this.token = token;
-    if (typeof window !== 'undefined') {
-      if (token) {
-        localStorage.setItem('backend_token', token);
-      } else {
-        localStorage.removeItem('backend_token');
-      }
-    }
+    this.authApi.setToken(token);
+    this.routesApi.setToken(token);
+    this.bookingsApi.setToken(token);
+    this.citiesApi.setToken(token);
   }
 
   getToken(): string | null {
-    return this.token;
+    return this.authApi.getToken();
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...(this.token && { Authorization: `Bearer ${this.token}` }),
-      ...options.headers,
-    };
-
-    const config: RequestInit = {
-      ...options,
-      headers,
-    };
-
-    try {
-      let response: Response;
-      try {
-        response = await fetch(url, config);
-      } catch (fetchError) {
-        // Обработка сетевых ошибок (CORS, недоступный сервер и т.д.)
-        let errorMessage = 'Неизвестная ошибка сети';
-        
-        if (fetchError instanceof Error) {
-          errorMessage = fetchError.message;
-        } else if (typeof fetchError === 'string') {
-          errorMessage = fetchError;
-        } else if (fetchError && typeof fetchError === 'object') {
-          // Пытаемся извлечь сообщение из объекта ошибки
-          errorMessage = (fetchError as any).message || (fetchError as any).toString() || 'Ошибка сети';
-        }
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Network error (fetch failed):', {
-            url: url,
-            endpoint: endpoint,
-            method: options.method || 'GET',
-            error: errorMessage,
-            errorType: fetchError instanceof Error ? fetchError.constructor.name : typeof fetchError,
-            errorString: String(fetchError),
-          });
-        }
-
-        // Определяем тип ошибки и выбрасываем понятное сообщение
-        if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError') || errorMessage === 'Failed to fetch') {
-          throw new Error('Не удалось подключиться к серверу. Проверьте подключение к интернету или попробуйте позже.');
-        } else if (errorMessage.includes('CORS')) {
-          throw new Error('Ошибка CORS. Сервер не разрешает запросы с этого домена.');
-        } else {
-          throw new Error(`Ошибка сети: ${errorMessage}`);
-        }
-      }
-
-      // Обработка ошибок HTTP
-      if (!response.ok) {
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch {
-          // Если ответ не JSON, создаем объект ошибки
-          errorData = {
-            error: {
-              code: 'HTTP_ERROR',
-              message: `HTTP ${response.status}: ${response.statusText}`,
-            },
-          };
-        }
-
-        // Извлекаем сообщение об ошибке
-        const errorMessage = errorData.error?.message || 
-                            errorData.message || 
-                            `HTTP error! status: ${response.status}`;
-
-        // Логируем ошибку только в режиме разработки
-        if (process.env.NODE_ENV === 'development') {
-          console.error('API request failed:', {
-            url: url,
-            endpoint: endpoint,
-            method: options.method || 'GET',
-            status: response.status,
-            statusText: response.statusText,
-            error: errorMessage,
-            errorData: errorData,
-          });
-        }
-
-        throw new Error(errorMessage);
-      }
-
-      // Парсинг JSON ответа
-      try {
-        return await response.json();
-      } catch (jsonError) {
-        // Ошибка парсинга JSON
-        if (process.env.NODE_ENV === 'development') {
-          console.error('JSON parse error:', {
-            url: url,
-            endpoint: endpoint,
-            method: options.method || 'GET',
-            status: response.status,
-            error: jsonError instanceof Error ? jsonError.message : String(jsonError),
-          });
-        }
-        throw new Error('Сервер вернул некорректный ответ. Попробуйте позже.');
-      }
-    } catch (error) {
-      // Если это уже наша обработанная ошибка, просто пробрасываем её
-      if (error instanceof Error) {
-        // Проверяем, не является ли это уже обработанной ошибкой
-        const processedErrors = [
-          'Не удалось подключиться к серверу',
-          'Ошибка CORS',
-          'Ошибка сети',
-          'Сервер вернул некорректный ответ',
-        ];
-        
-        if (processedErrors.some(msg => error.message.includes(msg))) {
-          throw error;
-        }
-        
-        // Если это ошибка из обработки HTTP, тоже пробрасываем
-        if (error.message.includes('HTTP error') || error.message.length > 0) {
-          throw error;
-        }
-      }
-      
-      // Иначе это необработанная ошибка
-      if (process.env.NODE_ENV === 'development') {
-        console.error('API request failed (unhandled error):', {
-          url: url,
-          endpoint: endpoint,
-          method: options.method || 'GET',
-          error: error instanceof Error ? error.message : String(error),
-          errorObject: error,
-        });
-      }
-      throw new Error('Произошла ошибка при выполнении запроса');
-    }
-  }
-
-  // Auth endpoints
+  // Auth endpoints - делегируем AuthApiService
   async register(data: {
     name: string;
     email: string;
     password: string;
   }): Promise<BackendAuthResponse> {
-    const response = await this.request<BackendAuthResponse>('/api/register', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    // Сохраняем токен
-    if (response.token) {
-      this.setToken(response.token);
-    }
+    const response = await this.authApi.register(data);
+    // Синхронизируем токен со всеми сервисами
+    this.setToken(response.token);
     return response;
   }
 
@@ -383,83 +242,65 @@ class BackendApiClient {
     email: string;
     password: string;
   }): Promise<BackendAuthResponse> {
-    const response = await this.request<BackendAuthResponse>('/api/login', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    // Сохраняем токен
-    if (response.token) {
-      this.setToken(response.token);
-    }
+    const response = await this.authApi.login(data);
+    // Синхронизируем токен со всеми сервисами
+    this.setToken(response.token);
     return response;
   }
 
-  // Health check
+  // Health check - делегируем RoutesApiService
   async healthCheck(): Promise<{
     status: string;
     version: string;
     timestamp: string;
   }> {
-    return this.request('/api/v1/health');
+    return this.routesApi.healthCheck();
   }
 
-  // Cities
+  // Cities - делегируем CitiesApiService
   async searchCities(name: string): Promise<{ cities: City[] }> {
-    return this.request(`/api/v1/cities?name=${encodeURIComponent(name)}`);
+    return this.citiesApi.searchCities(name);
   }
 
-  // Routes
+  // Routes - делегируем RoutesApiService
   async searchRoutes(params: {
     from: string;
     to: string;
     departure_date: string;
     passengers?: number;
   }): Promise<RoutesSearchResponse> {
-    return this.request('/api/v1/routes/search', {
-      method: 'POST',
-      body: JSON.stringify(params),
-    });
+    return this.routesApi.searchRoutes(params);
   }
 
   async getRouteDetails(routeId: string): Promise<RouteDetailsResponse> {
-    return this.request(`/api/v1/routes/${routeId}`);
+    return this.routesApi.getRouteDetails(routeId);
   }
 
-  // Bookings
+  // Bookings - делегируем BookingsApiService
   async createBooking(data: BookingRequest): Promise<Booking> {
-    return this.request('/api/v1/bookings', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    return this.bookingsApi.createBooking(data);
   }
 
   async getBooking(bookingId: string): Promise<Booking> {
-    return this.request(`/api/v1/bookings/${bookingId}`);
+    return this.bookingsApi.getBooking(bookingId);
   }
 
   async getMyBookings(): Promise<{ bookings: Booking[]; total: number }> {
-    return this.request('/api/my_routes');
+    return this.bookingsApi.getMyBookings();
   }
 
   async getAllBookings(params?: {
     status?: string;
     email?: string;
   }): Promise<{ bookings: Booking[]; total: number }> {
-    const queryParams = new URLSearchParams();
-    if (params?.status) queryParams.append('status', params.status);
-    if (params?.email) queryParams.append('email', params.email);
-    const query = queryParams.toString();
-    return this.request(`/api/v1/bookings${query ? `?${query}` : ''}`);
+    return this.bookingsApi.getAllBookings(params);
   }
 
   async cancelBooking(
     bookingId: string,
     reason: string
   ): Promise<Booking> {
-    return this.request(`/api/v1/bookings/${bookingId}/cancel`, {
-      method: 'POST',
-      body: JSON.stringify({ reason }),
-    });
+    return this.bookingsApi.cancelBooking(bookingId, reason);
   }
 }
 
