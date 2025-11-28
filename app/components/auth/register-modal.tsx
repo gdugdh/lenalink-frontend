@@ -121,53 +121,69 @@ export function RegisterModal({ open, onOpenChange, onSwitchToLogin }: RegisterM
     }
 
     try {
-      await register(email, password, name.trim(), role);
-      
-      // Wait a moment for session state to update, then get role from API
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      
-      // Get session from API to get the correct role
-      const sessionResponse = await fetch('/api/auth/session', {
-        credentials: 'include',
-      });
-      
-      if (sessionResponse.ok) {
-        const sessionData = await sessionResponse.json();
-        
-        toast({
-          title: 'Регистрация успешна',
-          description: 'Вы успешно зарегистрированы и вошли в систему',
-        });
+      const session = await register(email, password, name.trim(), role);
 
-        // Close modal
-        onOpenChange(false);
-        
-        // Reset form
-        setStep('role');
-        setRole('user');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setName('');
-        setShowPassword(false);
-        setShowConfirmPassword(false);
-        
-        // Get redirect parameter or default to dashboard
-        const redirectTo = searchParams.get('redirect') || `/dashboard/${sessionData.user.role}`;
-        router.push(redirectTo);
-        router.refresh(); // Refresh to update header
-      } else {
-        toast({
-          title: 'Ошибка получения сессии',
-          description: 'Не удалось получить информацию о сессии. Пожалуйста, попробуйте зарегистрироваться снова.',
-          variant: 'destructive',
-        });
-        onOpenChange(false);
-      }
+      toast({
+        title: 'Регистрация успешна',
+        description: 'Вы успешно зарегистрированы и вошли в систему',
+      });
+
+      // Close modal
+      onOpenChange(false);
+
+      // Reset form
+      setStep('role');
+      setRole('user');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setName('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+
+      // Get redirect parameter or default to dashboard
+      const redirectTo = searchParams.get('redirect') || `/dashboard/${session.user.role}`;
+      router.push(redirectTo);
+      router.refresh(); // Refresh to update header
     } catch (error) {
+      // Log error for debugging
+      console.error('Registration error:', error);
+
+      // Обработка ошибок
+      let errorMessage = 'Произошла ошибка при регистрации. Попробуйте снова.';
+
+      if (error instanceof Error) {
+        const errorText = error.message.toLowerCase();
+
+        // Log original error message
+        console.error('Error message:', error.message);
+
+        if (errorText.includes('user already exists') || errorText.includes('пользователь') || errorText.includes('существует')) {
+          errorMessage = 'Пользователь с таким email уже существует';
+        } else if (errorText.includes('network') || errorText.includes('fetch') || errorText.includes('failed to fetch')) {
+          errorMessage = 'Ошибка сети. Проверьте подключение к интернету';
+        } else if (errorText.includes('timeout')) {
+          errorMessage = 'Превышено время ожидания. Попробуйте позже';
+        } else if (errorText.includes('400') || errorText.includes('bad request')) {
+          errorMessage = 'Неверные данные. Проверьте правильность введенной информации';
+        } else if (errorText.includes('500') || errorText.includes('server')) {
+          errorMessage = 'Ошибка сервера. Попробуйте позже';
+        } else if (error.message && error.message.trim().length > 0) {
+          // Используем оригинальное сообщение, если оно не пустое
+          errorMessage = error.message;
+        }
+      } else if (typeof error === 'string' && error.trim().length > 0) {
+        errorMessage = error;
+      }
+
+      // Ensure error message is not empty
+      if (!errorMessage || errorMessage.trim().length === 0) {
+        errorMessage = 'Произошла неизвестная ошибка. Пожалуйста, попробуйте позже.';
+      }
+
       toast({
         title: 'Ошибка регистрации',
-        description: error instanceof Error ? error.message : 'Произошла ошибка при регистрации',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

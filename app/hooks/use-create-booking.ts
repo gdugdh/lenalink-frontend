@@ -65,9 +65,13 @@ export function useCreateBooking(selectedPayment: string, paymentMethodMap: Reco
       const bookingRequest = {
         route_id: bookingState.selectedRoute.id,
         passenger,
-        include_insurance: bookingState.tariff !== 'tariff1', // Include insurance if not base tariff
+        tariff: bookingState.tariff,
+        seat_selections: bookingState.seatSelections,
+        include_insurance: bookingState.includeInsurance,
         payment_method: paymentMethodMap[selectedPayment] || 'card',
       };
+
+      console.log('Creating booking with request:', bookingRequest);
 
       const booking = await backendApi.createBooking(bookingRequest);
       

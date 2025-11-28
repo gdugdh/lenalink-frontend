@@ -62,13 +62,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(session);
     const token = backendApi.getToken();
     setToken(token);
+    return session;
   }, []);
 
   const register = useCallback(async (email: string, password: string, name: string, role: UserRole) => {
     const session = await registerUser(email, password, name, role);
-        setSession(session);
+    setSession(session);
     const token = backendApi.getToken();
     setToken(token);
+    return session;
   }, []);
 
   const logout = useCallback(async () => {

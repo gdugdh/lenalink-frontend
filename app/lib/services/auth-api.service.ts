@@ -11,30 +11,38 @@ export class AuthApiService extends BaseApiService {
     email: string;
     password: string;
   }): Promise<BackendAuthResponse> {
-    const response = await this.request<BackendAuthResponse>('/api/register', {
+    const response = await this.request<{ data: BackendAuthResponse; success: boolean }>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+
+    // Извлекаем данные из обертки
+    const authData = response.data;
+
     // Сохраняем токен
-    if (response.token) {
-      this.setToken(response.token);
+    if (authData.token) {
+      this.setToken(authData.token);
     }
-    return response;
+    return authData;
   }
 
   async login(data: {
     email: string;
     password: string;
   }): Promise<BackendAuthResponse> {
-    const response = await this.request<BackendAuthResponse>('/api/login', {
+    const response = await this.request<{ data: BackendAuthResponse; success: boolean }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+
+    // Извлекаем данные из обертки
+    const authData = response.data;
+
     // Сохраняем токен
-    if (response.token) {
-      this.setToken(response.token);
+    if (authData.token) {
+      this.setToken(authData.token);
     }
-    return response;
+    return authData;
   }
 }
 

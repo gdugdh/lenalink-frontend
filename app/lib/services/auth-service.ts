@@ -9,6 +9,26 @@ import type { Session } from '../types/auth.types';
 
 // Transform BackendUser to our Session format
 export function backendUserToSession(backendUser: BackendUser, token: string): Session {
+  // Log for debugging
+  console.log('backendUserToSession called with:', { backendUser, token });
+
+  // Validate inputs
+  if (!backendUser) {
+    console.error('backendUser is undefined or null');
+    throw new Error('Не удалось получить данные пользователя от сервера');
+  }
+
+  if (!token) {
+    console.error('token is undefined or null');
+    throw new Error('Не удалось получить токен от сервера');
+  }
+
+  // Save token to localStorage and backendApi
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('backend_token', token);
+    backendApi.setToken(token);
+  }
+
   // Default role is 'user' since backend doesn't return role
   // In the future, we can add role field to backend or get it from token
   return {
@@ -17,6 +37,7 @@ export function backendUserToSession(backendUser: BackendUser, token: string): S
       email: backendUser.email,
       role: 'user' as UserRole, // Default user
       name: backendUser.name,
+      balance: 0,
     },
     expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
   };
@@ -90,97 +111,25 @@ export async function refreshUserSession(token: string): Promise<Session | null>
 }
 
 export async function loginUser(email: string, password: string): Promise<Session> {
-  // Check if we need to use mock API
-  const useMockAuth = process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true';
-  
-  if (useMockAuth) {
-    // Use mock API route for testing
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-      credentials: 'include',
-    });
+  console.log('loginUser called with:', { email });
+  const response = await backendApi.login({ email, password });
+  console.log('backendApi.login response:', response);
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Login error');
-    }
-
-    const data = await response.json();
-    
-    // Transform mock user to Session format
-    const session: Session = {
-      user: {
-        id: data.session.user.id,
-        email: data.session.user.email,
-        role: data.session.user.role,
-        name: data.session.user.name,
-        balance: data.session.user.balance,
-        companyId: data.session.user.companyId,
-        companyName: data.session.user.companyName,
-        companyBalance: data.session.user.companyBalance,
-      },
-      expiresAt: data.session.expiresAt,
-    };
-    
-    // For mock users, save special token
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('backend_token', 'mock-token');
-    }
-    
-    return session;
-  } else {
-    // Use real API with fallback to mock
-    try {
-      const response = await backendApi.login({ email, password });
-      return backendUserToSession(response.user, response.token);
-    } catch (error) {
-      // If real API doesn't work, try mock as fallback
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Real API failed, trying mock auth:', error);
-      }
-      try {
-        const mockResponse = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-          credentials: 'include',
-        });
-
-        if (!mockResponse.ok) {
-          const error = await mockResponse.json();
-          throw new Error(error.message || 'Login error');
-        }
-
-        const data = await mockResponse.json();
-        
-        const session: Session = {
-          user: {
-            id: data.session.user.id,
-            email: data.session.user.email,
-            role: data.session.user.role,
-            name: data.session.user.name,
-            balance: data.session.user.balance,
-          },
-          expiresAt: data.session.expiresAt,
-        };
-        
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('backend_token', 'mock-token');
-        }
-        
-        return session;
-      } catch (mockError) {
-        // If mock also doesn't work, rethrow original error
-        throw error;
-      }
-    }
+  if (!response) {
+    throw new Error('Сервер не вернул ответ');
   }
+
+  if (!response.user) {
+    console.error('Response does not contain user:', response);
+    throw new Error('Сервер не вернул данные пользователя');
+  }
+
+  if (!response.token) {
+    console.error('Response does not contain token:', response);
+    throw new Error('Сервер не вернул токен авторизации');
+  }
+
+  return backendUserToSession(response.user, response.token);
 }
 
 export async function registerUser(
@@ -189,95 +138,25 @@ export async function registerUser(
   name: string,
   role: UserRole
 ): Promise<Session> {
-  // Check if we need to use mock API
-  const useMockAuth = process.env.NEXT_PUBLIC_USE_MOCK_AUTH === 'true';
-  
-  if (useMockAuth) {
-    // Use mock API route for testing
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, name, role }),
-      credentials: 'include',
-    });
+  console.log('registerUser called with:', { email, name, role });
+  // Backend doesn't accept role during registration, only name, email, password
+  const response = await backendApi.register({ name, email, password });
+  console.log('backendApi.register response:', response);
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Registration error');
-    }
-
-    const data = await response.json();
-    
-    const session: Session = {
-      user: {
-        id: data.session.user.id,
-        email: data.session.user.email,
-        role: data.session.user.role,
-        name: data.session.user.name,
-        balance: data.session.user.balance,
-        companyId: data.session.user.companyId,
-        companyName: data.session.user.companyName,
-        companyBalance: data.session.user.companyBalance,
-      },
-      expiresAt: data.session.expiresAt,
-    };
-    
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('backend_token', 'mock-token');
-    }
-    
-    return session;
-  } else {
-    // Use real API with fallback to mock
-    try {
-      // Backend doesn't accept role during registration, only name, email, password
-      const response = await backendApi.register({ name, email, password });
-      return backendUserToSession(response.user, response.token);
-    } catch (error) {
-      // If real API doesn't work, try mock as fallback
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Real API failed, trying mock auth:', error);
-      }
-      try {
-        const mockResponse = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password, name, role }),
-          credentials: 'include',
-        });
-
-        if (!mockResponse.ok) {
-          const error = await mockResponse.json();
-          throw new Error(error.message || 'Registration error');
-        }
-
-        const data = await mockResponse.json();
-        
-        const session: Session = {
-          user: {
-            id: data.session.user.id,
-            email: data.session.user.email,
-            role: data.session.user.role,
-            name: data.session.user.name,
-            balance: data.session.user.balance,
-          },
-          expiresAt: data.session.expiresAt,
-        };
-        
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('backend_token', 'mock-token');
-        }
-        
-        return session;
-      } catch (mockError) {
-        // If mock also doesn't work, rethrow original error
-        throw error;
-      }
-    }
+  if (!response) {
+    throw new Error('Сервер не вернул ответ');
   }
+
+  if (!response.user) {
+    console.error('Response does not contain user:', response);
+    throw new Error('Сервер не вернул данные пользователя');
+  }
+
+  if (!response.token) {
+    console.error('Response does not contain token:', response);
+    throw new Error('Сервер не вернул токен авторизации');
+  }
+
+  return backendUserToSession(response.user, response.token);
 }
 

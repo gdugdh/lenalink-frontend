@@ -15,7 +15,8 @@ export function ConfirmationPageClient() {
   const priceBreakdown = calculatePrice(
     bookingState.passengerType,
     bookingState.tariff,
-    bookingState.seatType,
+    bookingState.seatSelections || [],
+    bookingState.includeInsurance || false,
     basePriceFromRoute
   );
 
